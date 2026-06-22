@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Priya — Cymbal Wealth Management Video Call</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; background: #04060f; font-family: 'Inter', system-ui, sans-serif; color: #e2e8f0; overflow: hidden; }
+
+.call-wrap {
+  display: flex; height: 100vh;
+}
+
+/* ── Avatar panel ── */
+.avatar-panel {
+  flex: 1; position: relative; background: #04060f;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+
+#avatarVideo {
+  width: 100%; height: 100%; object-fit: cover;
+  border-radius: 0;
+}
+
+/* Fallback when video hasn't started yet */
+.avatar-placeholder {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 16px;
+  background: radial-gradient(ellipse at 50% 40%, #0d1b3a 0%, #04060f 70%);
+}
+.avatar-initial {
+  width: 120px; height: 120px; border-radius: 50%;
+  background: linear-gradient(135deg, #1a56db, #6366f1);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 48px; font-weight: 800; color: white;
+  box-shadow: 0 0 60px rgba(99,102,241,0.3);
+}
+.avatar-placeholder-name { font-size: 22px; font-weight: 600; color: white; }
+.avatar-placeholder-sub  { font-size: 13px; color: #64748b; }
+
+/* Connecting spinner */
+.connecting-ring {
+  width: 140px; height: 140px; border-radius: 50%;
+  border: 3px solid rgba(99,102,241,0.15);
+  border-top-color: #6366f1;
+  animation: spin 1.1s linear infinite;
+  position: absolute;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Name tag overlay */
+.name-tag {
+  position: absolute; bottom: 90px; left: 24px;
+  background: rgba(0,0,0,0.55); backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px; padding: 8px 14px;
+  display: flex; align-items: center; gap: 10px;
+}
+.name-tag-dot {
+  width: 8px; height: 8px; border-radius: 50%; background: #10b981;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(1.5)} }
+.name-tag-text { font-size: 13px; font-weight: 600; color: white; }
+.name-tag-sub  { font-size: 11px; color: #94a3b8; margin-top: 1px; }
+
+/* Status pill */
+.status-pill {
+  position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+  background: rgba(0,0,0,0.6); backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.1); border-radius: 20px;
+  padding: 6px 16px; font-size: 12px; font-weight: 500; color: #94a3b8;
+  display: flex; align-items: center; gap: 8px;
+  transition: all .3s;
+}
+.status-pill.live { border-color: rgba(16,185,129,0.3); color: #34d399; }
+.status-pill.ended { border-color: rgba(239,68,68,0.3); color: #fca5a5; }
+
+/* ── Controls bar ── */
+.controls {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 72px;
+  display: flex; align-items: center; justify-content: center; gap: 16px;
+  background: linear-gradient(to top, rgba(4,6,15,0.95) 0%, transparent 100%);
+  padding-bottom: 8px;
+}
+.ctrl-btn {
+  width: 50px; height: 50px; border-radius: 50%; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; transition: all .18s; flex-shrink: 0;
+}
+.ctrl-btn:hover { transform: scale(1.08); }
+.btn-mic {
+  background: rgba(255,255,255,0.12); color: white;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+.btn-mic.muted { background: rgba(239,68,68,0.18); color: #fca5a5; border-color: rgba(239,68,68,.4); }
+.btn-end {
+  background: #ef4444; color: white; width: 56px; height: 56px;
+  box-shadow: 0 4px 20px rgba(239,68,68,0.4);
+}
+.btn-end:hover { background: #dc2626; }
+
+/* ── Transcript panel ── */
+.transcript-panel {
+  width: 320px; min-width: 320px;
+  background: #080c1a; border-left: 1px solid rgba(255,255,255,0.06);
+  display: flex; flex-direction: column;
+}
+.tx-header {
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.tx-title { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #475569; }
+.tx-investor { font-size: 13px; font-weight: 600; color: white; margin-top: 2px; }
+.tx-fund { font-size: 11px; color: #475569; margin-top: 2px; }
+
+.tx-body { flex: 1; overflow-y: auto; padding: 14px 14px; display: flex; flex-direction: column; gap: 10px; }
+.tx-body::-webkit-scrollbar { width: 3px; }
+.tx-body::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.25); border-radius: 3px; }
+
+.bubble { max-width: 88%; padding: 9px 12px; border-radius: 12px; font-size: 12px; line-height: 1.55; }
+.bubble-lbl { font-size: 10px; font-weight: 600; opacity: .55; margin-bottom: 4px; letter-spacing: .04em; }
+.bubble-priya {
+  align-self: flex-start;
+  background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,.2);
+  border-radius: 3px 12px 12px 12px; color: #c7d2fe;
+}
+.bubble-investor {
+  align-self: flex-end;
+  background: rgba(20,32,65,0.8); border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px 3px 12px 12px; color: #e2e8f0;
+}
+.tx-empty {
+  text-align: center; color: #334155; font-size: 12px;
+  padding: 32px 16px; line-height: 1.7;
+}
+
+.tx-footer {
+  padding: 12px 14px; border-top: 1px solid rgba(255,255,255,0.06);
+  font-size: 10px; color: #334155; text-align: center;
+}
+
+/* MJPEG canvas */
+#avatarCanvas {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; display: none;
+}
+</style>
+</head>
+<body>
+<div class="call-wrap">
+
+  <!-- ── Avatar panel ── -->
+  <div class="avatar-panel" id="avatarPanel">
+
+    <!-- Video element (for H.264 / MSE stream) -->
+    <video id="avatarVideo" autoplay playsinline muted style="display:none"></video>
+
+    <!-- Canvas element (for JPEG frame-by-frame rendering) -->
+    <canvas id="avatarCanvas"></canvas>
+
+    <!-- Placeholder shown while connecting -->
+    <div class="avatar-placeholder" id="placeholder">
+      <div style="position:relative;width:120px;height:120px;display:flex;align-items:center;justify-content:center">
+        <div class="connecting-ring" id="connectRing"></div>
+        <div class="avatar-initial">P</div>
+      </div>
+      <div class="avatar-placeholder-name">Priya</div>
+      <div class="avatar-placeholder-sub" id="statusText">Connecting…</div>
+    </div>
+
+    <!-- Status pill -->
+    <div class="status-pill" id="statusPill">
+      <span id="pillDot">⏳</span>
+      <span id="pillText">Connecting to Priya</span>
+    </div>
+
+    <!-- Name tag (shown once live) -->
+    <div class="name-tag" id="nameTag" style="display:none">
+      <div>
+        <div class="name-tag-dot"></div>
+      </div>
+      <div>
+        <div class="name-tag-text">Priya · Cymbal Wealth Management</div>
+        <div class="name-tag-sub" id="callTimer">00:00</div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <button class="ctrl-btn btn-mic" id="micBtn" onclick="toggleMic()" title="Mute/Unmute">🎙️</button>
+      <button class="ctrl-btn btn-end" onclick="endCall()" title="End Call">📵</button>
+    </div>
+
+  </div>
+
+  <!-- ── Transcript panel ── -->
+  <div class="transcript-panel">
+    <div class="tx-header">
+      <div>
+        <div class="tx-title">Live Transcript</div>
+        <div class="tx-investor" id="txInvestor">—</div>
+        <div class="tx-fund" id="txFund">—</div>
+      </div>
+    </div>
+    <div class="tx-body" id="txBody">
+      <div class="tx-empty">Transcript will appear here as the conversation progresses.</div>
+    </div>
+    <div class="tx-footer">Cymbal Wealth Management · AI-assisted advisory call</div>
+  </div>
+
+</div>
+
+<script>
+// ── Config from URL params ─────────────────────────────────────────────────
+const params   = new URLSearchParams(location.search);
+const CALL_ID  = params.get("call_id") || "";
+const BROKER   = params.get("broker")  || location.origin.replace(/^http/, "ws");
+const INVESTOR = params.get("investor") || "Investor";
+const FUND     = params.get("fund")     || "";
+
+document.getElementById("txInvestor").textContent = INVESTOR;
+document.getElementById("txFund").textContent = FUND;
+
+// ── State ──────────────────────────────────────────────────────────────────
+let ws = null;
+let micStream = null;
+let audioProcessor = null;
+let audioCtx = null;
+let muted = false;
+let callStartMs = null;
+let timerInterval = null;
+let transcriptEmpty = true;
+
+// ── Boot ───────────────────────────────────────────────────────────────────
+(async () => {
+  await startMic();
+  connectWs();
+})();
+
+// ── Microphone ─────────────────────────────────────────────────────────────
+async function startMic() {
+  try {
+    micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+    audioCtx = new AudioContext({ sampleRate: 16000 });
+    const source = audioCtx.createMediaStreamSource(micStream);
+    await audioCtx.audioWorklet.addModule(URL.createObjectURL(new Blob([`
+      class PCMProcessor extends AudioWorkletProcessor {
+        process(inputs) {
+          const ch = inputs[0][0];
+          if (!ch) return true;
+          const pcm = new Int16Array(ch.length);
+          for (let i = 0; i < ch.length; i++)
+            pcm[i] = Math.max(-32768, Math.min(32767, ch[i] * 32768));
+          this.port.postMessage(pcm.buffer, [pcm.buffer]);
+          return true;
+        }
+      }
+      registerProcessor('pcm-proc', PCMProcessor);
+    `], { type: 'application/javascript' })));
+    audioProcessor = new AudioWorkletNode(audioCtx, 'pcm-proc');
+    audioProcessor.port.onmessage = (e) => {
+      if (ws && ws.readyState === WebSocket.OPEN && !muted) {
+        ws.send(e.data);
+      }
+    };
+    source.connect(audioProcessor);
+  } catch (err) {
+    setStatus(`Mic error: ${err.message}`, false);
+  }
+}
+
+function toggleMic() {
+  muted = !muted;
+  const btn = document.getElementById("micBtn");
+  btn.textContent = muted ? "🔇" : "🎙️";
+  btn.classList.toggle("muted", muted);
+}
+
+// ── WebSocket to broker ────────────────────────────────────────────────────
+function connectWs() {
+  const brokerWs = BROKER.startsWith("http")
+    ? BROKER.replace(/^http/, "ws")
+    : BROKER;
+  const url = `${brokerWs}/video/${CALL_ID}`;
+  setStatus("Connecting to Priya…", false);
+
+  ws = new WebSocket(url);
+  ws.binaryType = "arraybuffer";
+
+  ws.onopen = () => {
+    setStatus("Connected — waiting for Priya…", false);
+  };
+
+  ws.onmessage = (evt) => {
+    if (typeof evt.data === "string") {
+      handleJsonMsg(JSON.parse(evt.data));
+    } else {
+      handleVideoChunk(evt.data);
+    }
+  };
+
+  ws.onclose = () => {
+    setStatus("Call ended", true);
+    document.getElementById("statusPill").className = "status-pill ended";
+    stopTimer();
+  };
+
+  ws.onerror = (e) => {
+    setStatus("Connection error", true);
+  };
+}
+
+// ── Video rendering ────────────────────────────────────────────────────────
+const canvas  = document.getElementById("avatarCanvas");
+const ctx2d   = canvas.getContext("2d");
+let   gotVideo = false;
+
+function handleVideoChunk(buffer) {
+  const bytes = new Uint8Array(buffer);
+
+  // JPEG magic bytes: 0xFF 0xD8
+  if (bytes[0] === 0xFF && bytes[1] === 0xD8) {
+    renderJpegFrame(buffer);
+    return;
+  }
+
+  // Try as generic video via <video> + MSE (H.264 / VP8)
+  renderVideoChunk(buffer);
+}
+
+// MJPEG path — each chunk is a complete JPEG frame
+function renderJpegFrame(buffer) {
+  showCanvas();
+  const blob = new Blob([buffer], { type: "image/jpeg" });
+  const url  = URL.createObjectURL(blob);
+  const img  = new Image();
+  img.onload = () => {
+    canvas.width  = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    ctx2d.drawImage(img, 0, 0);
+    URL.revokeObjectURL(url);
+    onFirstVideo();
+  };
+  img.src = url;
+}
+
+// MSE path — H.264 / VP8 segments
+let mediaSource = null;
+let sourceBuffer = null;
+const mseQueue = [];
+let mseReady = false;
+
+function renderVideoChunk(buffer) {
+  if (!mediaSource) {
+    const video = document.getElementById("avatarVideo");
+    video.style.display = "block";
+    canvas.style.display = "none";
+    mediaSource = new MediaSource();
+    video.src = URL.createObjectURL(mediaSource);
+    mediaSource.addEventListener("sourceopen", () => {
+      // Try common codec strings; adjust if needed for Gemini's output
+      const codecs = [
+        'video/mp4; codecs="avc1.42E01E"',
+        'video/webm; codecs="vp8"',
+        'video/webm; codecs="vp09.00.10.08"',
+      ];
+      const mime = codecs.find(c => MediaSource.isTypeSupported(c)) || codecs[0];
+      try {
+        sourceBuffer = mediaSource.addSourceBuffer(mime);
+        sourceBuffer.mode = "sequence";
+        sourceBuffer.addEventListener("updateend", flushMseQueue);
+        mseReady = true;
+        flushMseQueue();
+      } catch (e) {
+        console.warn("MSE codec error:", e);
+      }
+    });
+    onFirstVideo();
+  }
+  mseQueue.push(buffer);
+  flushMseQueue();
+}
+
+function flushMseQueue() {
+  if (!mseReady || !sourceBuffer || sourceBuffer.updating || !mseQueue.length) return;
+  sourceBuffer.appendBuffer(mseQueue.shift());
+}
+
+function showCanvas() {
+  canvas.style.display = "block";
+  document.getElementById("avatarVideo").style.display = "none";
+}
+
+function onFirstVideo() {
+  if (gotVideo) return;
+  gotVideo = true;
+  document.getElementById("placeholder").style.display = "none";
+  document.getElementById("nameTag").style.display = "flex";
+  document.getElementById("statusPill").className = "status-pill live";
+  document.getElementById("pillDot").textContent = "🟢";
+  document.getElementById("pillText").textContent = "Live";
+  startTimer();
+}
+
+// ── JSON control messages ──────────────────────────────────────────────────
+function handleJsonMsg(msg) {
+  if (msg.type === "transcript") {
+    addBubble(msg.speaker, msg.text);
+  } else if (msg.type === "interrupted") {
+    // Gemini stopped speaking — optional: dim video briefly
+  } else if (msg.type === "error") {
+    setStatus(`Error: ${msg.message}`, true);
+  }
+}
+
+function addBubble(speaker, text) {
+  const body = document.getElementById("txBody");
+  if (transcriptEmpty) {
+    body.innerHTML = "";
+    transcriptEmpty = false;
+  }
+  const isPriya = speaker === "priya";
+  const div = document.createElement("div");
+  div.className = `bubble ${isPriya ? "bubble-priya" : "bubble-investor"}`;
+  div.innerHTML = `<div class="bubble-lbl">${isPriya ? "🤖 Priya" : "👤 " + INVESTOR.split(" ")[0]}</div>${text}`;
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+}
+
+// ── Timer ──────────────────────────────────────────────────────────────────
+function startTimer() {
+  callStartMs = Date.now();
+  timerInterval = setInterval(() => {
+    const s = Math.floor((Date.now() - callStartMs) / 1000);
+    const m = Math.floor(s / 60);
+    document.getElementById("callTimer").textContent =
+      String(m).padStart(2,"0") + ":" + String(s % 60).padStart(2,"0");
+  }, 1000);
+}
+function stopTimer() { clearInterval(timerInterval); }
+
+// ── End call ──────────────────────────────────────────────────────────────
+function endCall() {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ type: "end_call" }));
+    ws.close();
+  }
+  if (micStream) micStream.getTracks().forEach(t => t.stop());
+  if (audioCtx)  audioCtx.close();
+  stopTimer();
+  document.getElementById("statusPill").className = "status-pill ended";
+  document.getElementById("pillDot").textContent = "🔴";
+  document.getElementById("pillText").textContent = "Call ended";
+  // Auto-close tab after 3s
+  setTimeout(() => window.close(), 3000);
+}
+
+// ── Status helper ─────────────────────────────────────────────────────────
+function setStatus(text, isError) {
+  document.getElementById("statusText").textContent = text;
+  document.getElementById("pillText").textContent = text;
+  if (isError) document.getElementById("connectRing").style.display = "none";
+}
+</script>
+</body>
+</html>

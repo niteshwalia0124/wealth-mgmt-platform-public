@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cymbal Wealth — AI Relationship Manager</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #070b18;
+  --bg2:      #0c1225;
+  --bg3:      #101830;
+  --surface:  rgba(15,24,52,0.8);
+  --s2:       rgba(20,34,70,0.6);
+  --border:   rgba(99,130,241,0.13);
+  --b2:       rgba(255,255,255,0.05);
+  --b3:       rgba(255,255,255,0.03);
+  --accent:   #5b6ef5;
+  --accent2:  #818cf8;
+  --gold:     #f59e0b;
+  --gold2:    #fcd34d;
+  --ok:       #10b981;
+  --ok2:      #34d399;
+  --warn:     #f59e0b;
+  --danger:   #ef4444;
+  --info:     #3b82f6;
+  --text:     #e2e8f0;
+  --text2:    #cbd5e1;
+  --muted:    #64748b;
+  --muted2:   #94a3b8;
+  --r:        14px;
+  --rs:       9px;
+  --shadow:   0 4px 24px rgba(0,0,0,.45);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.5;
+  overflow: hidden;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(99,130,241,0.25); border-radius: 99px; }
+
+/* ═══ TOP NAVIGATION ═══ */
+.topnav {
+  height: 60px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center;
+  padding: 0 28px; gap: 0;
+  flex-shrink: 0; position: relative; z-index: 10;
+}
+
+.nav-brand {
+  display: flex; align-items: center; gap: 12px;
+  margin-right: 36px; flex-shrink: 0;
+}
+.nav-logo {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: linear-gradient(135deg, #1a56db 0%, var(--accent) 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px; font-weight: 800; color: #fff;
+  box-shadow: 0 4px 12px rgba(91,110,245,.35);
+}
+.nav-name  { font-size: 16px; font-weight: 700; color: #fff; letter-spacing: -.01em; }
+.nav-sub   { font-size: 10px; color: var(--muted); margin-top: 1px; letter-spacing: .03em; }
+
+.nav-dist-wrap {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 10px; padding: 7px 14px;
+  cursor: pointer; transition: border-color .15s;
+  position: relative; min-width: 260px;
+}
+.nav-dist-wrap:focus-within { border-color: var(--accent); }
+.nav-dist-icon { font-size: 14px; flex-shrink: 0; }
+.nav-dist-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.nav-dist-sel {
+  width: 100%; appearance: none; background: transparent;
+  border: none; color: var(--text); font-family: 'Inter',sans-serif;
+  font-size: 13px; font-weight: 600; cursor: pointer; outline: none;
+}
+.nav-dist-sel option { background: #0c1225; }
+.nav-dist-arrow {
+  position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+  color: var(--muted); pointer-events: none; font-size: 12px;
+}
+
+.nav-spacer { flex: 1; }
+
+.nav-live {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 11px; font-weight: 600; color: var(--ok2);
+  background: rgba(16,185,129,.08); border: 1px solid rgba(16,185,129,.18);
+  border-radius: 20px; padding: 5px 12px; margin-right: 16px;
+}
+.pulse-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--ok); animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(1.5)} }
+
+.nav-clock {
+  font-size: 12px; font-weight: 600; color: var(--muted2);
+  font-variant-numeric: tabular-nums; margin-right: 20px;
+  letter-spacing: .01em;
+}
+
+.nav-avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: linear-gradient(135deg, #7c3aed, var(--accent));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0;
+}
+
+/* ═══ APP BODY ═══ */
+.app-body { display: flex; height: calc(100vh - 60px); overflow: hidden; }
+
+/* ═══ LEFT SIDEBAR ═══ */
+.sidebar {
+  width: 72px; flex-shrink: 0;
+  background: var(--bg2); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; align-items: center;
+  padding: 20px 0; gap: 6px; overflow: hidden;
+}
+.nav-icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; cursor: pointer; transition: all .15s;
+  color: var(--muted); position: relative;
+}
+.nav-icon:hover  { background: var(--b2); color: var(--text2); }
+.nav-icon.active { background: rgba(91,110,245,.15); color: var(--accent2); }
+.nav-icon .nav-tip {
+  position: absolute; left: 58px; top: 50%; transform: translateY(-50%);
+  background: var(--bg3); border: 1px solid var(--border);
+  color: var(--text); font-size: 11px; font-weight: 500;
+  padding: 5px 10px; border-radius: 7px; white-space: nowrap;
+  pointer-events: none; opacity: 0; transition: opacity .15s; z-index: 100;
+}
+.nav-icon:hover .nav-tip { opacity: 1; }
+.sidebar-spacer { flex: 1; }
+
+/* ═══ MAIN CONTENT ═══ */
+.main {
+  flex: 1; display: flex; flex-direction: column; overflow: hidden;
+  min-width: 0;
+}
+
+/* ── Countdown strip ── */
+.refresh-strip {
+  height: 3px; background: var(--b2); flex-shrink: 0;
+}
+.refresh-bar {
+  height: 100%; background: linear-gradient(90deg, var(--accent), #8b5cf6);
+  border-radius: 0 3px 3px 0; transition: width .95s linear;
+}
+
+/* ── Scrollable content area ── */
+.content {
+  flex: 1; overflow-y: auto; padding: 24px 28px;
+  display: flex; flex-direction: column; gap: 20px;
+}
+
+/* ═══ KPI ROW ═══ */
+.kpi-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; flex-shrink: 0; }
+
+.kpi-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 18px 20px;
+  display: flex; flex-direction: column; gap: 10px;
+  position: relative; overflow: hidden; transition: border-color .2s;
+}
+.kpi-card:hover { border-color: rgba(99,130,241,.28); }
+.kpi-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+}
+.kpi-card.c-calls::before  { background: linear-gradient(90deg,#5b6ef5,#8b5cf6); }
+.kpi-card.c-aum::before    { background: linear-gradient(90deg,#f59e0b,#f97316); }
+.kpi-card.c-renew::before  { background: linear-gradient(90deg,#10b981,#059669); }
+.kpi-card.c-invest::before { background: linear-gradient(90deg,#3b82f6,#6366f1); }
+
+.kpi-top { display: flex; align-items: flex-start; justify-content: space-between; }
+.kpi-icon-wrap {
+  width: 38px; height: 38px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center; font-size: 17px;
+}
+.c-calls  .kpi-icon-wrap { background: rgba(91,110,245,.12); }
+.c-aum    .kpi-icon-wrap { background: rgba(245,158,11,.1); }
+.c-renew  .kpi-icon-wrap { background: rgba(16,185,129,.1); }
+.c-invest .kpi-icon-wrap { background: rgba(59,130,246,.1); }
+
+.kpi-trend {
+  font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 20px;
+}
+.kpi-trend.up   { background: rgba(16,185,129,.1); color: var(--ok2); }
+.kpi-trend.flat { background: rgba(100,116,139,.1); color: var(--muted2); }
+
+.kpi-val  { font-size: 26px; font-weight: 800; color: #fff; line-height: 1; letter-spacing: -.02em; }
+.kpi-lbl  { font-size: 12px; font-weight: 500; color: var(--muted2); }
+.kpi-sub  { font-size: 10px; color: var(--muted); }
+
+/* ═══ SECTION PANELS ═══ */
+.panel {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--r); overflow: hidden;
+}
+.panel-header {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--b2);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.panel-title {
+  display: flex; align-items: center; gap: 9px;
+  font-size: 14px; font-weight: 700; color: #fff;
+}
+.panel-title-sub { font-size: 11px; font-weight: 400; color: var(--muted); margin-left: 2px; }
+.panel-actions { display: flex; align-items: center; gap: 10px; }
+.panel-badge {
+  font-size: 10px; font-weight: 700; padding: 3px 10px;
+  border-radius: 20px; background: var(--s2); color: var(--muted2);
+  border: 1px solid var(--b2); letter-spacing: .02em;
+}
+
+/* ── Countdown ── */
+.cd-wrap { display: flex; align-items: center; gap: 8px; }
+.cd-text { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.cd-bar-bg { width: 60px; height: 3px; background: var(--b2); border-radius: 3px; overflow: hidden; }
+.cd-bar    { height: 100%; background: var(--accent); border-radius: 3px; transition: width .95s linear; }
+
+/* ── Filter chips ── */
+.fchips { display: flex; gap: 4px; }
+.fchip {
+  font-size: 10px; font-weight: 600; padding: 4px 10px; border-radius: 20px;
+  border: 1px solid var(--b2); background: transparent; color: var(--muted);
+  font-family: 'Inter',sans-serif; cursor: pointer; transition: all .15s;
+}
+.fchip:hover { border-color: var(--accent); color: var(--text2); }
+.fchip.active { background: rgba(91,110,245,.14); border-color: var(--accent); color: var(--accent2); }
+
+/* ═══ PORTFOLIO TABLE ═══ */
+.port-wrap  { overflow-x: auto; }
+.port-table { width: 100%; border-collapse: collapse; min-width: 700px; }
+.port-table th {
+  text-align: left; padding: 10px 16px;
+  font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--muted); border-bottom: 1px solid var(--b2);
+  white-space: nowrap; background: rgba(255,255,255,.015);
+}
+.port-table td {
+  padding: 13px 16px; border-bottom: 1px solid var(--b3); vertical-align: middle;
+}
+.port-table tr:last-child td { border-bottom: none; }
+.port-table tbody tr { transition: background .1s; }
+.port-table tbody tr:hover td { background: rgba(255,255,255,.018); }
+
+.inv-cell  { display: flex; align-items: center; gap: 12px; }
+.inv-avatar {
+  width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--accent), #7c3aed);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: #fff;
+}
+.inv-avatar.av-1 { background: linear-gradient(135deg,#5b6ef5,#7c3aed); }
+.inv-avatar.av-2 { background: linear-gradient(135deg,#0ea5e9,#5b6ef5); }
+.inv-avatar.av-3 { background: linear-gradient(135deg,#f59e0b,#ef4444); }
+.inv-avatar.av-4 { background: linear-gradient(135deg,#10b981,#0ea5e9); }
+.inv-avatar.av-5 { background: linear-gradient(135deg,#8b5cf6,#ec4899); }
+
+.inv-name { font-size: 13px; font-weight: 600; color: #fff; }
+.inv-meta { display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+.inv-city { font-size: 11px; color: var(--muted); }
+
+.lang-pill {
+  font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 20px;
+  background: rgba(59,130,246,.1); color: #93c5fd; border: 1px solid rgba(59,130,246,.2);
+  letter-spacing: .03em; text-transform: uppercase;
+}
+
+.fund-name { font-size: 12px; font-weight: 500; color: var(--text2); max-width: 200px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fund-amc  { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+.amount-cell { font-size: 14px; font-weight: 700; color: var(--gold2); letter-spacing: -.01em; }
+.amount-sub  { font-size: 10px; font-weight: 400; color: var(--muted); }
+
+.expiry-date { font-size: 12px; color: var(--text2); font-variant-numeric: tabular-nums; }
+
+/* Urgency pills */
+.upill {
+  font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 20px;
+  white-space: nowrap; display: inline-flex; align-items: center; gap: 4px;
+  letter-spacing: .02em;
+}
+.up-fail   { background: rgba(239,68,68,.1);   color: #fca5a5; border: 1px solid rgba(239,68,68,.25); }
+.up-exp    { background: rgba(245,158,11,.1);  color: #fcd34d; border: 1px solid rgba(245,158,11,.25); }
+.up-active { background: rgba(16,185,129,.08); color: var(--ok2); border: 1px solid rgba(16,185,129,.2); }
+.up-paused { background: rgba(99,102,241,.08); color: var(--accent2); border: 1px solid rgba(99,102,241,.2); }
+.up-expired{ background: rgba(100,116,139,.08);color: var(--muted2); border: 1px solid rgba(100,116,139,.2); }
+
+/* Contact button + inline panel */
+.contact-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: 8px;
+  background: rgba(91,110,245,.08); border: 1px solid rgba(91,110,245,.3);
+  color: var(--accent2); font-family:'Inter',sans-serif; font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all .15s; white-space: nowrap;
+}
+.contact-btn:hover  { background: rgba(91,110,245,.16); border-color: var(--accent); color: #fff; }
+.contact-btn.active { background: rgba(91,110,245,.18); border-color: var(--accent); color: #fff; }
+
+.inline-row { display: none; background: rgba(8,14,36,.6); }
+.inline-row.open { display: table-row; }
+
+.inline-panel {
+  padding: 14px 20px;
+  border-top: 1px solid rgba(91,110,245,.12);
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+}
+.ip-label { font-size: 11px; color: var(--muted); font-weight: 500; }
+
+.trigger-sel {
+  appearance: none; background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--text); font-family:'Inter',sans-serif;
+  font-size: 12px; font-weight: 500; padding: 7px 12px; cursor: pointer; outline: none;
+  transition: border-color .15s;
+}
+.trigger-sel:focus { border-color: var(--accent); }
+.trigger-sel option { background: #0c1225; }
+
+.ch-divider { width: 1px; height: 24px; background: var(--b2); }
+
+.ch-btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 8px 16px; border-radius: 8px;
+  font-family:'Inter',sans-serif; font-size: 12px; font-weight: 600;
+  cursor: pointer; border: 1px solid; transition: all .15s;
+}
+.ch-btn:hover    { filter: brightness(1.2); transform: translateY(-1px); }
+.ch-btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+.ch-btn:active   { transform: translateY(0); }
+
+.ch-wa    { background: rgba(37,211,102,.1); border-color: rgba(37,211,102,.3); color: #4ade80; }
+.ch-voice { background: rgba(91,110,245,.1); border-color: rgba(91,110,245,.35); color: var(--accent2); }
+.ch-video { background: rgba(245,158,11,.08); border-color: rgba(245,158,11,.28); color: var(--gold2); }
+
+.close-btn {
+  margin-left: auto; padding: 7px 12px; background: transparent;
+  border: 1px solid var(--b2); border-radius: 8px; color: var(--muted);
+  font-family:'Inter',sans-serif; font-size: 12px; cursor: pointer; transition: all .15s;
+}
+.close-btn:hover { border-color: var(--muted); color: var(--text); }
+
+/* ═══ CALL ACTIVITY ═══ */
+.activity-body { padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; min-height: 80px; }
+.activity-empty {
+  padding: 36px 16px; text-align: center; color: var(--muted);
+  font-size: 12px; display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+.activity-empty .ei { font-size: 32px; opacity: .4; }
+
+/* Call card */
+.ccard {
+  border: 1px solid var(--b2); border-radius: 10px; overflow: hidden;
+  transition: border-color .2s, box-shadow .2s; background: var(--bg3);
+}
+.ccard.live   { border-color: rgba(16,185,129,.3); box-shadow: 0 0 0 1px rgba(16,185,129,.08); }
+.ccard.done   { border-color: rgba(91,110,245,.25); }
+.ccard.failed { border-color: rgba(239,68,68,.2); }
+
+.ccard-head {
+  padding: 12px 16px; display: flex; align-items: center; gap: 12px;
+  background: var(--s2);
+}
+.ccard-av {
+  width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--accent), #7c3aed);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: #fff;
+}
+.ccard-main { flex: 1; min-width: 0; }
+.ccard-name { font-size: 13px; font-weight: 600; color: #fff; }
+.ccard-meta { display: flex; align-items: center; gap: 8px; margin-top: 2px; flex-wrap: wrap; }
+.ccard-fund    { font-size: 11px; color: var(--muted2); }
+.ccard-trigger { font-size: 10px; color: var(--muted); }
+.ccard-time    { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; flex-shrink: 0; }
+
+/* Status chip */
+.schip {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+  padding: 4px 10px; border-radius: 20px; flex-shrink: 0;
+}
+.sc-init   { background: rgba(245,158,11,.1); color: #fcd34d; border: 1px solid rgba(245,158,11,.25); }
+.sc-live   { background: rgba(16,185,129,.1); color: var(--ok2); border: 1px solid rgba(16,185,129,.25); animation: schip-pulse 2s infinite; }
+.sc-done   { background: rgba(91,110,245,.1); color: var(--accent2); border: 1px solid rgba(91,110,245,.25); }
+.sc-fail   { background: rgba(239,68,68,.1);  color: #fca5a5; border: 1px solid rgba(239,68,68,.25); }
+@keyframes schip-pulse { 0%,100%{opacity:1} 50%{opacity:.6} }
+
+/* Outcome & footer */
+.ccard-foot {
+  padding: 9px 16px; display: flex; align-items: center; gap: 10px;
+  border-top: 1px solid var(--b2); flex-wrap: wrap;
+}
+.obadge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 20px;
+  letter-spacing: .02em;
+}
+.o-renewal  { background: rgba(16,185,129,.1); color: var(--ok2); border: 1px solid rgba(16,185,129,.25); }
+.o-callback { background: rgba(59,130,246,.1); color: #93c5fd; border: 1px solid rgba(59,130,246,.25); }
+.o-notint   { background: rgba(100,116,139,.1);color: var(--muted2); border: 1px solid rgba(100,116,139,.25); }
+.o-wrong    { background: rgba(239,68,68,.1);  color: #fca5a5; border: 1px solid rgba(239,68,68,.25); }
+.o-noanswer { background: rgba(107,114,128,.1);color: #9ca3af; border: 1px solid rgba(107,114,128,.25); }
+.o-query    { background: rgba(91,110,245,.1); color: var(--accent2); border: 1px solid rgba(91,110,245,.25); }
+.o-pending  { background: rgba(245,158,11,.1); color: #fcd34d; border: 1px solid rgba(245,158,11,.25); }
+
+.cnotes { font-size: 11px; color: var(--muted); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.tx-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 600; color: var(--accent2);
+  padding: 5px 12px; border-radius: 7px;
+  border: 1px solid rgba(91,110,245,.25); background: rgba(91,110,245,.07);
+  cursor: pointer; transition: all .15s; flex-shrink: 0;
+}
+.tx-btn:hover { background: rgba(91,110,245,.18); border-color: rgba(91,110,245,.5); }
+
+/* Transcript expand */
+.tx-expand { display: none; padding: 14px 18px; border-top: 1px solid var(--b2); background: rgba(4,8,24,.5); }
+.tx-expand.open { display: block; }
+.chat-wrap { display: flex; flex-direction: column; gap: 10px; max-height: 260px; overflow-y: auto; padding-right: 4px; }
+.bubble { max-width: 80%; padding: 9px 13px; border-radius: 12px; font-size: 12px; line-height: 1.55; }
+.bubble-lbl { font-size: 10px; font-weight: 700; opacity: .6; margin-bottom: 3px; letter-spacing: .02em; }
+.bubble-agent {
+  align-self: flex-start;
+  background: rgba(91,110,245,.13); border: 1px solid rgba(91,110,245,.2);
+  border-radius: 3px 12px 12px 12px; color: #c7d2fe;
+}
+.bubble-investor {
+  align-self: flex-end;
+  background: var(--bg3); border: 1px solid var(--b2);
+  border-radius: 12px 3px 12px 12px; color: var(--text);
+}
+.gcs-path {
+  font-size: 10px; color: var(--muted); font-family: monospace;
+  background: var(--s2); padding: 6px 10px; border-radius: 6px; margin-bottom: 10px;
+  word-break: break-all;
+}
+
+/* ═══ TOAST ═══ */
+.toast-wrap {
+  position: fixed; bottom: 24px; right: 24px; z-index: 999;
+  display: flex; flex-direction: column; gap: 8px; pointer-events: none;
+}
+.toast {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 11px 18px; font-size: 12px;
+  color: var(--text); box-shadow: 0 8px 32px rgba(0,0,0,.5);
+  pointer-events: all; animation: tin .22s ease;
+  display: flex; align-items: center; gap: 10px; min-width: 240px;
+}
+.toast.s { border-left: 3px solid var(--ok); }
+.toast.e { border-left: 3px solid var(--danger); }
+.toast.i { border-left: 3px solid var(--accent); }
+@keyframes tin { from{transform:translateX(16px);opacity:0} to{transform:none;opacity:1} }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- ══ TOP NAVIGATION ══ -->
+<nav class="topnav">
+  <div class="nav-brand">
+    <div class="nav-logo">W</div>
+    <div>
+      <div class="nav-name">Cymbal Wealth</div>
+      <div class="nav-sub">AI Relationship Manager</div>
+    </div>
+  </div>
+
+  <div class="nav-dist-wrap">
+    <span class="nav-dist-icon">🏢</span>
+    <div style="flex:1;min-width:0">
+      <div class="nav-dist-label">Distributor</div>
+      <select id="arnSel" class="nav-dist-sel" onchange="onArnChange(this.value)">
+        <option value="">— Select Distributor —</option>
+      </select>
+    </div>
+    <span class="nav-dist-arrow">▾</span>
+  </div>
+
+  <div class="nav-spacer"></div>
+
+  <div class="nav-live"><div class="pulse-dot"></div> Live Platform</div>
+  <div class="nav-clock" id="clock">—</div>
+  <div class="nav-avatar">P</div>
+</nav>
+
+<div class="app-body">
+
+  <!-- ══ LEFT SIDEBAR NAV ══ -->
+  <aside class="sidebar">
+    <div class="nav-icon active" title="Dashboard">
+      <span>📊</span>
+      <span class="nav-tip">Dashboard</span>
+    </div>
+    <div class="nav-icon" title="Portfolio">
+      <span>👥</span>
+      <span class="nav-tip">Portfolio</span>
+    </div>
+    <div class="nav-icon" title="Calls">
+      <span>📞</span>
+      <span class="nav-tip">Calls</span>
+    </div>
+    <div class="nav-icon" title="Analytics">
+      <span>📈</span>
+      <span class="nav-tip">Analytics</span>
+    </div>
+    <div class="sidebar-spacer"></div>
+    <div class="nav-icon" title="Settings">
+      <span>⚙️</span>
+      <span class="nav-tip">Settings</span>
+    </div>
+  </aside>
+
+  <!-- ══ MAIN ══ -->
+  <main class="main">
+    <div class="refresh-strip"><div class="refresh-bar" id="cd-bar" style="width:100%"></div></div>
+
+    <div class="content">
+
+      <!-- KPI ROW -->
+      <div class="kpi-row">
+        <div class="kpi-card c-calls">
+          <div class="kpi-top">
+            <div class="kpi-icon-wrap">📞</div>
+            <span class="kpi-trend flat" id="kpi-calls-trend">Session</span>
+          </div>
+          <div class="kpi-val" id="k-total">—</div>
+          <div class="kpi-lbl">Total Calls</div>
+          <div class="kpi-sub" id="k-calls-sub">—</div>
+        </div>
+        <div class="kpi-card c-aum">
+          <div class="kpi-top">
+            <div class="kpi-icon-wrap">💰</div>
+            <span class="kpi-trend up" id="kpi-aum-trend">Monthly</span>
+          </div>
+          <div class="kpi-val" id="k-aum">—</div>
+          <div class="kpi-lbl">Portfolio AUM</div>
+          <div class="kpi-sub" id="k-aum-sub">SIP commitments</div>
+        </div>
+        <div class="kpi-card c-renew">
+          <div class="kpi-top">
+            <div class="kpi-icon-wrap">✅</div>
+            <span class="kpi-trend up" id="kpi-renew-trend">+ve</span>
+          </div>
+          <div class="kpi-val" id="k-renewal">—</div>
+          <div class="kpi-lbl">Renewal Intent</div>
+          <div class="kpi-sub" id="k-renew-sub">Confirmed renewals</div>
+        </div>
+        <div class="kpi-card c-invest">
+          <div class="kpi-top">
+            <div class="kpi-icon-wrap">👥</div>
+            <span class="kpi-trend flat">Active</span>
+          </div>
+          <div class="kpi-val" id="k-investors">—</div>
+          <div class="kpi-lbl">Investors</div>
+          <div class="kpi-sub" id="k-invest-sub">Under management</div>
+        </div>
+      </div>
+
+      <!-- INVESTOR PORTFOLIO -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>👥</span> Investor Portfolio
+            <span class="panel-title-sub" id="port-arn-label"></span>
+          </div>
+          <div class="panel-actions">
+            <span class="panel-badge" id="port-count">—</span>
+          </div>
+        </div>
+        <div class="port-wrap">
+          <table class="port-table">
+            <thead>
+              <tr>
+                <th>Investor</th>
+                <th>Fund / SIP</th>
+                <th>Monthly SIP</th>
+                <th>Expiry</th>
+                <th>Status</th>
+                <th>Contact</th>
+              </tr>
+            </thead>
+            <tbody id="port-body">
+              <tr><td colspan="6" style="padding:40px;text-align:center;color:var(--muted)">
+                Select a distributor from the top to load portfolio.
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CALL ACTIVITY -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <div class="pulse-dot"></div>
+            Live Call Activity
+          </div>
+          <div class="panel-actions">
+            <div class="fchips">
+              <button class="fchip active" onclick="setFilter('all')">All</button>
+              <button class="fchip" onclick="setFilter('10m')">10m</button>
+              <button class="fchip" onclick="setFilter('30m')">30m</button>
+              <button class="fchip" onclick="setFilter('1h')">1h</button>
+            </div>
+            <div class="cd-wrap">
+              <span class="cd-text">↺ <span id="cd-num">10</span>s</span>
+              <div class="cd-bar-bg"><div class="cd-bar" id="cd-bar2" style="width:100%"></div></div>
+            </div>
+            <span class="panel-badge" id="activity-count">0 calls</span>
+          </div>
+        </div>
+        <div id="activity-body">
+          <div class="activity-empty">
+            <div class="ei">📡</div>
+            <div>No calls yet. Select a distributor and contact an investor.</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </main>
+</div><!-- /app-body -->
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+// ── State ────────────────────────────────────────────────────────────────────
+let ARN = "{{ arn }}";
+let countdown = 10;
+let activityFilter = "all";
+let activeCalls = [];
+try { activeCalls = JSON.parse(sessionStorage.getItem("cymbal_calls") || "[]"); } catch(e) {}
+let openInlineRow = null;
+
+// ── Boot ─────────────────────────────────────────────────────────────────────
+(async () => {
+  await loadArns();
+  if (ARN) {
+    document.getElementById("arnSel").value = ARN;
+    await initArn(ARN);
+  }
+  startCountdown();
+  setInterval(tickClock, 1000);
+  tickClock();
+  renderActivity();
+})();
+
+// ── Clock ─────────────────────────────────────────────────────────────────────
+function tickClock() {
+  document.getElementById("clock").textContent = new Date().toLocaleTimeString("en-IN",
+    { timeZone: "Asia/Kolkata", hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit" }) + " IST";
+}
+
+// ── Countdown ─────────────────────────────────────────────────────────────────
+function startCountdown() {
+  setInterval(() => {
+    countdown--;
+    const pct = (countdown / 10 * 100) + "%";
+    document.getElementById("cd-num").textContent = countdown;
+    document.getElementById("cd-bar").style.width  = pct;
+    document.getElementById("cd-bar2").style.width = pct;
+    if (countdown <= 0) { countdown = 10; pollAll(); }
+  }, 1000);
+}
+
+async function pollAll() {
+  if (!ARN) return;
+  await Promise.all(activeCalls.map(c => refreshCard(c.call_id)));
+  loadKPIs(ARN);
+  syncHistoryCalls();
+}
+
+// ── ARN loading ───────────────────────────────────────────────────────────────
+async function loadArns() {
+  try {
+    const d = await api("/api/arns");
+    const sel = document.getElementById("arnSel");
+    (d.arns || []).forEach(a => {
+      const o = document.createElement("option");
+      o.value = a.arn_code;
+      o.textContent = `${a.name} (${a.arn_code})`;
+      sel.appendChild(o);
+    });
+  } catch(e) { console.error("loadArns error", e); }
+}
+
+async function onArnChange(arn) {
+  ARN = arn;
+  history.replaceState(null, "", `/?arn=${encodeURIComponent(arn)}`);
+  await initArn(arn);
+}
+
+async function initArn(arn) {
+  const lbl = arnLabel(arn);
+  document.getElementById("port-arn-label").textContent = lbl ? `— ${lbl}` : "";
+  await Promise.all([loadPortfolio(arn), loadKPIs(arn), syncHistoryCalls()]);
+}
+
+function arnLabel(arn) {
+  const sel = document.getElementById("arnSel");
+  const opt = [...sel.options].find(o => o.value === arn);
+  return opt ? opt.textContent : arn;
+}
+
+// ── KPIs ──────────────────────────────────────────────────────────────────────
+async function loadKPIs(arn) {
+  try {
+    const [callsD, outD] = await Promise.all([
+      api(`/api/calls?arn=${enc(arn)}&limit=200`),
+      api(`/api/outcomes?arn=${enc(arn)}`),
+    ]);
+    const total   = callsD.total ?? 0;
+    const outs    = outD.outcomes || [];
+    const renewal = outs.find(o => o.outcome === "renewal_intent")?.count ?? 0;
+    const cb      = outs.find(o => o.outcome === "callback_requested")?.count ?? 0;
+
+    document.getElementById("k-total").textContent = total;
+    document.getElementById("k-renewal").textContent = renewal;
+    document.getElementById("k-calls-sub").textContent = `${cb} callback${cb !== 1 ? "s" : ""} pending`;
+
+    const rate = total ? Math.round(renewal / total * 100) : 0;
+    document.getElementById("kpi-renew-trend").textContent = rate + "% rate";
+    document.getElementById("k-renew-sub").textContent = `Out of ${total} completed calls`;
+  } catch(e) { console.error("loadKPIs", e); }
+}
+
+// ── Sync history calls ────────────────────────────────────────────────────────
+async function syncHistoryCalls() {
+  if (!ARN) return;
+  try {
+    const d = await api(`/api/calls?arn=${enc(ARN)}&limit=30`);
+    const existing = new Set(activeCalls.map(c => c.call_id));
+    (d.calls || []).forEach(c => {
+      if (!existing.has(c.call_id)) {
+        activeCalls.push({
+          call_id: c.call_id, investor_name: c.investor_name || "Unknown",
+          fund_name: "", trigger_type: c.trigger_type || "", arn: ARN,
+          started_at: parseIst(c.initiated_ist) || Date.now(),
+          initials: initials(c.investor_name || "?"),
+          status: c.status, outcome: c.outcome,
+        });
+      }
+    });
+    saveCalls();
+    renderActivity();
+  } catch(e) {}
+}
+
+function parseIst(s) {
+  if (!s) return null;
+  try { return new Date(s.replace(" IST", "").replace(" ", "T") + "+05:30").getTime(); } catch(e) { return null; }
+}
+
+// ── Portfolio table ───────────────────────────────────────────────────────────
+async function loadPortfolio(arn) {
+  const body = document.getElementById("port-body");
+  body.innerHTML = `<tr><td colspan="6" style="padding:40px;text-align:center;color:var(--muted)">
+    <span style="display:inline-block;animation:spin 1s linear infinite;margin-right:8px">↻</span>Loading portfolio…</td></tr>`;
+
+  try {
+    const d = await api(`/api/investors?arn=${enc(arn)}`);
+    const investors = d.investors || [];
+
+    document.getElementById("port-count").textContent = `${investors.length} investor${investors.length !== 1 ? "s" : ""}`;
+    document.getElementById("k-investors").textContent = investors.length;
+
+    // AUM: sum monthly SIP amounts
+    let aum = 0;
+    const rows = [];
+    investors.forEach(inv => {
+      inv.sips.forEach(s => {
+        aum += Number(s.monthly_amount_inr) || 0;
+        rows.push({ inv, sip: s });
+      });
+    });
+    document.getElementById("k-aum").textContent = fmtAum(aum);
+    document.getElementById("k-invest-sub").textContent = `${rows.length} active SIP${rows.length !== 1 ? "s" : ""}`;
+
+    rows.sort((a, b) => urgencyOrder(a.sip) - urgencyOrder(b.sip));
+
+    if (!rows.length) {
+      body.innerHTML = `<tr><td colspan="6" style="padding:40px;text-align:center;color:var(--muted)">No investors found for this distributor.</td></tr>`;
+      return;
+    }
+
+    body.innerHTML = rows.map(({ inv, sip }, i) => {
+      const urg = sipUrgency(sip);
+      const avCls = `av-${(i % 5) + 1}`;
+      return `
+        <tr id="row-${i}">
+          <td>
+            <div class="inv-cell">
+              <div class="inv-avatar ${avCls}">${initials(inv.full_name)}</div>
+              <div>
+                <div class="inv-name">${inv.full_name}</div>
+                <div class="inv-meta">
+                  <span class="inv-city">${inv.city || ""}</span>
+                  <span class="lang-pill">${langName(inv.preferred_language)}</span>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="fund-name" title="${sip.fund_name}">${sip.fund_name}</div>
+            <div class="fund-amc">${sip.amc_name || ""}</div>
+          </td>
+          <td>
+            <span class="amount-cell">₹${fmtN(sip.monthly_amount_inr)}</span>
+            <span class="amount-sub">/mo</span>
+          </td>
+          <td class="expiry-date">${fmtDate(sip.expiry_date)}</td>
+          <td>${urg.html}</td>
+          <td>
+            <button class="contact-btn" id="btn-${i}"
+              onclick="toggleInline(${i},'${esc(inv.investor_id)}','${esc(inv.full_name)}','${esc(sip.sip_id)}','${esc(sip.fund_name)}','${esc(ARN)}')">
+              Contact ▾
+            </button>
+          </td>
+        </tr>
+        <tr class="inline-row" id="inline-${i}">
+          <td colspan="6" style="padding:0">
+            <div class="inline-panel">
+              <span class="ip-label">Contact via:</span>
+              <select class="trigger-sel" id="tsel-${i}">
+                <option value="sip_renewal">🔄 SIP Renewal</option>
+                <option value="sip_debit_failure">⚠️ Debit Failure</option>
+                <option value="sip_paused">⏸️ SIP Paused</option>
+                <option value="fund_maturity">📈 Fund Maturity</option>
+              </select>
+              <div class="ch-divider"></div>
+              <button class="ch-btn ch-wa"
+                onclick="launchWhatsApp(${i},'${esc(inv.investor_id)}','${esc(sip.sip_id)}','${esc(ARN)}')">
+                💬 WhatsApp
+              </button>
+              <button class="ch-btn ch-voice"
+                onclick="launchCall(${i},'${esc(inv.investor_id)}','${esc(inv.full_name)}','${esc(sip.sip_id)}','${esc(sip.fund_name)}','${esc(ARN)}')">
+                📞 Voice Call
+              </button>
+              <button class="ch-btn ch-video"
+                onclick="launchVideoCall(${i},'${esc(inv.investor_id)}','${esc(sip.sip_id)}','${esc(ARN)}','${esc(inv.full_name)}','${esc(sip.fund_name)}')">
+                🎥 Video Call
+              </button>
+              <button class="close-btn" onclick="closeInline(${i})">✕ Close</button>
+            </div>
+          </td>
+        </tr>`;
+    }).join("");
+  } catch(e) {
+    body.innerHTML = `<tr><td colspan="6" style="padding:32px;text-align:center;color:var(--danger)">
+      Failed to load portfolio. Check console for details.</td></tr>`;
+    console.error("loadPortfolio", e);
+  }
+}
+
+function toggleInline(i) {
+  const row = document.getElementById(`inline-${i}`);
+  const btn = document.getElementById(`btn-${i}`);
+  if (openInlineRow !== null && openInlineRow !== i) closeInline(openInlineRow);
+  const isOpen = row.classList.contains("open");
+  if (isOpen) { closeInline(i); }
+  else {
+    row.classList.add("open");
+    btn.classList.add("active");
+    openInlineRow = i;
+    row.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+}
+
+function closeInline(i) {
+  const row = document.getElementById(`inline-${i}`);
+  const btn = document.getElementById(`btn-${i}`);
+  if (row) row.classList.remove("open");
+  if (btn) btn.classList.remove("active");
+  openInlineRow = null;
+}
+
+// ── Launch: Voice Call ────────────────────────────────────────────────────────
+async function launchCall(i, investorId, name, sipId, fund, arn) {
+  const trigger = document.getElementById(`tsel-${i}`)?.value || "sip_renewal";
+  closeInline(i);
+  toast(`Connecting Priya to ${name}…`, "i");
+
+  try {
+    const d = await api("/api/call", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ investor_id: investorId, sip_id: sipId, arn_code: arn, trigger_type: trigger }),
+    });
+    if (d.error || d.status === "error")
+      throw new Error(d.error || "Broker unavailable — retry in a moment");
+
+    activeCalls.unshift({
+      call_id: d.call_id, investor_name: name, fund_name: fund,
+      trigger_type: trigger, arn, started_at: Date.now(),
+      initials: initials(name), status: "initiated", outcome: null,
+    });
+    saveCalls();
+    renderActivity();
+    toast(`Voice call started — ${d.call_id}`, "s");
+    document.querySelector(".content").scrollTo({ top: 9999, behavior: "smooth" });
+  } catch(e) {
+    toast(e.message || "Launch failed", "e");
+  }
+}
+
+// ── Launch: Video Call ────────────────────────────────────────────────────────
+async function launchVideoCall(i, investorId, sipId, arn, name, fund) {
+  const triggerType = document.getElementById(`tsel-${i}`)?.value || "sip_renewal";
+  closeInline(i);
+  toast(`Preparing video call with ${name}…`, "i");
+  try {
+    const d = await api("/api/video-call", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ investor_id: investorId, sip_id: sipId, arn_code: arn, trigger_type: triggerType }),
+    });
+    if (d.error) throw new Error(d.error);
+    window.open(d.video_url, "_blank", "width=1100,height=700,noopener");
+  } catch(e) {
+    toast(e.message || "Video call failed", "e");
+  }
+}
+
+// ── Launch: WhatsApp ─────────────────────────────────────────────────────────
+async function launchWhatsApp(i, investorId, sipId, arn) {
+  const triggerType = document.getElementById(`tsel-${i}`)?.value || "sip_renewal";
+  closeInline(i);
+  toast("Sending WhatsApp message…", "i");
+  try {
+    const d = await api("/api/whatsapp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ investor_id: investorId, sip_id: sipId, arn_code: arn, trigger_type: triggerType }),
+    });
+    if (d.error) throw new Error(d.error);
+    toast(d.simulated ? `[Demo] WhatsApp sent to ${d.to}` : `WhatsApp sent to ${d.to}`, "s");
+  } catch(e) {
+    toast(e.message || "WhatsApp failed", "e");
+  }
+}
+
+// ── Activity rendering ────────────────────────────────────────────────────────
+function setFilter(f) {
+  activityFilter = f;
+  document.querySelectorAll(".fchip").forEach(b =>
+    b.classList.toggle("active", b.textContent.toLowerCase() === f.replace("all", "all"))
+  );
+  // map button text to filter
+  document.querySelectorAll(".fchip").forEach(b => {
+    const map = { "All": "all", "10m": "10m", "30m": "30m", "1h": "1h" };
+    b.classList.toggle("active", map[b.textContent] === f);
+  });
+  renderActivity();
+}
+
+function renderActivity() {
+  const el    = document.getElementById("activity-body");
+  const badge = document.getElementById("activity-count");
+
+  activeCalls.sort((a, b) => (b.started_at || 0) - (a.started_at || 0));
+  const now = Date.now();
+  const windowMs = { all: Infinity, "10m": 600000, "30m": 1800000, "1h": 3600000 }[activityFilter] ?? Infinity;
+  const filtered = activeCalls.filter(c => (now - (c.started_at || 0)) <= windowMs);
+
+  badge.textContent = `${filtered.length} call${filtered.length !== 1 ? "s" : ""}`;
+
+  if (!filtered.length) {
+    const msg = activityFilter === "all"
+      ? "No calls yet. Select a distributor and contact an investor."
+      : `No calls in the last ${activityFilter}.`;
+    el.innerHTML = `<div class="activity-empty"><div class="ei">📡</div><div>${msg}</div></div>`;
+    return;
+  }
+
+  el.innerHTML = `<div class="activity-body" style="padding:14px 18px;display:flex;flex-direction:column;gap:10px">
+    ${filtered.map(c => callCard(c)).join("")}</div>`;
+}
+
+function callCard(c) {
+  const isDone  = c.outcome && c.outcome !== "pending";
+  const isLive  = !isDone && (c.status === "initiated" || c.status === "in-progress");
+  const cardCls = isDone ? "done" : (isLive ? "live" : "fail");
+  const chipHtml = statusChip(c.status, isDone, c.outcome);
+  const elapsed  = elapsedStr(c.started_at);
+
+  const showFooter = isDone || c.has_transcript;
+  const footer = showFooter ? `
+    <div class="ccard-foot">
+      ${isDone ? outcomeBadge(c.outcome) : `<span class="obadge o-pending">⏳ Classifying…</span>`}
+      ${c.notes ? `<span class="cnotes">${c.notes}</span>` : ""}
+      ${c.has_transcript
+        ? `<button class="tx-btn" onclick="toggleTranscript('${esc(c.call_id)}')">📄 Transcript</button>`
+        : `<span style="font-size:11px;color:var(--muted)">Processing…</span>`}
+    </div>
+    <div class="tx-expand" id="tx-${c.call_id}">
+      <div class="gcs-path" id="tx-gcs-${c.call_id}">Loading…</div>
+      <div class="chat-wrap" id="tx-chat-${c.call_id}"></div>
+    </div>` : "";
+
+  return `
+    <div class="ccard ${cardCls}" id="card-${c.call_id}">
+      <div class="ccard-head">
+        <div class="ccard-av">${c.initials || "?"}</div>
+        <div class="ccard-main">
+          <div class="ccard-name">${c.investor_name}</div>
+          <div class="ccard-meta">
+            <span class="ccard-fund">${c.fund_name || ""}</span>
+            <span class="ccard-trigger">${triggerLabel(c.trigger_type)}</span>
+          </div>
+        </div>
+        ${chipHtml}
+        <span class="ccard-time" id="elapsed-${c.call_id}">${elapsed}</span>
+      </div>
+      ${footer}
+    </div>`;
+}
+
+// ── Poll a single card ────────────────────────────────────────────────────────
+async function refreshCard(call_id) {
+  try {
+    const d   = await api(`/api/call-status/${call_id}`);
+    const idx = activeCalls.findIndex(c => c.call_id === call_id);
+    if (idx < 0) return;
+
+    const prev = { ...activeCalls[idx] };
+    activeCalls[idx].status        = d.status        || prev.status;
+    activeCalls[idx].outcome       = d.outcome        || prev.outcome;
+    activeCalls[idx].notes         = d.notes;
+    activeCalls[idx].has_transcript = d.has_transcript;
+
+    const elEl = document.getElementById(`elapsed-${call_id}`);
+    if (elEl) elEl.textContent = elapsedStr(activeCalls[idx].started_at);
+
+    if (d.outcome !== prev.outcome || d.has_transcript !== prev.has_transcript || d.status !== prev.status) {
+      saveCalls();
+      renderActivity();
+    }
+  } catch(e) {}
+}
+
+// ── Transcript ────────────────────────────────────────────────────────────────
+async function toggleTranscript(call_id) {
+  const el = document.getElementById(`tx-${call_id}`);
+  if (!el) return;
+  const isOpen = el.classList.toggle("open");
+  if (!isOpen) return;
+
+  document.getElementById(`tx-gcs-${call_id}`).textContent = "Loading…";
+  document.getElementById(`tx-chat-${call_id}`).innerHTML = `<div style="color:var(--muted);font-size:12px">Fetching transcript…</div>`;
+
+  try {
+    const d = await api(`/api/transcript/${call_id}`);
+    if (d.error) throw new Error(d.error);
+    document.getElementById(`tx-gcs-${call_id}`).textContent = d.gcs_path || "";
+    const segs = d.segments || [];
+    if (!segs.length) {
+      document.getElementById(`tx-chat-${call_id}`).innerHTML = `<div style="color:var(--muted);font-size:12px">Transcript is empty.</div>`;
+      return;
+    }
+    document.getElementById(`tx-chat-${call_id}`).innerHTML = segs.map(s => {
+      const isAgent = (s.speaker || "").toLowerCase().includes("agent") || (s.speaker || "").toLowerCase() === "priya";
+      return `<div class="bubble ${isAgent ? "bubble-agent" : "bubble-investor"}">
+        <div class="bubble-lbl">${isAgent ? "🤖 Priya" : "👤 Investor"}</div>
+        ${s.text || ""}
+      </div>`;
+    }).join("");
+  } catch(e) {
+    document.getElementById(`tx-chat-${call_id}`).innerHTML =
+      `<div style="color:var(--muted);font-size:12px">${e.message || "Transcript not yet available."}</div>`;
+  }
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function statusChip(status, isDone, outcome) {
+  if (isDone) return `<div class="schip sc-done">✓ ${outcomeShort(outcome)}</div>`;
+  const isInitiated = !status || status === "initiated";
+  if (isInitiated) return `<div class="schip sc-init">⏳ Initiating</div>`;
+  if (status === "in-progress") return `<div class="schip sc-live"><div class="pulse-dot"></div>Live</div>`;
+  return `<div class="schip sc-fail">✗ ${status}</div>`;
+}
+
+function outcomeShort(o) {
+  return { renewal_intent:"Renewal", callback_requested:"Callback", not_interested:"Declined",
+    wrong_number:"Wrong #", no_answer:"No Answer", query_raised:"Query",
+    no_meaningful_conversation:"No Conv." }[o] || o || "Done";
+}
+
+function outcomeBadge(o) {
+  const map = {
+    renewal_intent:             ["✅ Renewal Intent",   "o-renewal"],
+    callback_requested:         ["🔔 Callback",         "o-callback"],
+    not_interested:             ["🚫 Not Interested",   "o-notint"],
+    wrong_number:               ["❓ Wrong Number",     "o-wrong"],
+    no_answer:                  ["📵 No Answer",        "o-noanswer"],
+    query_raised:               ["💬 Query Raised",     "o-query"],
+    no_meaningful_conversation: ["⏭ No Conv.",         "o-notint"],
+    pending:                    ["⏳ Pending",          "o-pending"],
+  };
+  const [label, cls] = map[o] || [o || "⏳ Pending", "o-pending"];
+  return `<span class="obadge ${cls}">${label}</span>`;
+}
+
+function sipUrgency(s) {
+  if (s.sip_status === "debit_failed") return { html: `<span class="upill up-fail">⚠ Debit Failed</span>`, order: 0 };
+  if (s.sip_status === "paused")       return { html: `<span class="upill up-paused">⏸ Paused</span>`,     order: 1 };
+  if (s.sip_status === "expired")      return { html: `<span class="upill up-expired">Expired</span>`,      order: 4 };
+  if (s.expiry_date) {
+    const days = Math.ceil((new Date(s.expiry_date) - new Date()) / 86400000);
+    if (days < 0)  return { html: `<span class="upill up-expired">Expired</span>`, order: 4 };
+    if (days < 30) return { html: `<span class="upill up-exp">Exp. in ${days}d</span>`, order: 2 };
+  }
+  return { html: `<span class="upill up-active">● Active</span>`, order: 3 };
+}
+function urgencyOrder(s) { return sipUrgency(s).order; }
+
+function triggerLabel(t) {
+  return { sip_renewal: "SIP Renewal", sip_debit_failure: "Debit Failure",
+    sip_paused: "SIP Paused", fund_maturity: "Fund Maturity" }[t] || (t || "").replace(/_/g, " ");
+}
+
+function langName(c) {
+  return { "hi-IN":"Hindi","ta-IN":"Tamil","te-IN":"Telugu","kn-IN":"Kannada",
+    "ml-IN":"Malayalam","mr-IN":"Marathi","bn-IN":"Bengali","gu-IN":"Gujarati","en-IN":"English" }[c] || c || "Hindi";
+}
+
+function initials(name) { return (name || "?").split(" ").slice(0, 2).map(w => w[0]).join("").toUpperCase(); }
+
+function fmtN(n) { return n ? Number(n).toLocaleString("en-IN") : "—"; }
+
+function fmtAum(n) {
+  if (!n) return "—";
+  if (n >= 10000000) return "₹" + (n / 10000000).toFixed(1) + "Cr";
+  if (n >= 100000)   return "₹" + (n / 100000).toFixed(1) + "L";
+  if (n >= 1000)     return "₹" + (n / 1000).toFixed(1) + "K";
+  return "₹" + n.toLocaleString("en-IN");
+}
+
+function fmtDate(d) {
+  if (!d) return "—";
+  return new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+}
+
+function elapsedStr(startMs) {
+  if (!startMs) return "";
+  const sec = Math.floor((Date.now() - startMs) / 1000);
+  const m = Math.floor(sec / 60), s = sec % 60;
+  return m > 60
+    ? `${Math.floor(m/60)}h ${m%60}m ago`
+    : m ? `${m}m ${s}s ago` : `${s}s ago`;
+}
+
+function enc(s)  { return encodeURIComponent(s || ""); }
+function esc(s)  { return (s || "").replace(/'/g, "\\'").replace(/"/g, "&quot;"); }
+function saveCalls() { sessionStorage.setItem("cymbal_calls", JSON.stringify(activeCalls.slice(0, 50))); }
+
+function toast(msg, type = "i") {
+  const icons = { s: "✅", e: "❌", i: "ℹ️" };
+  const el = document.createElement("div");
+  el.className = `toast ${type}`;
+  el.innerHTML = `<span>${icons[type] || "ℹ️"}</span><span>${msg}</span>`;
+  document.getElementById("toastWrap").appendChild(el);
+  setTimeout(() => el.remove(), 4000);
+}
+
+async function api(url, opts) {
+  const r = await fetch(url, opts);
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  return r.json();
+}
+</script>
+</body>
+</html>

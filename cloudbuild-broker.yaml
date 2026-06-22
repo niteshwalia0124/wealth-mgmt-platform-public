@@ -1,0 +1,5 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/butterfly-987/wealth-mgmt-broker', '-f', 'Dockerfile.broker', '.']
+images:
+  - 'gcr.io/butterfly-987/wealth-mgmt-broker'

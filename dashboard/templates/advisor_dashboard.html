@@ -1,0 +1,2995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Cymbal Wealth · Advisory Platform</title>
+<script src="/static/vendor/tailwind.min.js"></script>
+<script src="/static/vendor/react.min.js"></script>
+<script src="/static/vendor/react-dom.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body, #root { height: 100%; width: 100%; overflow: hidden; }
+  body { background: #06091a; color: #f1f5f9; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; -webkit-font-smoothing: antialiased; }
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.25); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(99,102,241,0.45); }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+  @keyframes pulse2s { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.9;transform:scale(1.01)} }
+  @keyframes ai-shimmer { 0%,100%{opacity:.4} 50%{opacity:1} }
+  * { transition-property: none; }
+  button { transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease !important; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const {
+  useState,
+  useEffect,
+  useRef
+} = React;
+const SVG_PATHS = {
+  dashboard: '<path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/>',
+  clients: '<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>',
+  portfolios: '<path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/>',
+  analytics: '<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>',
+  compliance: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/>',
+  bell: '<path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/>',
+  search: '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
+  phone: '<path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.64A2 2 0 012 1h3a2 2 0 012 1.72c.13 1 .37 2 .71 2.95a2 2 0 01-.45 2.11L6.09 9a16 16 0 006.92 6.92l1.22-1.17a2 2 0 012.11-.45c.95.34 1.94.58 2.95.71A2 2 0 0122 16.92z"/>',
+  mic: '<path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>',
+  video: '<polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/>',
+  fileSearch: '<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><circle cx="10" cy="14" r="2"/><line x1="12" y1="16" x2="13.5" y2="17.5"/>',
+  sparkles: '<path d="M12 3l1.88 5.76L20 10l-6.12 1.24L12 17l-1.88-5.76L4 10l6.12-1.24L12 3z"/>',
+  zap: '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+  trendUp: '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>',
+  trendDown: '<polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/>',
+  alertTri: '<path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+  check: '<polyline points="20 6 9 17 4 12"/>',
+  clock: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+  chevRight: '<polyline points="9 18 15 12 9 6"/>',
+  chevDown: '<polyline points="6 9 12 15 18 9"/>',
+  settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>',
+  dollar: '<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>',
+  activity: '<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>',
+  filter: '<polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>',
+  grid: '<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>',
+  share2: '<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>',
+  user: '<path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  cpu: '<rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/>',
+  close: '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+  moreVert: '<circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>',
+  shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+  globe: '<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>',
+  info: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>',
+  star: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>'
+};
+function Ico({
+  n,
+  size,
+  cls,
+  sw
+}) {
+  var _size = size || 16;
+  var _sw = sw || 1.75;
+  var _cls = cls || '';
+  var html = SVG_PATHS[n] || SVG_PATHS.alertTri;
+  return React.createElement('svg', {
+    width: _size,
+    height: _size,
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: _sw,
+    strokeLinecap: 'round',
+    strokeLinejoin: 'round',
+    className: 'shrink-0 ' + _cls,
+    dangerouslySetInnerHTML: {
+      __html: html
+    }
+  });
+}
+
+// ─── ENRICHED CLIENT DATA ──────────────────────────────────────────────────────
+var CLIENTS = [{
+  id: 1,
+  clientKey: 'amit_patel',
+  initials: 'AP',
+  grad: '135deg,#3b82f6,#6366f1',
+  name: 'Amit Patel',
+  loc: 'Mumbai',
+  age: 52,
+  risk: 'Aggressive',
+  riskC: '#f43f5e',
+  nw: '₹45.2 Cr',
+  aum: '₹38.4 Cr',
+  health: 72,
+  hC: '#f59e0b',
+  tag: 'PE Maturity',
+  tagC: '#f59e0b',
+  alertL: 'urgent',
+  urgencyDays: 10,
+  recommendedChannel: 'voice',
+  alert: '₹12 Cr Kotak Alternate Fund matures Jun 30',
+  story: '₹12 Cr PE fund matures in 10 days. Waterfall distribution triggers a single taxable event. Also holds ₹4.8 Cr unrealised LTCG in FAANG — netting window closing.',
+  complianceNote: null,
+  geminiActions: ['Load Kotak Alternate Fund factsheet', 'Compute waterfall distribution breakdown', 'Draft 3 reinvestment scenarios (AIF Cat II / PMS / Liquid bridge)', 'Calculate LTCG netting with FAANG positions', 'Launch SEBI-compliant voice briefing', 'Auto-log outcome to CRM'],
+  talkingPoints: ['PE waterfall: ₹12 Cr principal + carry + interest explained', 'AIF Cat II reinvestment window closes Jun 30', 'LTCG netting opportunity: ₹4.8 Cr FAANG gain vs losses', 'TDS recovery timeline on PE distribution', '3 scenarios: conservative / balanced / aggressive redeployment'],
+  last: '3 days ago',
+  ctx: 'PE waterfall event · FAANG holdings · Tax planning needed',
+  sessionScript: [{
+    t: 4,
+    role: 'ai',
+    text: 'Good afternoon, Mr. Patel. I am calling on behalf of Rohan Sharma from Cymbal Wealth regarding your Kotak Alternate Fund maturity on June 30th.'
+  }, {
+    t: 11,
+    role: 'client',
+    text: 'Yes, I was expecting this call. The fund is maturing in 10 days and I haven\'t decided where to reinvest.'
+  }, {
+    t: 18,
+    role: 'ai',
+    text: 'Understood. The distribution will include ₹9.8 Cr principal, ₹1.4 Cr carry, and ₹0.8 Cr interest — all in one taxable event. I have prepared three reinvestment scenarios for you.'
+  }, {
+    t: 27,
+    role: 'client',
+    text: 'What about the LTCG on my US tech stocks? I was thinking of booking some losses.'
+  }, {
+    t: 34,
+    role: 'ai',
+    text: 'Excellent timing. You have ₹4.8 Cr in unrealised LTCG on FAANG. Booking STCL in two positions would reduce your net LTCG liability by ₹1.2 Cr. Shall I walk through scenario two which factors this in?'
+  }, {
+    t: 41,
+    role: 'client',
+    text: 'Yes, please. And what about the AIF Cat II option Rohan mentioned?'
+  }, {
+    t: 48,
+    role: 'ai',
+    text: 'AIF Cat II offers a 10-year lock-in with projected 14–16% IRR and pass-through tax treatment — ideal for your risk profile. The commitment window closes June 28. I am connecting Rohan now for the final decision.'
+  }]
+}, {
+  id: 2,
+  clientKey: 'priya_kapoor',
+  initials: 'PK',
+  grad: '135deg,#8b5cf6,#7c3aed',
+  name: 'Priya Kapoor',
+  loc: 'Bengaluru',
+  age: 44,
+  risk: 'Balanced',
+  riskC: '#3b82f6',
+  nw: '₹28.7 Cr',
+  aum: '₹21.3 Cr',
+  health: 61,
+  hC: '#ef4444',
+  tag: 'Compliance Breach',
+  tagC: '#ef4444',
+  alertL: 'critical',
+  urgencyDays: 16,
+  recommendedChannel: 'voice',
+  alert: 'AA lapsed 14d · IPS drift 14% · SEBI Day 14/30',
+  story: 'Account Agreement consent lapsed 14 days ago. IPS shows 14% drift — real estate at 65% vs 40% limit. SEBI Circular requires documented advisor outreach before Day 30. Day 14/30.',
+  complianceNote: 'SEBI/HO/MIRSD/2021 — 16 days remaining to create a documented compliance record. Gemini reads a pre-approved script verbatim. Every word is timestamp-logged.',
+  geminiActions: ['Pull IPS drift report from portfolio system', 'Load SEBI Circular SEBI/HO/MIRSD/2021 language', 'Draft SEBI-compliant script (zero deviation allowed)', 'Call client with full timestamp logging', 'Generate compliance evidence record', 'Flag for RM countersign in portal'],
+  talkingPoints: ['Account Agreement: renewal steps via DigiLocker', 'IPS rebalancing: reduce real estate 65% → 40%', 'SEBI disclosure acknowledgment (verbal + written)', '3 rebalancing options: gradual / structured / immediate', '16-day action window — firm exposure if unlogged'],
+  last: '12 days ago',
+  ctx: 'AA renewal urgent · Real estate overweight 65% · SEBI risk',
+  sessionScript: [{
+    t: 4,
+    role: 'ai',
+    text: 'Good morning, Ms. Kapoor. I am calling on behalf of Rohan Sharma from Cymbal Wealth regarding your Investment Policy Statement and Account Agreement status.'
+  }, {
+    t: 12,
+    role: 'client',
+    text: 'Oh yes, I have been meaning to call. My real estate allocation has gone up a lot with the Whitefield property appreciation.'
+  }, {
+    t: 19,
+    role: 'ai',
+    text: 'That is correct. Your real estate exposure is currently 65% of portfolio value, against your IPS limit of 40%. Under SEBI regulations, we are required to document this conversation as formal notification of the drift. Do you acknowledge understanding this?'
+  }, {
+    t: 30,
+    role: 'client',
+    text: 'Yes, I understand. What are my options to rebalance?'
+  }, {
+    t: 36,
+    role: 'ai',
+    text: 'There are three approaches. First, a gradual rebalancing over 6 months — lowest tax impact. Second, a structured exit via a REIT conversion — maintains real estate exposure with better liquidity. Third, an immediate rebalancing with a tax-loss offset strategy in your equity portfolio.'
+  }, {
+    t: 47,
+    role: 'client',
+    text: 'I think gradual rebalancing makes sense. Can Rohan send me the plan?'
+  }, {
+    t: 52,
+    role: 'ai',
+    text: 'Absolutely. I am logging this conversation as your formal SEBI acknowledgment. Rohan will send a written rebalancing plan within 48 hours. Your Account Agreement renewal link is also being sent to your registered email now.'
+  }]
+}, {
+  id: 3,
+  clientKey: 'vikram_nair',
+  initials: 'VN',
+  grad: '135deg,#f59e0b,#ea580c',
+  name: 'Vikram Nair',
+  loc: 'Chennai',
+  age: 48,
+  risk: 'Growth',
+  riskC: '#f59e0b',
+  nw: '₹31.6 Cr',
+  aum: '₹26.8 Cr',
+  health: 79,
+  hC: '#f59e0b',
+  tag: 'SIP Mandate Expiry',
+  tagC: '#818cf8',
+  alertL: 'medium',
+  urgencyDays: 30,
+  recommendedChannel: 'whatsapp',
+  alert: '12 SIP mandates expire in 30 days · ₹8.4 Cr/mo at risk',
+  story: '12 SIP mandates expire within 30 days — 4 e-NACH, 8 physical NACH. ₹8.4 Cr/month in mid-cap flows at risk. Each bounce = ₹500–2,000 penalty + broken rupee-cost averaging.',
+  complianceNote: null,
+  geminiActions: ['Pull mandate schedule from CDSL/RTA records', 'Identify each mandate: AMC, amount, expiry date', 'Generate personalised voice script in Tamil/English', 'Send via WhatsApp Business API with renewal links', 'Track read receipts and link-tap events', 'Auto-follow-up on unread messages at 48 hours'],
+  talkingPoints: ['12 mandates — e-NACH renewal via NetBanking (4 mandates)', 'Physical NACH: branch visit or WhatsApp form (8 mandates)', 'SIP continuity: mid-cap averaging disrupted at current NAV levels', 'NACH bounce: ₹500–2,000 per failed transaction + AMC penalty', 'One-tap renewal link: valid 7 days'],
+  last: '5 days ago',
+  ctx: 'SIP investor · Mid-cap heavy · 12 mandate renewals pending',
+  sessionScript: [{
+    t: 3,
+    role: 'ai',
+    text: 'Vikram sir, Cymbal Wealth இல் இருந்து Rohan Sharma சார்பில் தொடர்பு கொள்கிறோம். உங்கள் 12 SIP mandates அடுத்த 30 நாட்களில் முடிவடைகின்றன.'
+  }, {
+    t: 11,
+    role: 'client',
+    text: 'Oh, I did not realise. How many are expiring? I have so many SIPs running.'
+  }, {
+    t: 17,
+    role: 'ai',
+    text: 'You have 12 mandates in total — 4 via e-NACH and 8 physical NACH. The largest is your ₹1.2 Cr monthly SIP in Mirae Asset Mid Cap. I am sending the renewal links to your WhatsApp right now.'
+  }, {
+    t: 26,
+    role: 'client',
+    text: 'Good. Can I renew all of them in one go from the link?'
+  }, {
+    t: 31,
+    role: 'ai',
+    text: 'Yes. The e-NACH mandates can be renewed with one NetBanking login — it takes about 3 minutes. I have grouped all 4 together. The 8 physical mandates have pre-filled forms attached. You can sign digitally via Aadhaar OTP.'
+  }, {
+    t: 41,
+    role: 'client',
+    text: 'Perfect. What happens if I miss one?'
+  }, {
+    t: 46,
+    role: 'ai',
+    text: 'A missed NACH results in a ₹500 to ₹2,000 penalty per transaction and breaks your mid-cap averaging at current NAV levels. Your 3-year return would be impacted by approximately ₹4.2 L in missed compounding. I recommend completing the renewals this week.'
+  }]
+}, {
+  id: 4,
+  clientKey: 'rajiv_singhania',
+  initials: 'RS',
+  grad: '135deg,#10b981,#0d9488',
+  name: 'Rajiv Singhania',
+  loc: 'NRI · Dubai',
+  age: 61,
+  risk: 'HNW Global',
+  riskC: '#14b8a6',
+  nw: '₹62.1 Cr',
+  aum: '₹58.7 Cr',
+  health: 88,
+  hC: '#3b82f6',
+  tag: 'DTAA Deadline',
+  tagC: '#14b8a6',
+  alertL: 'high',
+  urgencyDays: 41,
+  recommendedChannel: 'video',
+  alert: 'DTAA Form 67 due Jul 31 · ₹42 L treaty benefit at risk',
+  story: 'DTAA Form 67 deadline Jul 31 (India-UAE, Section 90). ₹4.2 Cr US equity LTCG eligible for 10% treaty rate vs 20% standard — ₹42 L at stake. Also planning ₹9 Cr Dubai property repatriation.',
+  complianceNote: null,
+  geminiActions: ['Parse US broker statement PDF via Document Intelligence', 'Extract DTAA-eligible LTCG amounts by security', 'Apply India-UAE treaty rates (Section 90)', 'Compute tax delta: treaty 10% vs standard 20%', 'Annotate Form 67 draft live on screen during video call', 'Generate FEMA 5-year repatriation plan (₹9 Cr from Dubai)'],
+  talkingPoints: ['DTAA India-UAE: 10% LTCG vs 20% standard — ₹42 L saving', 'Form 67 filing steps: ITR portal → Schedule TR → treaty claim', 'FEMA repatriation: USD 1M/year limit → 5-year plan for ₹9 Cr', 'US broker statement: 3 positions eligible for treaty benefit', 'Dubai property: FEMA structuring via NRO/NRE accounts'],
+  last: 'Yesterday',
+  ctx: 'Global portfolio · US equity · DTAA applicable · FEMA repatriation',
+  sessionScript: [{
+    t: 5,
+    role: 'ai',
+    text: 'Good evening, Mr. Singhania. I have loaded your US broker statement and Form 67 draft. I can see 3 positions with LTCG eligible for the India-UAE DTAA treaty rate.'
+  }, {
+    t: 14,
+    role: 'client',
+    text: 'Yes, I was worried about the July 31 deadline. What exactly is the benefit?'
+  }, {
+    t: 20,
+    role: 'ai',
+    text: 'Under Section 90 of the Income Tax Act and the India-UAE treaty, your LTCG on US equities is taxable at 10% instead of the standard 20%. On your ₹4.2 Cr gain, that is a saving of ₹42 lakhs. I am highlighting the relevant positions on your broker statement now.'
+  }, {
+    t: 32,
+    role: 'client',
+    text: 'That is significant. I can see you highlighting the Apple and Microsoft positions. What about the Dubai property repatriation I mentioned?'
+  }, {
+    t: 40,
+    role: 'ai',
+    text: 'For the ₹9 Cr from the Dubai property sale, FEMA allows USD 1 million per year repatriation via your NRE account. I have modelled a 5-year plan that minimises TDS and avoids gift tax triggers. I am sending the plan document to your screen now.'
+  }, {
+    t: 51,
+    role: 'client',
+    text: 'This is very helpful. Can Rohan co-sign the Form 67 recommendation before I file?'
+  }, {
+    t: 56,
+    role: 'ai',
+    text: 'Rohan is reviewing the annotated Form 67 right now. He will send you the signed recommendation within 24 hours. I am also attaching the DTAA treaty text for your records. Shall we confirm the filing strategy?'
+  }]
+}, {
+  id: 5,
+  clientKey: 'sunita_mehrotra',
+  initials: 'SM',
+  grad: '135deg,#f43f5e,#db2777',
+  name: 'Sunita Mehrotra',
+  loc: 'Pune',
+  age: 58,
+  risk: 'Conservative',
+  riskC: '#94a3b8',
+  nw: '₹18.4 Cr',
+  aum: '₹15.2 Cr',
+  health: 95,
+  hC: '#10b981',
+  tag: 'FD Maturity',
+  tagC: '#38bdf8',
+  alertL: 'medium',
+  urgencyDays: 25,
+  recommendedChannel: 'docai',
+  alert: '₹2.5 Cr HDFC FD matures Jul 15 · rate-cut switch opportunity',
+  story: '₹2.5 Cr HDFC FD matures Jul 15. New FD rate: 6.5% vs locked 7.2%. Post-rate-cut, short-duration debt MF yields 7.8% post-tax with indexation. Without intervention she auto-renews.',
+  complianceNote: null,
+  geminiActions: ['OCR scan FD advice slip (PDF/image upload)', 'Pull current HDFC FD rates from rate card', 'Load HDFC Floating Rate Fund factsheet', 'Compute post-tax yields: FD vs Debt MF with indexation', 'Generate named comparison PDF for Sunita Mehrotra', 'Send via WhatsApp/email · RM brief before client call'],
+  talkingPoints: ['FD renewal rate: 6.5% vs Debt MF 1Y rolling: 7.8% post-tax', 'Indexation benefit on 3-year hold: effective yield 8.1%', 'Liquidity: Debt MF T+2 redemption vs FD premature penalty', 'Switch plan: ₹2.5 Cr → HDFC Floating Rate Fund before Jul 15', 'Risk: short-duration bond fund AAA-rated, near-zero credit risk'],
+  last: 'Today',
+  ctx: 'Conservative · FD rollover · post-rate-cut debt MF switch',
+  sessionScript: [{
+    t: 4,
+    role: 'ai',
+    text: 'Good morning. I have analysed the FD advice slip for your ₹2.5 Cr HDFC Fixed Deposit maturing July 15th, along with current rate cards and the HDFC Floating Rate Fund factsheet.'
+  }, {
+    t: 13,
+    role: 'client',
+    text: 'Yes, I usually just auto-renew the FD. Is there something better available?'
+  }, {
+    t: 19,
+    role: 'ai',
+    text: 'Yes. The new FD rate is 6.5%, down from your locked 7.2%. A short-duration debt mutual fund currently yields 7.8% post-tax on a 1-year rolling basis — and with indexation on a 3-year hold, the effective yield reaches 8.1%. I am showing you the side-by-side comparison now.'
+  }, {
+    t: 31,
+    role: 'client',
+    text: 'That sounds good but I am worried about safety. I only invest in fixed income.'
+  }, {
+    t: 37,
+    role: 'ai',
+    text: 'The HDFC Floating Rate Fund holds 97% AAA-rated instruments — similar credit quality to your FD. The difference is liquidity: mutual funds allow T+2 redemption with no premature penalty, unlike your FD which charges 1% for early withdrawal.'
+  }, {
+    t: 48,
+    role: 'client',
+    text: 'Hmm. And how much better would I do over 3 years?'
+  }, {
+    t: 53,
+    role: 'ai',
+    text: 'On ₹2.5 Cr over 3 years, the debt MF with indexation would yield approximately ₹14.2 L more than the FD after tax. I have prepared a personalised comparison document with your exact figures. Shall I send it to your WhatsApp for review?'
+  }]
+}];
+var CHANNEL_MAP = {
+  voice: {
+    icon: 'phone',
+    color: '#22c55e',
+    label: 'AI Call'
+  },
+  whatsapp: {
+    icon: 'mic',
+    color: '#25D366',
+    label: 'WhatsApp'
+  },
+  video: {
+    icon: 'video',
+    color: '#3b82f6',
+    label: 'Video'
+  },
+  docai: {
+    icon: 'fileSearch',
+    color: '#8b5cf6',
+    label: 'Doc AI'
+  }
+};
+var CHANNELS = [{
+  id: 'voice',
+  label: 'Gemini Voice Call',
+  icon: 'phone',
+  color: '#22c55e',
+  bg: 'rgba(34,197,94,0.12)',
+  badge: 'Agentic',
+  desc: 'Gemini dials on your behalf. You join as silent co-pilot.',
+  launch: 'Launch Gemini Voice Call',
+  features: ['Smart intro & briefing', 'Live script guidance', 'CRM auto-log']
+}, {
+  id: 'whatsapp',
+  label: 'WhatsApp Voice Note',
+  icon: 'mic',
+  color: '#25D366',
+  bg: 'rgba(37,211,102,0.12)',
+  badge: 'Voice Note',
+  desc: 'AI drafts a personalized voice message sent via WhatsApp.',
+  launch: 'Send Voice Note',
+  features: ['Language-aware delivery', 'Fund context injected', 'Read receipts']
+}, {
+  id: 'video',
+  label: 'Live Video Call',
+  icon: 'video',
+  color: '#3b82f6',
+  bg: 'rgba(59,130,246,0.12)',
+  badge: 'Co-pilot',
+  desc: 'Face-to-face with real-time Gemini insights & doc share.',
+  launch: 'Start Video',
+  features: ['Shared screen', 'Doc annotation', 'Live AI tips']
+}, {
+  id: 'docai',
+  label: 'Document Intelligence',
+  icon: 'fileSearch',
+  color: '#8b5cf6',
+  bg: 'rgba(139,92,246,0.12)',
+  badge: 'Multimodal',
+  desc: 'Analyze statements, fund docs, and legal agreements live.',
+  launch: 'Analyze Doc',
+  features: ['PDF · Excel · Images', 'Risk extraction', 'Action plan']
+}];
+var AGENTSPACE_ENGINE_ID = "agentspace_1751710232953";
+var ENTERPRISE_APPS = [{
+  id: 'crm',
+  label: 'CRM',
+  color: '#3b82f6',
+  sub: 'Salesforce sync'
+}, {
+  id: 'port',
+  label: 'Portfolio',
+  color: '#10b981',
+  sub: 'Builder Pro'
+}, {
+  id: 'sebi',
+  label: 'Compliance',
+  color: '#8b5cf6',
+  sub: 'SEBI / AMFI'
+}, {
+  id: 'rsch',
+  label: 'Research',
+  color: '#f59e0b',
+  sub: 'Terminal'
+}];
+var ALERT_COLORS = {
+  urgent: '#f59e0b',
+  critical: '#ef4444',
+  high: '#f97316',
+  medium: '#38bdf8'
+};
+var KPI_DATA = [{
+  id: 'aum',
+  label: 'Total AUM',
+  value: '₹187.2 Cr',
+  sub: '5 HNW priority clients',
+  delta: '+₹8.4 Cr',
+  up: true,
+  color: '#6366f1',
+  bg: 'rgba(99,102,241,0.08)',
+  icon: 'dollar'
+}, {
+  id: 'revenue',
+  label: 'Revenue at Risk',
+  value: '₹2.8 L',
+  sub: '3 clients need action',
+  delta: '16 days',
+  up: false,
+  color: '#f43f5e',
+  bg: 'rgba(244,63,94,0.08)',
+  icon: 'alertTri'
+}, {
+  id: 'health',
+  label: 'Avg Portfolio',
+  value: '79/100',
+  sub: '2 below 70 · need review',
+  delta: '+4 pts',
+  up: true,
+  color: '#3b82f6',
+  bg: 'rgba(59,130,246,0.08)',
+  icon: 'activity'
+}, {
+  id: 'alerts',
+  label: 'Days to Act',
+  value: '10 Days',
+  sub: 'PE maturity: Jun 30 · Amit',
+  delta: 'Urgent',
+  up: false,
+  color: '#f59e0b',
+  bg: 'rgba(245,158,11,0.08)',
+  icon: 'clock'
+}];
+var NAV = [{
+  id: 'dashboard',
+  label: 'Dashboard',
+  icon: 'dashboard'
+}, {
+  id: 'clients',
+  label: 'Clients',
+  icon: 'clients',
+  badge: '5'
+}, {
+  id: 'port',
+  label: 'Portfolios',
+  icon: 'portfolios'
+}, {
+  id: 'analytics',
+  label: 'Analytics',
+  icon: 'analytics'
+}, {
+  id: 'compliance',
+  label: 'Compliance',
+  icon: 'compliance',
+  badge: '2',
+  badgeRed: true
+}];
+
+// ─── SIDEBAR ──────────────────────────────────────────────────────────────────
+function Sidebar({
+  active,
+  onNav
+}) {
+  return /*#__PURE__*/React.createElement("aside", {
+    style: {
+      width: 196,
+      minWidth: 196,
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      background: '#07091c',
+      borderRight: '1px solid rgba(99,102,241,0.1)'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: '16px 14px 12px',
+      borderBottom: '1px solid rgba(255,255,255,0.04)'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 9,
+      marginBottom: 10
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 32,
+      height: 32,
+      minWidth: 32,
+      borderRadius: 9,
+      background: 'linear-gradient(135deg,#6366f1,#7c3aed)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontWeight: 800,
+      color: '#fff',
+      fontSize: 14,
+      boxShadow: '0 4px 14px rgba(99,102,241,.35)'
+    }
+  }, "W"), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      fontWeight: 700,
+      color: '#f1f5f9'
+    }
+  }, "Cymbal Wealth Platform"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 8,
+      color: '#34d399',
+      fontWeight: 600
+    }
+  }, "Powered by Gemini"))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 5,
+      padding: '4px 8px',
+      borderRadius: 6,
+      background: 'rgba(16,185,129,0.06)',
+      border: '1px solid rgba(16,185,129,0.15)'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 5,
+      height: 5,
+      borderRadius: '50%',
+      background: '#10b981',
+      animation: 'blink 1.5s ease-in-out infinite'
+    }
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 8,
+      fontWeight: 700,
+      color: '#34d399'
+    }
+  }, "SEBI Compliant · Live"))), /*#__PURE__*/React.createElement("nav", {
+    style: {
+      flex: 1,
+      padding: '10px 7px',
+      overflowY: 'auto'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 8,
+      fontWeight: 700,
+      color: '#334155',
+      textTransform: 'uppercase',
+      letterSpacing: '.1em',
+      padding: '0 7px',
+      marginBottom: 5
+    }
+  }, "Workspace"), NAV.map(function (item) {
+    var on = active === item.id;
+    return /*#__PURE__*/React.createElement("button", {
+      key: item.id,
+      onClick: function () {
+        onNav(item.id);
+      },
+      style: {
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8,
+        padding: '8px 9px',
+        borderRadius: 8,
+        border: 'none',
+        cursor: 'pointer',
+        marginBottom: 2,
+        fontFamily: 'Inter,sans-serif',
+        textAlign: 'left',
+        background: on ? 'rgba(99,102,241,0.12)' : 'transparent',
+        color: on ? '#a5b4fc' : '#64748b',
+        boxShadow: on ? 'inset 0 0 0 1px rgba(99,102,241,0.2)' : 'none'
+      }
+    }, /*#__PURE__*/React.createElement(Ico, {
+      n: item.icon,
+      size: 13
+    }), /*#__PURE__*/React.createElement("span", {
+      style: {
+        flex: 1,
+        fontSize: 11,
+        fontWeight: on ? 600 : 500
+      }
+    }, item.label), item.badge && /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 8,
+        fontWeight: 800,
+        padding: '1px 5px',
+        borderRadius: 20,
+        background: item.badgeRed ? 'rgba(239,68,68,0.15)' : on ? 'rgba(165,180,252,0.12)' : 'rgba(255,255,255,0.06)',
+        color: item.badgeRed ? '#f87171' : on ? '#a5b4fc' : '#64748b'
+      }
+    }, item.badge));
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 12
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 8,
+      fontWeight: 700,
+      color: '#334155',
+      textTransform: 'uppercase',
+      letterSpacing: '.1em',
+      padding: '0 7px',
+      marginBottom: 5
+    }
+  }, "Live Markets"), [{
+    l: 'NIFTY 50',
+    v: '+0.42%',
+    up: true
+  }, {
+    l: '10Y G-Sec',
+    v: '6.89%',
+    up: false,
+    s: '-2bps'
+  }, {
+    l: 'USD/INR',
+    v: '₹83.42',
+    up: false
+  }, {
+    l: 'SENSEX',
+    v: '+0.38%',
+    up: true
+  }].map(function (m) {
+    return /*#__PURE__*/React.createElement("div", {
+      key: m.l,
+      style: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '5px 8px',
+        borderRadius: 6,
+        marginBottom: 2,
+        background: 'rgba(255,255,255,0.02)'
+      }
+    }, /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 9,
+        color: '#475569'
+      }
+    }, m.l), /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 9,
+        fontWeight: 700,
+        color: m.up ? '#34d399' : '#f87171'
+      }
+    }, m.v, m.s ? ' ' + m.s : ''));
+  }))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: 7,
+      borderTop: '1px solid rgba(255,255,255,0.04)'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 7,
+      padding: '6px 8px',
+      borderRadius: 8,
+      cursor: 'pointer'
+    },
+    onMouseEnter: function (e) {
+      e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
+    },
+    onMouseLeave: function (e) {
+      e.currentTarget.style.background = 'transparent';
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 26,
+      height: 26,
+      minWidth: 26,
+      borderRadius: 7,
+      background: 'linear-gradient(135deg,rgba(99,102,241,.5),rgba(124,58,237,.5))',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontWeight: 700,
+      color: '#fff',
+      fontSize: 9
+    }
+  }, "RS"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1,
+      minWidth: 0
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 10,
+      fontWeight: 600,
+      color: '#e2e8f0',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap'
+    }
+  }, "Rohan Sharma"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 8,
+      color: '#475569'
+    }
+  }, "ARN-0047")), /*#__PURE__*/React.createElement(Ico, {
+    n: "moreVert",
+    size: 11,
+    cls: "text-slate-500",
+    sw: 2
+  }))));
+}
+
+// ─── HEADER ───────────────────────────────────────────────────────────────────
+function Header({
+  client,
+  notifCount
+}) {
+  return /*#__PURE__*/React.createElement("header", {
+    style: {
+      height: 50,
+      minHeight: 50,
+      display: 'flex',
+      alignItems: 'center',
+      gap: 12,
+      padding: '0 18px',
+      borderBottom: '1px solid rgba(99,102,241,0.08)',
+      background: 'rgba(6,9,26,0.96)',
+      backdropFilter: 'blur(12px)',
+      flexShrink: 0,
+      zIndex: 20
+    }
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 14,
+      fontWeight: 800,
+      color: '#f1f5f9',
+      letterSpacing: '-.01em'
+    }
+  }, "Priority Outreach · Today"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 9,
+      color: '#475569'
+    }
+  }, "5 HNW clients · ₹187.2 Cr AUM · Gemini Hub active")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1
+    }
+  }), client && /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 7,
+      padding: '4px 11px',
+      borderRadius: 20,
+      background: 'rgba(99,102,241,0.08)',
+      border: '1px solid rgba(99,102,241,0.2)'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 5,
+      height: 5,
+      borderRadius: '50%',
+      background: '#6366f1',
+      animation: 'blink 1.5s ease-in-out infinite'
+    }
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 10,
+      fontWeight: 700,
+      color: '#a5b4fc'
+    }
+  }, "Focus: ", client.name)), /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: 'relative',
+      display: 'flex',
+      alignItems: 'center'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: 'absolute',
+      left: 9,
+      top: '50%',
+      transform: 'translateY(-50%)',
+      pointerEvents: 'none'
+    }
+  }, /*#__PURE__*/React.createElement(Ico, {
+    n: "search",
+    size: 11,
+    cls: "text-slate-500"
+  })), /*#__PURE__*/React.createElement("input", {
+    type: "text",
+    placeholder: "Search clients, PAN, funds...",
+    style: {
+      width: 190,
+      padding: '6px 10px 6px 28px',
+      borderRadius: 8,
+      border: '1px solid rgba(255,255,255,0.08)',
+      background: 'rgba(255,255,255,0.04)',
+      color: '#e2e8f0',
+      fontFamily: 'Inter,sans-serif',
+      fontSize: 10,
+      outline: 'none'
+    }
+  })), /*#__PURE__*/React.createElement("button", {
+    style: {
+      position: 'relative',
+      padding: 7,
+      borderRadius: 8,
+      border: 'none',
+      background: 'transparent',
+      cursor: 'pointer',
+      color: '#64748b'
+    },
+    onMouseEnter: function (e) {
+      e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
+    },
+    onMouseLeave: function (e) {
+      e.currentTarget.style.background = 'transparent';
+    }
+  }, /*#__PURE__*/React.createElement(Ico, {
+    n: "bell",
+    size: 15
+  }), notifCount > 0 && /*#__PURE__*/React.createElement("span", {
+    style: {
+      position: 'absolute',
+      top: '-1px',
+      right: '-1px',
+      minWidth: 14,
+      height: 14,
+      borderRadius: 20,
+      background: '#ef4444',
+      color: '#fff',
+      fontSize: 8,
+      fontWeight: 800,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '0 3px'
+    }
+  }, notifCount)), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 7,
+      paddingLeft: 11,
+      borderLeft: '1px solid rgba(255,255,255,0.06)'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 29,
+      height: 29,
+      minWidth: 29,
+      borderRadius: 8,
+      background: 'linear-gradient(135deg,#6366f1,#7c3aed)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontWeight: 700,
+      color: '#fff',
+      fontSize: 10
+    }
+  }, "RS"), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 10,
+      fontWeight: 600,
+      color: '#f1f5f9'
+    }
+  }, "Rohan Sharma"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 8,
+      color: '#475569'
+    }
+  }, "Principal Director"))));
+}
+
+// ─── KPI CARD ─────────────────────────────────────────────────────────────────
+function KPICard({
+  k
+}) {
+  var [hovered, setHovered] = useState(false);
+  return /*#__PURE__*/React.createElement("div", {
+    onMouseEnter: function () {
+      setHovered(true);
+    },
+    onMouseLeave: function () {
+      setHovered(false);
+    },
+    style: {
+      borderRadius: 14,
+      padding: '15px 16px',
+      background: hovered ? 'rgba(20,30,60,0.8)' : 'rgba(14,20,48,0.6)',
+      border: '1px solid ' + (hovered ? k.color + '30' : 'rgba(255,255,255,0.06)'),
+      position: 'relative',
+      overflow: 'hidden',
+      cursor: 'default',
+      transition: 'all .2s ease',
+      boxShadow: hovered ? '0 8px 32px ' + k.color + '22' : 'none'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: 'absolute',
+      top: 0,
+      left: 14,
+      right: 14,
+      height: 1,
+      background: 'linear-gradient(90deg,transparent,' + k.color + ',transparent)',
+      opacity: hovered ? .8 : .4
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+      marginBottom: 10
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: 7,
+      borderRadius: 9,
+      background: k.bg,
+      color: k.color
+    }
+  }, /*#__PURE__*/React.createElement(Ico, {
+    n: k.icon,
+    size: 13,
+    sw: 2
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 3,
+      padding: '2px 6px',
+      borderRadius: 20,
+      fontSize: 9,
+      fontWeight: 700,
+      background: k.up ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)',
+      color: k.up ? '#34d399' : '#fbbf24'
+    }
+  }, /*#__PURE__*/React.createElement(Ico, {
+    n: k.up ? 'trendUp' : 'alertTri',
+    size: 8
+  }), k.delta)), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 22,
+      fontWeight: 900,
+      color: '#f1f5f9',
+      letterSpacing: '-.02em',
+      lineHeight: 1
+    }
+  }, k.value), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      fontWeight: 600,
+      color: k.color,
+      marginTop: 5
+    }
+  }, k.label), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 9,
+      color: '#475569',
+      marginTop: 2
+    }
+  }, k.sub));
+}
+
+// ─── PORTFOLIO CHART ──────────────────────────────────────────────────────────
+var PVALS = [140, 155, 148, 168, 180, 187];
+var BVALS = [140, 148, 145, 156, 165, 172];
+var MOS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+var XS = [0, 100, 200, 300, 400, 500];
+function sy(v) {
+  return 130 - (v - 130) / 70 * 115;
+}
+function PortfolioChart() {
+  var pPts = XS.map(function (x, i) {
+    return x + ',' + sy(PVALS[i]);
+  }).join(' ');
+  var bPts = XS.map(function (x, i) {
+    return x + ',' + sy(BVALS[i]);
+  }).join(' ');
+  var pArea = 'M' + pPts.split(' ').join(' L') + ' L500,132 L0,132 Z';
+  var bArea = 'M' + bPts.split(' ').join(' L') + ' L500,132 L0,132 Z';
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      borderRadius: 14,
+      padding: '14px 16px 10px',
+      background: 'rgba(14,20,48,0.6)',
+      border: '1px solid rgba(255,255,255,0.06)',
+      flex: 1
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: 12
+    }
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      fontWeight: 700,
+      color: '#f1f5f9'
+    }
+  }, "5-Client AUM Performance"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 9,
+      color: '#475569'
+    }
+  }, "Priority HNW portfolio aggregate · Jan–Jun 2026")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 12
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 5
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 18,
+      height: 2,
+      background: '#6366f1',
+      borderRadius: 2
+    }
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 8,
+      color: '#64748b'
+    }
+  }, "Portfolio")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 5
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 18,
+      height: 1,
+      background: 'rgba(148,163,184,.35)',
+      borderTop: '1px dashed rgba(148,163,184,.4)'
+    }
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 8,
+      color: '#64748b'
+    }
+  }, "Benchmark")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: '2px 7px',
+      borderRadius: 6,
+      background: 'rgba(16,185,129,0.08)',
+      border: '1px solid rgba(16,185,129,0.2)',
+      fontSize: 9,
+      fontWeight: 700,
+      color: '#34d399'
+    }
+  }, "+33.7% YTD"))), /*#__PURE__*/React.createElement("svg", {
+    viewBox: "0 0 500 150",
+    style: {
+      width: '100%',
+      height: 130,
+      overflow: 'visible'
+    }
+  }, /*#__PURE__*/React.createElement("defs", null, /*#__PURE__*/React.createElement("linearGradient", {
+    id: "pg",
+    x1: "0",
+    y1: "0",
+    x2: "0",
+    y2: "1"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    stopColor: "#6366f1",
+    stopOpacity: ".22"
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "100%",
+    stopColor: "#6366f1",
+    stopOpacity: "0"
+  })), /*#__PURE__*/React.createElement("linearGradient", {
+    id: "bg2",
+    x1: "0",
+    y1: "0",
+    x2: "0",
+    y2: "1"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    stopColor: "#94a3b8",
+    stopOpacity: ".07"
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "100%",
+    stopColor: "#94a3b8",
+    stopOpacity: "0"
+  }))), [.25, .5, .75].map(function (f) {
+    return /*#__PURE__*/React.createElement("line", {
+      key: f,
+      x1: "0",
+      y1: 130 - f * 115,
+      x2: "500",
+      y2: 130 - f * 115,
+      stroke: "rgba(255,255,255,0.04)",
+      strokeWidth: "1"
+    });
+  }), /*#__PURE__*/React.createElement("path", {
+    d: bArea,
+    fill: "url(#bg2)"
+  }), /*#__PURE__*/React.createElement("polyline", {
+    points: bPts,
+    fill: "none",
+    stroke: "rgba(148,163,184,.28)",
+    strokeWidth: "1.5",
+    strokeDasharray: "4 3"
+  }), /*#__PURE__*/React.createElement("path", {
+    d: pArea,
+    fill: "url(#pg)"
+  }), /*#__PURE__*/React.createElement("polyline", {
+    points: pPts,
+    fill: "none",
+    stroke: "#6366f1",
+    strokeWidth: "2.5",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  }), /*#__PURE__*/React.createElement("circle", {
+    cx: "500",
+    cy: sy(187),
+    r: "4",
+    fill: "#6366f1"
+  }), /*#__PURE__*/React.createElement("circle", {
+    cx: "500",
+    cy: sy(187),
+    r: "8",
+    fill: "rgba(99,102,241,0.18)"
+  }), /*#__PURE__*/React.createElement("text", {
+    x: "493",
+    y: sy(187) - 10,
+    textAnchor: "end",
+    fontSize: "9",
+    fill: "#a5b4fc",
+    fontWeight: "700"
+  }, "₹187.2 Cr"), MOS.map(function (m, i) {
+    return /*#__PURE__*/React.createElement("text", {
+      key: m,
+      x: XS[i],
+      y: "148",
+      textAnchor: "middle",
+      fontSize: "8",
+      fill: "#334155"
+    }, m);
+  })));
+}
+
+// ─── MARKET PULSE ─────────────────────────────────────────────────────────────
+function MarketPulse() {
+  var mkts = [{
+    l: 'NIFTY 50',
+    v: '24,323',
+    d: '+0.42%',
+    up: true
+  }, {
+    l: 'SENSEX',
+    v: '79,810',
+    d: '+0.38%',
+    up: true
+  }, {
+    l: '10Y G-Sec',
+    v: '6.89%',
+    d: '-2bps',
+    up: false
+  }, {
+    l: 'USD/INR',
+    v: '₹83.42',
+    d: '+0.12%',
+    up: false
+  }, {
+    l: 'Gold MCX',
+    v: '₹73,240',
+    d: '+0.61%',
+    up: true
+  }, {
+    l: 'Crude WTI',
+    v: '$82.4',
+    d: '+1.2%',
+    up: true
+  }];
+  var news = ['RBI holds repo at 6.5% — debt MF inflows surge 18%', 'SEBI tightens AIF Category III norms · Apr 2026', 'Budget: LTCG exemption raised to ₹1.5 L per FY'];
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      borderRadius: 14,
+      padding: '14px 13px',
+      background: 'rgba(14,20,48,0.6)',
+      border: '1px solid rgba(255,255,255,0.06)',
+      width: 210,
+      minWidth: 210,
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 7
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 7
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: 5,
+      borderRadius: 7,
+      background: 'rgba(99,102,241,0.1)'
+    }
+  }, /*#__PURE__*/React.createElement(Ico, {
+    n: "activity",
+    size: 11,
+    cls: "text-indigo-400"
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      fontWeight: 700,
+      color: '#f1f5f9'
+    }
+  }, "Market Pulse"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 8,
+      color: '#475569'
+    }
+  }, "Live · BSE NSE CDSL")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 3,
+      padding: '2px 6px',
+      borderRadius: 20,
+      background: 'rgba(16,185,129,0.07)',
+      border: '1px solid rgba(16,185,129,0.15)'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 5,
+      height: 5,
+      borderRadius: '50%',
+      background: '#10b981',
+      animation: 'blink 1.5s ease-in-out infinite'
+    }
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 7,
+      fontWeight: 700,
+      color: '#34d399'
+    }
+  }, "LIVE"))), mkts.map(function (m) {
+    return /*#__PURE__*/React.createElement("div", {
+      key: m.l,
+      style: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '5px 8px',
+        borderRadius: 7,
+        background: 'rgba(255,255,255,0.02)',
+        border: '1px solid rgba(255,255,255,0.03)'
+      }
+    }, /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 9,
+        color: '#64748b'
+      }
+    }, m.l), /*#__PURE__*/React.createElement("div", {
+      style: {
+        textAlign: 'right'
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 10,
+        fontWeight: 800,
+        color: '#f1f5f9'
+      }
+    }, m.v), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 8,
+        fontWeight: 700,
+        color: m.up ? '#34d399' : '#f87171'
+      }
+    }, m.d)));
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      borderTop: '1px solid rgba(255,255,255,0.04)',
+      paddingTop: 6
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 7,
+      fontWeight: 700,
+      color: '#334155',
+      textTransform: 'uppercase',
+      letterSpacing: '.1em',
+      marginBottom: 5
+    }
+  }, "FSI Headlines"), news.map(function (n, i) {
+    return /*#__PURE__*/React.createElement("div", {
+      key: i,
+      style: {
+        display: 'flex',
+        gap: 5,
+        marginBottom: 4
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        width: 3,
+        height: 3,
+        borderRadius: '50%',
+        background: '#6366f1',
+        marginTop: 5,
+        flexShrink: 0
+      }
+    }), /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 8,
+        color: '#64748b',
+        lineHeight: 1.4
+      }
+    }, n));
+  })));
+}
+
+// ─── CLIENT TABLE ─────────────────────────────────────────────────────────────
+function UrgencyBadge({
+  days
+}) {
+  var color = days <= 15 ? '#ef4444' : days <= 25 ? '#f59e0b' : '#475569';
+  var bg = days <= 15 ? 'rgba(239,68,68,0.1)' : days <= 25 ? 'rgba(245,158,11,0.1)' : 'rgba(255,255,255,0.04)';
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 3,
+      padding: '2px 6px',
+      borderRadius: 20,
+      background: bg,
+      border: '1px solid ' + color + '44'
+    }
+  }, /*#__PURE__*/React.createElement(Ico, {
+    n: "clock",
+    size: 8,
+    sw: 2
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 8,
+      fontWeight: 800,
+      color: color,
+      whiteSpace: 'nowrap'
+    }
+  }, days, "d"));
+}
+function ChannelDropdown({ client, selectedChannelId, onSelect }) {
+  var [open, setOpen] = useState(false);
+  var ch = CHANNEL_MAP[selectedChannelId] || CHANNEL_MAP.voice;
+  return /*#__PURE__*/React.createElement("div", { style: { position: 'relative' } },
+    /*#__PURE__*/React.createElement("button", {
+      onClick: function (e) { e.stopPropagation(); setOpen(function (o) { return !o; }); },
+      style: { display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 6px 3px 7px', borderRadius: 20, background: ch.color + '18', border: '1px solid ' + ch.color + '40', color: ch.color, cursor: 'pointer', fontFamily: 'Inter,sans-serif', whiteSpace: 'nowrap' }
+    },
+      /*#__PURE__*/React.createElement(Ico, { n: ch.icon, size: 9, sw: 2 }),
+      /*#__PURE__*/React.createElement("span", { style: { fontSize: 8, fontWeight: 700 } }, ch.label),
+      /*#__PURE__*/React.createElement(Ico, { n: 'chevDown', size: 8, sw: 2 })
+    ),
+    open && /*#__PURE__*/React.createElement("div", {
+      style: { position: 'absolute', left: 0, top: '100%', marginTop: 3, background: '#0d1627', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 9, padding: '4px', zIndex: 9999, minWidth: 182, boxShadow: '0 10px 30px rgba(0,0,0,0.6)' }
+    },
+      /*#__PURE__*/React.createElement("div", { style: { fontSize: 6.5, fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '.1em', padding: '3px 8px 5px' } }, "Select AI Channel"),
+      CHANNELS.map(function (c) {
+        var isSel = c.id === selectedChannelId;
+        var isRec = c.id === client.recommendedChannel;
+        return /*#__PURE__*/React.createElement("button", {
+          key: c.id,
+          onClick: function (e) { e.stopPropagation(); onSelect(c.id); setOpen(false); },
+          style: { display: 'flex', alignItems: 'center', gap: 6, width: '100%', padding: '5px 8px', borderRadius: 6, border: 'none', cursor: 'pointer', fontFamily: 'Inter,sans-serif', textAlign: 'left', background: isSel ? c.color + '22' : 'transparent', color: isSel ? c.color : '#94a3b8', marginBottom: 1 }
+        },
+          /*#__PURE__*/React.createElement(Ico, { n: c.icon, size: 9, sw: 2 }),
+          /*#__PURE__*/React.createElement("span", { style: { fontSize: 8, fontWeight: isSel ? 700 : 500, flex: 1 } }, c.label),
+          isRec && /*#__PURE__*/React.createElement("span", { style: { fontSize: 6, fontWeight: 800, padding: '1px 4px', borderRadius: 3, background: 'rgba(99,102,241,0.18)', color: '#a5b4fc' } }, "★ AI Pick")
+        );
+      })
+    )
+  );
+}
+function ClientTable({
+  selected,
+  onSelect,
+  activeCh,
+  onChannelSelect
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      borderRadius: 14,
+      border: '1px solid rgba(255,255,255,0.06)',
+      background: 'rgba(14,20,48,0.6)',
+      overflow: 'hidden',
+      flexShrink: 0
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      padding: '11px 16px',
+      borderBottom: '1px solid rgba(255,255,255,0.04)',
+      background: 'rgba(4,8,24,0.5)'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 7
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: 5,
+      borderRadius: 7,
+      background: 'rgba(99,102,241,0.1)'
+    }
+  }, /*#__PURE__*/React.createElement(Ico, {
+    n: "star",
+    size: 11,
+    cls: "text-indigo-400"
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      fontWeight: 700,
+      color: '#f1f5f9'
+    }
+  }, "5 HNW Priority Clients"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 8,
+      color: '#475569'
+    }
+  }, "Click a row · Gemini Hub activates · AI recommends best channel"))), /*#__PURE__*/React.createElement("button", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 4,
+      padding: '5px 10px',
+      borderRadius: 7,
+      border: 'none',
+      background: '#4f46e5',
+      color: '#fff',
+      fontFamily: 'Inter,sans-serif',
+      fontSize: 9,
+      fontWeight: 700,
+      cursor: 'pointer'
+    }
+  }, /*#__PURE__*/React.createElement(Ico, {
+    n: "zap",
+    size: 9
+  }), "Bulk Outreach")), /*#__PURE__*/React.createElement("table", {
+    style: {
+      width: '100%',
+      borderCollapse: 'collapse'
+    }
+  }, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", {
+    style: {
+      background: 'rgba(4,8,24,0.4)'
+    }
+  }, ['Client', 'Net Worth / AUM', 'Health', 'Trigger Alert', 'AI Channel', 'Urgency', ''].map(function (h) {
+    return /*#__PURE__*/React.createElement("th", {
+      key: h,
+      style: {
+        padding: '7px 13px',
+        textAlign: 'left',
+        fontSize: 8,
+        fontWeight: 700,
+        color: '#475569',
+        textTransform: 'uppercase',
+        letterSpacing: '.08em',
+        borderBottom: '1px solid rgba(255,255,255,0.04)',
+        whiteSpace: 'nowrap'
+      }
+    }, h);
+  }))), /*#__PURE__*/React.createElement("tbody", null, CLIENTS.map(function (c) {
+    var sel = selected && selected.id === c.id;
+    var ac = ALERT_COLORS[c.alertL] || '#64748b';
+    return /*#__PURE__*/React.createElement("tr", {
+      key: c.id,
+      onClick: function () {
+        onSelect(sel ? null : c);
+      },
+      style: {
+        borderBottom: '1px solid rgba(255,255,255,0.03)',
+        cursor: 'pointer',
+        transition: 'background .12s',
+        background: sel ? 'rgba(99,102,241,0.07)' : 'transparent',
+        outline: sel ? '1px solid rgba(99,102,241,0.18)' : 'none',
+        outlineOffset: '-1px'
+      },
+      onMouseEnter: function (e) {
+        if (!sel) e.currentTarget.style.background = 'rgba(255,255,255,0.02)';
+      },
+      onMouseLeave: function (e) {
+        if (!sel) e.currentTarget.style.background = 'transparent';
+      }
+    }, /*#__PURE__*/React.createElement("td", {
+      style: {
+        padding: '9px 13px'
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: 9
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        width: 32,
+        height: 32,
+        minWidth: 32,
+        borderRadius: 9,
+        background: 'linear-gradient(' + c.grad + ')',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontWeight: 700,
+        color: '#fff',
+        fontSize: 10,
+        boxShadow: sel ? '0 4px 12px rgba(99,102,241,.3)' : 'none'
+      }
+    }, c.initials), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 11,
+        fontWeight: 700,
+        color: '#f1f5f9',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 5
+      }
+    }, c.name, sel && /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 7,
+        fontWeight: 800,
+        padding: '1px 4px',
+        borderRadius: 20,
+        background: 'rgba(99,102,241,0.2)',
+        color: '#a5b4fc'
+      }
+    }, "FOCUS")), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 8,
+        color: '#475569'
+      }
+    }, c.loc, " · ", c.age, "y · ", /*#__PURE__*/React.createElement("span", {
+      style: {
+        color: c.riskC
+      }
+    }, c.risk))))), /*#__PURE__*/React.createElement("td", {
+      style: {
+        padding: '9px 13px',
+        whiteSpace: 'nowrap'
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 12,
+        fontWeight: 800,
+        color: '#f1f5f9'
+      }
+    }, c.nw), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 8,
+        color: '#475569'
+      }
+    }, "AUM ", /*#__PURE__*/React.createElement("span", {
+      style: {
+        color: '#94a3b8',
+        fontWeight: 600
+      }
+    }, c.aum))), /*#__PURE__*/React.createElement("td", {
+      style: {
+        padding: '9px 13px'
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: 5
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 13,
+        fontWeight: 900,
+        color: c.hC
+      }
+    }, c.health), /*#__PURE__*/React.createElement("div", {
+      style: {
+        width: 36,
+        height: 4,
+        borderRadius: 4,
+        background: 'rgba(255,255,255,0.07)',
+        overflow: 'hidden'
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        width: c.health + '%',
+        height: '100%',
+        background: c.hC,
+        borderRadius: 4
+      }
+    })))), /*#__PURE__*/React.createElement("td", {
+      style: {
+        padding: '9px 13px'
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 3,
+        padding: '2px 6px',
+        borderRadius: 5,
+        fontSize: 8,
+        fontWeight: 700,
+        background: ac + '18',
+        color: ac,
+        border: '1px solid ' + ac + '33',
+        marginBottom: 3,
+        whiteSpace: 'nowrap'
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        width: 4,
+        height: 4,
+        borderRadius: '50%',
+        background: 'currentColor',
+        flexShrink: 0
+      }
+    }), c.tag), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 8,
+        color: '#64748b',
+        maxWidth: 140
+      }
+    }, c.alert)), /*#__PURE__*/React.createElement("td", {
+      style: {
+        padding: '9px 13px'
+      }
+    }, /*#__PURE__*/React.createElement(ChannelDropdown, {
+      client: c,
+      selectedChannelId: (sel && activeCh) ? activeCh : c.recommendedChannel,
+      onSelect: function (channelId) { onChannelSelect(c, channelId); }
+    })), /*#__PURE__*/React.createElement("td", {
+      style: {
+        padding: '9px 13px'
+      }
+    }, /*#__PURE__*/React.createElement(UrgencyBadge, {
+      days: c.urgencyDays
+    })), /*#__PURE__*/React.createElement("td", {
+      style: {
+        padding: '9px 13px'
+      }
+    }, /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 9,
+        fontWeight: 700,
+        color: sel ? '#818cf8' : '#334155',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 2
+      }
+    }, sel ? 'Use Hub →' : 'Select', /*#__PURE__*/React.createElement(Ico, {
+      n: "chevRight",
+      size: 9
+    }))));
+  }))));
+}
+
+// ─── CHANNEL CARD ─────────────────────────────────────────────────────────────
+function ChannelCard({
+  ch,
+  selected,
+  onClick,
+  onLaunch,
+  client,
+  isRecommended
+}) {
+  return /*#__PURE__*/React.createElement("button", {
+    onClick: onClick,
+    style: {
+      width: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 5,
+      padding: '10px 11px',
+      borderRadius: 10,
+      cursor: 'pointer',
+      fontFamily: 'Inter,sans-serif',
+      textAlign: 'left',
+      border: '1px solid ' + (selected ? ch.color + '55' : isRecommended ? ch.color + '33' : 'rgba(255,255,255,0.06)'),
+      background: selected ? ch.bg : isRecommended ? ch.color + '08' : 'rgba(255,255,255,0.02)',
+      boxShadow: selected ? '0 0 20px ' + ch.color + '22' : 'none',
+      transition: 'all .18s ease',
+      position: 'relative'
+    },
+    onMouseEnter: function (e) {
+      if (!selected) {
+        e.currentTarget.style.borderColor = ch.color + '44';
+        e.currentTarget.style.background = ch.color + '0d';
+      }
+    },
+    onMouseLeave: function (e) {
+      if (!selected) {
+        e.currentTarget.style.borderColor = isRecommended ? ch.color + '33' : 'rgba(255,255,255,0.06)';
+        e.currentTarget.style.background = isRecommended ? ch.color + '08' : 'rgba(255,255,255,0.02)';
+      }
+    }
+  }, isRecommended && !selected && /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: 'absolute',
+      top: 7,
+      right: 7,
+      padding: '1px 5px',
+      borderRadius: 4,
+      background: ch.color + '25',
+      border: '1px solid ' + ch.color + '44',
+      fontSize: 7,
+      fontWeight: 800,
+      color: ch.color
+    }
+  }, "RECOMMENDED"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 8
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: 7,
+      borderRadius: 8,
+      background: selected ? ch.color + '25' : 'rgba(255,255,255,0.05)',
+      color: ch.color,
+      flexShrink: 0
+    }
+  }, /*#__PURE__*/React.createElement(Ico, {
+    n: ch.icon,
+    size: 13,
+    sw: 2
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1,
+      paddingRight: isRecommended ? 60 : 0
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      fontWeight: 700,
+      color: selected ? '#f1f5f9' : '#cbd5e1'
+    }
+  }, ch.label), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 7,
+      fontWeight: 800,
+      padding: '1px 5px',
+      borderRadius: 4,
+      background: ch.color + '22',
+      color: ch.color
+    }
+  }, ch.badge)), selected && /*#__PURE__*/React.createElement(Ico, {
+    n: "chevRight",
+    size: 9,
+    sw: 2.5
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 9,
+      color: '#64748b',
+      lineHeight: 1.4,
+      paddingLeft: 36
+    }
+  }, ch.desc), selected && client && /*#__PURE__*/React.createElement("div", {
+    style: {
+      paddingLeft: 0,
+      marginTop: 2
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 3,
+      marginBottom: 8
+    }
+  }, (client.talkingPoints || ch.features).map(function (f) {
+    return /*#__PURE__*/React.createElement("div", {
+      key: f,
+      style: {
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: 5
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        width: 4,
+        height: 4,
+        borderRadius: '50%',
+        background: ch.color,
+        flexShrink: 0,
+        marginTop: 4
+      }
+    }), /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 9,
+        color: '#94a3b8',
+        lineHeight: 1.4
+      }
+    }, f));
+  })), /*#__PURE__*/React.createElement("button", {
+    onClick: function (e) {
+      e.stopPropagation();
+      if (onLaunch) onLaunch();
+    },
+    style: {
+      width: '100%',
+      padding: '9px',
+      borderRadius: 9,
+      border: 'none',
+      background: 'linear-gradient(135deg,' + ch.color + 'ee,' + ch.color + 'aa)',
+      color: '#fff',
+      fontSize: 11,
+      fontWeight: 800,
+      cursor: 'pointer',
+      fontFamily: 'Inter,sans-serif',
+      boxShadow: '0 4px 16px ' + ch.color + '44'
+    }
+  }, ch.launch, " →")));
+}
+
+// ─── SMART BRIEF ──────────────────────────────────────────────────────────────
+function SmartBrief({
+  client
+}) {
+  var chMeta = CHANNEL_MAP[client.recommendedChannel] || CHANNEL_MAP.voice;
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      borderRadius: 10,
+      border: '1px solid rgba(99,102,241,0.15)',
+      background: 'rgba(6,9,26,0.7)',
+      padding: '9px 10px',
+      marginBottom: 8
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 5,
+      marginBottom: 6
+    }
+  }, /*#__PURE__*/React.createElement(Ico, {
+    n: "sparkles",
+    size: 9,
+    cls: "text-indigo-400",
+    sw: 2.5
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 8,
+      fontWeight: 800,
+      color: '#a5b4fc',
+      textTransform: 'uppercase',
+      letterSpacing: '.1em'
+    }
+  }, "Gemini Smart Brief")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 9,
+      color: '#94a3b8',
+      lineHeight: 1.45,
+      marginBottom: 7
+    }
+  }, client.story), client.complianceNote && /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: '5px 8px',
+      borderRadius: 7,
+      background: 'rgba(245,158,11,0.08)',
+      border: '1px solid rgba(245,158,11,0.25)',
+      marginBottom: 7,
+      display: 'flex',
+      alignItems: 'flex-start',
+      gap: 5
+    }
+  }, /*#__PURE__*/React.createElement(Ico, {
+    n: "shield",
+    size: 9,
+    cls: "text-amber-400",
+    sw: 2
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 8,
+      color: '#fbbf24',
+      lineHeight: 1.45
+    }
+  }, client.complianceNote)), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 7,
+      fontWeight: 700,
+      color: '#475569',
+      textTransform: 'uppercase',
+      letterSpacing: '.1em',
+      marginBottom: 4
+    }
+  }, "Gemini Action Plan"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 3
+    }
+  }, client.geminiActions.map(function (action, i) {
+    return /*#__PURE__*/React.createElement("div", {
+      key: i,
+      style: {
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: 5
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        width: 14,
+        height: 14,
+        minWidth: 14,
+        borderRadius: 4,
+        background: 'rgba(99,102,241,0.12)',
+        border: '1px solid rgba(99,102,241,0.2)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: 6,
+        fontWeight: 800,
+        color: '#818cf8',
+        marginTop: 1
+      }
+    }, i + 1), /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 8,
+        color: '#64748b',
+        lineHeight: 1.4
+      }
+    }, action));
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 7,
+      display: 'flex',
+      alignItems: 'center',
+      gap: 5,
+      padding: '4px 7px',
+      borderRadius: 6,
+      background: chMeta.color + '15',
+      border: '1px solid ' + chMeta.color + '33'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: chMeta.color
+    }
+  }, /*#__PURE__*/React.createElement(Ico, {
+    n: chMeta.icon,
+    size: 9,
+    sw: 2
+  })), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 8,
+      fontWeight: 700,
+      color: chMeta.color
+    }
+  }, "Best channel: ", chMeta.label), /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1
+    }
+  }), /*#__PURE__*/React.createElement(UrgencyBadge, {
+    days: client.urgencyDays
+  })));
+}
+
+// ─── GEMINI HUB ───────────────────────────────────────────────────────────────
+function GeminiHub({
+  client,
+  activeCh
+}) {
+  var [live, setLive] = useState(false);
+  var [secs, setSecs] = useState(0);
+  var [msgs, setMsgs] = useState([]);
+  var [tick, setTick] = useState(0);
+  var [callId, setCallId] = useState(null);
+  var [callPhase, setCallPhase] = useState('idle');
+  var [gcsPath, setGcsPath] = useState(null);
+  var [hubTab, setHubTab] = useState('brief');
+  var [actions, setActions] = useState([]);
+  var [crmSync, setCrmSync] = useState(null);
+  var [actionsLoading, setActionsLoading] = useState(false);
+  var [voiceNote, setVoiceNote] = useState(null);
+  var timerRef = useRef(null);
+  var pollRef = useRef(null);
+  useEffect(function () {
+    clearInterval(pollRef.current);
+    clearInterval(timerRef.current);
+    setLive(false);
+    setSecs(0);
+    setMsgs([]);
+    setCallId(null);
+    setCallPhase('idle');
+    setGcsPath(null);
+    setHubTab('brief');
+    setActions([]);
+    setCrmSync(null);
+    setActionsLoading(false);
+    setVoiceNote(null);
+    if (!client) return;
+    fetch('/api/wealth/client/' + client.clientKey + '/history')
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (!data.found) return;
+        setCallId(data.call_id);
+        if (data.gcs_path) setGcsPath(data.gcs_path);
+        if (data.segments && data.segments.length > 0) {
+          setMsgs(data.segments.map(function (s) {
+            return { role: s.speaker === 'rm' || s.speaker === 'priya' ? 'ai' : 'client', text: s.text };
+          }));
+        }
+        if (data.actions && data.actions.length > 0) {
+          setActions(data.actions);
+          setCrmSync('cached');
+        }
+        if (data.voice_note) {
+          setVoiceNote(data.voice_note);
+        }
+        if (data.completed) {
+          setCallPhase('completed');
+          setLive(true);
+          setHubTab(data.actions && data.actions.length > 0 ? 'actions' : 'compliance');
+        }
+      })
+      .catch(function () {});
+  }, [client]);
+  useEffect(function () {
+    if (!live) return;
+    timerRef.current = setInterval(function () {
+      setSecs(function (s) {
+        return s + 1;
+      });
+      setTick(function (t) {
+        return t + 1;
+      });
+    }, 1000);
+    if (activeCh !== 'voice') {
+      var script = client && client.sessionScript || [];
+      script.forEach(function (m) {
+        setTimeout(function () {
+          setMsgs(function (p) {
+            return p.concat(m);
+          });
+        }, m.t * 1000);
+      });
+    }
+    return function () {
+      clearInterval(timerRef.current);
+    };
+  }, [live]);
+  useEffect(function () {
+    if (!callId) return;
+    pollRef.current = setInterval(function () {
+      fetch('/api/wealth/call/transcript/' + callId)
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (data.segments && data.segments.length > 0) {
+            setMsgs(data.segments.map(function (s) {
+              return { role: s.speaker === 'rm' ? 'ai' : 'client', text: s.text };
+            }));
+          }
+          if (!data.live) {
+            clearInterval(pollRef.current);
+            clearInterval(timerRef.current);
+            if (data.error) {
+              setCallPhase('failed');
+              setMsgs([{ role: 'system', text: data.error }]);
+            } else {
+              setCallPhase('completed');
+              if (data.gcs_path) setGcsPath(data.gcs_path);
+            }
+          } else {
+            var cs = data.call_status || '';
+            setCallPhase(cs === 'in-progress' ? 'live' : cs === 'ringing' || cs === 'queued' ? 'ringing' : 'live');
+          }
+        })
+        .catch(function () {});
+    }, 3000);
+    return function () { clearInterval(pollRef.current); };
+  }, [callId]);
+  useEffect(function () {
+    if (callPhase !== 'completed' || !callId) return;
+    setActionsLoading(true);
+    fetch('/api/wealth/call/' + callId + '/actions', { method: 'POST' })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data.actions) { setActions(data.actions); setCrmSync(data.crm_sync || null); }
+        setTimeout(function () { setHubTab('actions'); }, 1500);
+      })
+      .catch(function () {})
+      .finally(function () { setActionsLoading(false); });
+  }, [callPhase]);
+  function fmt(s) {
+    var m = Math.floor(s / 60);
+    var sc = s % 60;
+    return (m < 10 ? '0' : '') + m + ':' + (sc < 10 ? '0' : '') + sc;
+  }
+  function doLaunch(channelId) {
+    if (channelId === 'voice' && client) {
+      setCallPhase('calling');
+      setLive(true);
+      setMsgs([]);
+      setHubTab('live');
+      fetch('/api/wealth/call/initiate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          client_id: client.clientKey,
+          client_name: client.name,
+          mobile: '',
+          context: client.story || '',
+          channel: 'voice'
+        })
+      })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data.call_id) {
+          setCallId(data.call_id);
+          setCallPhase('ringing');
+        } else {
+          setCallPhase('idle');
+          setLive(false);
+        }
+      })
+      .catch(function () {
+        setCallPhase('idle');
+        setLive(false);
+      });
+    } else {
+      setLive(true);
+      setHubTab('live');
+    }
+  }
+  var sp = ['⠋','⠙','⠹','⠸','⠼','⠴','⠦','⠧','⠇','⠏'][tick % 10];
+  var ch = CHANNELS.find(function (c) { return c.id === activeCh; });
+  var callEnded = callPhase === 'completed' || callPhase === 'failed';
+  function renderTabBar() {
+    if (!client) return null;
+    var tabs = [
+      { id: 'brief', label: 'Brief', icon: 'sparkles' },
+      { id: 'live', label: 'Live Call', icon: 'phone' },
+      { id: 'actions', label: 'Actions', icon: 'zap', badge: actions.length > 0 ? String(actions.length) : null },
+      { id: 'compliance', label: 'Vault', icon: 'shield', locked: !callEnded }
+    ];
+    return /*#__PURE__*/React.createElement("div", {
+      style: { display: 'flex', gap: 2, padding: '6px 8px 0', borderBottom: '1px solid rgba(255,255,255,0.05)', flexShrink: 0 }
+    }, tabs.map(function (t) {
+      var isActive = hubTab === t.id;
+      var disabled = t.locked;
+      return /*#__PURE__*/React.createElement("button", {
+        key: t.id,
+        onClick: function () { if (!disabled) setHubTab(t.id); },
+        style: {
+          flex: 1, padding: '4px 3px', borderRadius: '5px 5px 0 0', border: 'none',
+          cursor: disabled ? 'default' : 'pointer', fontFamily: 'Inter,sans-serif',
+          fontSize: 7.5, fontWeight: isActive ? 700 : 600,
+          color: isActive ? '#a5b4fc' : disabled ? '#334155' : '#64748b',
+          background: isActive ? 'rgba(99,102,241,0.12)' : 'transparent',
+          borderBottom: isActive ? '2px solid #6366f1' : '2px solid transparent',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2, position: 'relative'
+        }
+      },
+      /*#__PURE__*/React.createElement(Ico, { n: t.icon, size: 8, sw: 2 }),
+      t.label,
+      t.badge ? /*#__PURE__*/React.createElement("span", {
+        style: { background: '#6366f1', color: '#fff', borderRadius: 10, fontSize: 7, fontWeight: 800, padding: '0 4px', lineHeight: '14px', minWidth: 14, textAlign: 'center' }
+      }, t.badge) : null);
+    }));
+  }
+  function renderBriefTab() {
+    if (!client) return null;
+    var channel = activeCh || client.recommendedChannel;
+    if (channel === 'whatsapp') return renderWACard();
+    if (channel === 'video')    return renderVideoCard();
+    if (channel === 'docai')    return renderDocAICard();
+    return renderVoiceCard();
+  }
+
+  function PoweredBadge(label, color) {
+    return /*#__PURE__*/React.createElement("span", {
+      style: { fontSize: 6.5, fontWeight: 800, padding: '2px 6px', borderRadius: 10, background: color + '1a', border: '1px solid ' + color + '44', color: color, letterSpacing: '.06em', whiteSpace: 'nowrap' }
+    }, label);
+  }
+
+  function ChannelHeader(title, powered, poweredColor, icon) {
+    return /*#__PURE__*/React.createElement("div", {
+      style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 }
+    },
+      /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: 5 } },
+        /*#__PURE__*/React.createElement(Ico, { n: icon, size: 10, sw: 2, cls: 'text-slate-300' }),
+        /*#__PURE__*/React.createElement("span", { style: { fontSize: 9, fontWeight: 800, color: '#f1f5f9', letterSpacing: '.04em' } }, title)
+      ),
+      PoweredBadge(powered, poweredColor)
+    );
+  }
+
+  function AlertCard() {
+    return /*#__PURE__*/React.createElement("div", {
+      style: { padding: '7px 9px', borderRadius: 8, background: 'rgba(251,191,36,0.06)', border: '1px solid rgba(251,191,36,0.2)' }
+    },
+      /*#__PURE__*/React.createElement("div", { style: { fontSize: 7, fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 3 } }, "Client Alert · " + client.urgencyDays + " days"),
+      /*#__PURE__*/React.createElement("div", { style: { fontSize: 9, color: '#e2e8f0', lineHeight: 1.45 } }, client.alert || client.story || '')
+    );
+  }
+
+  function LaunchBtn(label, color, gradientEnd, glow, channelId) {
+    return /*#__PURE__*/React.createElement("button", {
+      onClick: function () { doLaunch(channelId); },
+      style: { width: '100%', padding: '9px', borderRadius: 9, border: 'none', cursor: 'pointer', fontFamily: 'Inter,sans-serif', fontSize: 11, fontWeight: 800, color: '#fff', background: 'linear-gradient(135deg,' + color + ',' + gradientEnd + ')', boxShadow: '0 4px 20px ' + glow }
+    }, label);
+  }
+
+  function renderVoiceCard() {
+    var nodes = [
+      { label: 'Portfolio Data', detail: client.aum + ' · ' + client.risk + ' Profile', color: '#3b82f6' },
+      { label: 'Compliance Gate', detail: 'SEBI · TRAI DND · DPDP 2023', color: '#10b981' },
+      { label: 'Gemini 3.1 Live', detail: 'en-IN · Voice AI', color: '#6366f1' },
+      { label: 'Twilio Outbound', detail: 'Logged · timestamped · GCS vault', color: '#f59e0b' }
+    ];
+    return /*#__PURE__*/React.createElement("div", { style: { padding: '10px', display: 'flex', flexDirection: 'column', gap: 8 } },
+      ChannelHeader('AI Voice Call', 'Powered by Gemini 3.1 Live', '#818cf8', 'phone'),
+      AlertCard(),
+      /*#__PURE__*/React.createElement("div", null,
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 7, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 5 } }, "Script Intelligence Chain"),
+        nodes.map(function (node, idx) {
+          return /*#__PURE__*/React.createElement("div", { key: idx },
+            /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: 7, padding: '5px 8px', borderRadius: 7, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' } },
+              /*#__PURE__*/React.createElement("div", { style: { width: 6, height: 6, borderRadius: '50%', background: node.color, flexShrink: 0 } }),
+              /*#__PURE__*/React.createElement("div", { style: { flex: 1 } },
+                /*#__PURE__*/React.createElement("div", { style: { fontSize: 9, fontWeight: 700, color: '#e2e8f0' } }, node.label),
+                /*#__PURE__*/React.createElement("div", { style: { fontSize: 7, color: '#64748b' } }, node.detail)
+              ),
+              idx < 3 ? /*#__PURE__*/React.createElement(Ico, { n: 'chevRight', size: 8, cls: 'text-slate-600' }) : null
+            ),
+            idx < 3 ? /*#__PURE__*/React.createElement("div", { style: { width: 1, height: 4, background: 'rgba(255,255,255,0.07)', marginLeft: 18 } }) : null
+          );
+        })
+      ),
+      /*#__PURE__*/React.createElement("div", null,
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 7, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 4 } }, "Talking Points"),
+        (client.talkingPoints || []).slice(0, 4).map(function (tp, i) {
+          return /*#__PURE__*/React.createElement("div", { key: i, style: { display: 'flex', alignItems: 'flex-start', gap: 5, marginBottom: 4 } },
+            /*#__PURE__*/React.createElement("div", { style: { width: 4, height: 4, borderRadius: '50%', background: '#6366f1', marginTop: 4, flexShrink: 0 } }),
+            /*#__PURE__*/React.createElement("span", { style: { fontSize: 9, color: '#94a3b8', lineHeight: 1.4 } }, tp));
+        })
+      ),
+      /*#__PURE__*/React.createElement("div", { style: { borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 8 } },
+        LaunchBtn('✦ Launch Gemini Voice Call →', '#4f46e5', '#7c3aed', 'rgba(99,102,241,0.45)', 'voice')
+      )
+    );
+  }
+
+  function renderWACard() {
+    var vnStatus = voiceNote ? voiceNote.status : 'idle';
+    var vnGenerating = vnStatus === 'generating';
+    var vnPreview   = vnStatus === 'preview';
+    var vnSending   = vnStatus === 'sending';
+    var vnDone      = vnStatus === 'sent' || vnStatus === 'sent_text_fallback' || vnStatus === 'simulated';
+    var vnError     = vnStatus === 'error';
+    var vnAudioUrl  = (voiceNote && voiceNote.note_id)
+      ? (window.location.origin + '/api/wealth/voice-note/' + voiceNote.note_id + '/audio')
+      : null;
+
+    function doGenerate() {
+      if (!client || vnGenerating) return;
+      setVoiceNote({ status: 'generating' });
+      fetch('/api/wealth/whatsapp/voice-note/generate', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ client_key: client.clientKey, client_name: client.name }),
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (d) { setVoiceNote({ note_id: d.note_id, status: 'preview', script: d.script, has_audio: d.has_audio }); })
+        .catch(function () { setVoiceNote({ status: 'error' }); });
+    }
+
+    function doSend() {
+      if (!voiceNote || !voiceNote.note_id || vnSending) return;
+      var prev = voiceNote;
+      setVoiceNote({ note_id: prev.note_id, status: 'sending', script: prev.script, has_audio: prev.has_audio });
+      fetch('/api/wealth/whatsapp/voice-note/send', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ note_id: prev.note_id, client_key: client.clientKey }),
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (d) { setVoiceNote({ note_id: prev.note_id, status: d.status, script: prev.script, twilio_sid: d.twilio_sid, has_audio: prev.has_audio }); })
+        .catch(function () { setVoiceNote({ note_id: prev.note_id, status: 'error', script: prev.script }); });
+    }
+
+    function doPlay() {
+      if (!vnAudioUrl) return;
+      try { var a = new Audio(vnAudioUrl); a.play(); } catch (e) {}
+    }
+
+    var scriptText = voiceNote && voiceNote.script ? voiceNote.script : '';
+    var scriptPreview = scriptText.slice(0, 155) + (scriptText.length > 155 ? '…' : '');
+    var showScript = vnPreview || vnSending || vnDone;
+
+    return /*#__PURE__*/React.createElement("div", { style: { padding: '10px', display: 'flex', flexDirection: 'column', gap: 8 } },
+      ChannelHeader('WhatsApp Voice Note', 'Powered by Gemini 3.1 TTS', '#25D366', 'mic'),
+      AlertCard(),
+
+      /* ── Script / Audio preview card (appears after generation) ── */
+      showScript && /*#__PURE__*/React.createElement("div", {
+        style: { padding: '9px 10px', borderRadius: 8, background: 'rgba(37,211,102,0.05)', border: '1px solid rgba(37,211,102,0.2)' }
+      },
+        /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 5 } },
+          /*#__PURE__*/React.createElement("span", { style: { fontSize: 7, fontWeight: 800, color: '#25D366', textTransform: 'uppercase', letterSpacing: '.1em' } }, "AI-Generated Script · Autonoe · ~30 sec"),
+          vnAudioUrl && /*#__PURE__*/React.createElement("button", {
+            onClick: doPlay,
+            style: { display: 'inline-flex', alignItems: 'center', gap: 3, padding: '2px 8px', borderRadius: 20, border: '1px solid rgba(37,211,102,0.35)', background: 'rgba(37,211,102,0.1)', cursor: 'pointer', fontFamily: 'Inter,sans-serif', color: '#34d399', fontSize: 7.5, fontWeight: 700 }
+          },
+            /*#__PURE__*/React.createElement(Ico, { n: 'mic', size: 8, sw: 2 }),
+            '▶ Listen'
+          )
+        ),
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 8.5, color: '#cbd5e1', lineHeight: 1.55, fontStyle: 'italic' } },
+          '“' + scriptPreview + '”'
+        ),
+        vnDone && voiceNote.twilio_sid && /*#__PURE__*/React.createElement("div", {
+          style: { marginTop: 6, display: 'flex', alignItems: 'center', gap: 5 }
+        },
+          /*#__PURE__*/React.createElement(Ico, { n: 'check', size: 9, sw: 2.5, cls: 'text-emerald-400' }),
+          /*#__PURE__*/React.createElement("span", { style: { fontSize: 7, fontWeight: 700, color: '#34d399' } }, "Delivered"),
+          /*#__PURE__*/React.createElement("span", { style: { fontSize: 7, color: '#475569' } }, '·  SID …' + voiceNote.twilio_sid.slice(-8))
+        )
+      ),
+
+      /* ── Placeholder card before generation ── */
+      !showScript && /*#__PURE__*/React.createElement("div", {
+        style: { padding: '8px 9px', borderRadius: 8, background: 'rgba(37,211,102,0.03)', border: '1px dashed rgba(37,211,102,0.2)' }
+      },
+        /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: 8 } },
+          [['mic','Gemini 3.1 TTS'], ['globe','WhatsApp delivery'], ['check','Read receipts']].map(function (f) {
+            return /*#__PURE__*/React.createElement("div", { key: f[0], style: { display: 'flex', alignItems: 'center', gap: 3 } },
+              /*#__PURE__*/React.createElement(Ico, { n: f[0], size: 8, sw: 2, cls: 'text-slate-500' }),
+              /*#__PURE__*/React.createElement("span", { style: { fontSize: 7, color: '#475569' } }, f[1]));
+          })
+        ),
+        /*#__PURE__*/React.createElement("div", { style: { marginTop: 5, fontSize: 8, color: '#334155', fontStyle: 'italic' } },
+          'Click Generate to create a personalised ' + (client.name || 'client') + ' voice note'
+        )
+      ),
+
+      /* ── CTA buttons ── */
+      /*#__PURE__*/React.createElement("div", { style: { borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 8, display: 'flex', flexDirection: 'column', gap: 5 } },
+        /* Step 1 – Generate */
+        !vnPreview && !vnSending && !vnDone && /*#__PURE__*/React.createElement("button", {
+          onClick: doGenerate,
+          disabled: vnGenerating,
+          style: { width: '100%', padding: '9px', borderRadius: 9, border: 'none', cursor: vnGenerating ? 'default' : 'pointer', fontFamily: 'Inter,sans-serif', fontSize: 11, fontWeight: 800, color: '#fff', background: vnGenerating ? 'rgba(37,211,102,0.2)' : 'linear-gradient(135deg,#059669,#25D366)', boxShadow: vnGenerating ? 'none' : '0 4px 20px rgba(37,211,102,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, opacity: vnGenerating ? 0.6 : 1 }
+        },
+          /*#__PURE__*/React.createElement(Ico, { n: 'mic', size: 12, sw: 2.5 }),
+          vnGenerating ? (sp + ' Generating script & audio…') : vnError ? '↺ Retry Generate' : '✦ Generate Voice Note'
+        ),
+        /* Step 2 – Send (visible only in preview / sending states) */
+        (vnPreview || vnSending) && /*#__PURE__*/React.createElement("button", {
+          onClick: doSend,
+          disabled: vnSending,
+          style: { width: '100%', padding: '9px', borderRadius: 9, border: 'none', cursor: vnSending ? 'default' : 'pointer', fontFamily: 'Inter,sans-serif', fontSize: 11, fontWeight: 800, color: '#fff', background: vnSending ? 'rgba(37,211,102,0.2)' : 'linear-gradient(135deg,#059669,#10b981)', boxShadow: vnSending ? 'none' : '0 4px 20px rgba(16,185,129,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, opacity: vnSending ? 0.6 : 1 }
+        },
+          /*#__PURE__*/React.createElement(Ico, { n: 'share2', size: 12, sw: 2.5 }),
+          vnSending ? (sp + ' Sending via WhatsApp…') : '✦ Send to WhatsApp'
+        ),
+        /* Resend option when delivered */
+        vnDone && /*#__PURE__*/React.createElement("button", {
+          onClick: doGenerate,
+          style: { width: '100%', padding: '6px', borderRadius: 7, border: '1px solid rgba(37,211,102,0.2)', cursor: 'pointer', fontFamily: 'Inter,sans-serif', fontSize: 9, fontWeight: 600, color: '#475569', background: 'transparent' }
+        }, '↺ Generate & Resend')
+      )
+    );
+  }
+
+  function renderVideoCard() {
+    var features = [
+      { icon: 'video', label: 'Face-to-face HD video', detail: 'Browser-based, no app needed' },
+      { icon: 'cpu', label: 'Gemini Avatar co-pilot', detail: 'Real-time meeting insights' },
+      { icon: 'share2', label: 'Screen + doc share', detail: 'Annotate fund statements live' },
+      { icon: 'shield', label: 'SEBI-compliant recording', detail: 'Auto-logged to GCS vault' }
+    ];
+    return /*#__PURE__*/React.createElement("div", { style: { padding: '10px', display: 'flex', flexDirection: 'column', gap: 8 } },
+      ChannelHeader('Live Video Call', 'Powered by Gemini Avatar', '#3b82f6', 'video'),
+      AlertCard(),
+      /*#__PURE__*/React.createElement("div", null,
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 7, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 5 } }, "What Gemini Avatar Does"),
+        features.map(function (f) {
+          return /*#__PURE__*/React.createElement("div", { key: f.label, style: { display: 'flex', alignItems: 'flex-start', gap: 7, padding: '5px 8px', borderRadius: 7, background: 'rgba(59,130,246,0.04)', border: '1px solid rgba(59,130,246,0.1)', marginBottom: 4 } },
+            /*#__PURE__*/React.createElement(Ico, { n: f.icon, size: 10, sw: 2, cls: 'text-blue-400' }),
+            /*#__PURE__*/React.createElement("div", null,
+              /*#__PURE__*/React.createElement("div", { style: { fontSize: 9, fontWeight: 700, color: '#e2e8f0' } }, f.label),
+              /*#__PURE__*/React.createElement("div", { style: { fontSize: 7, color: '#64748b' } }, f.detail)
+            )
+          );
+        })
+      ),
+      /*#__PURE__*/React.createElement("div", { style: { borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 8 } },
+        LaunchBtn('✦ Start Video Call →', '#2563eb', '#3b82f6', 'rgba(59,130,246,0.4)', 'video')
+      )
+    );
+  }
+
+  function renderDocAICard() {
+    var docs = [
+      { icon: 'fileSearch', label: 'Portfolio Statement', detail: 'Holdings, P&L, tax summary' },
+      { icon: 'fileSearch', label: 'Fund Prospectus', detail: 'NAV, risk factors, exit load' },
+      { icon: 'shield', label: 'Compliance Docs', detail: 'KYC, consent, FATCA forms' },
+      { icon: 'activity', label: 'Market Research', detail: 'Sector reports, analyst notes' }
+    ];
+    return /*#__PURE__*/React.createElement("div", { style: { padding: '10px', display: 'flex', flexDirection: 'column', gap: 8 } },
+      ChannelHeader('Document Intelligence', 'Powered by Gemini 3.1 Pro', '#8b5cf6', 'fileSearch'),
+      AlertCard(),
+      /*#__PURE__*/React.createElement("div", null,
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 7, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 5 } }, "Documents to Analyze"),
+        docs.map(function (d) {
+          return /*#__PURE__*/React.createElement("div", { key: d.label, style: { display: 'flex', alignItems: 'flex-start', gap: 7, padding: '5px 8px', borderRadius: 7, background: 'rgba(139,92,246,0.04)', border: '1px solid rgba(139,92,246,0.1)', marginBottom: 4 } },
+            /*#__PURE__*/React.createElement(Ico, { n: d.icon, size: 10, sw: 2, cls: 'text-violet-400' }),
+            /*#__PURE__*/React.createElement("div", null,
+              /*#__PURE__*/React.createElement("div", { style: { fontSize: 9, fontWeight: 700, color: '#e2e8f0' } }, d.label),
+              /*#__PURE__*/React.createElement("div", { style: { fontSize: 7, color: '#64748b' } }, d.detail)
+            )
+          );
+        })
+      ),
+      /*#__PURE__*/React.createElement("div", { style: { borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 8 } },
+        LaunchBtn('✦ Analyze Documents →', '#7c3aed', '#8b5cf6', 'rgba(139,92,246,0.4)', 'docai')
+      )
+    );
+  }
+  function renderLiveTab() {
+    var isActive = callPhase === 'live' || callPhase === 'ringing' || callPhase === 'calling';
+    var dotColor = callPhase === 'failed' ? '#f59e0b' : callPhase === 'completed' ? '#64748b' : '#ef4444';
+    var statusLabel = callPhase === 'failed' ? 'NOT ANSWERED' : callPhase === 'completed' ? 'CALL ENDED' : 'LIVE';
+    var statusBg = callPhase === 'failed' ? 'rgba(245,158,11,0.07)' : callPhase === 'completed' ? 'rgba(100,116,139,0.07)' : 'rgba(34,197,94,0.07)';
+    var statusBorder = callPhase === 'failed' ? 'rgba(245,158,11,0.2)' : callPhase === 'completed' ? 'rgba(100,116,139,0.2)' : 'rgba(34,197,94,0.2)';
+    if (!live && callPhase === 'idle') {
+      return /*#__PURE__*/React.createElement("div", {
+        style: { padding: '30px 14px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, color: '#475569' }
+      },
+      /*#__PURE__*/React.createElement(Ico, { n: 'phone', size: 24, cls: 'text-slate-600' }),
+      /*#__PURE__*/React.createElement("div", { style: { fontSize: 10, textAlign: 'center', color: '#64748b' } }, "Launch a voice call from the Brief tab to see the live transcript here")
+      );
+    }
+    return /*#__PURE__*/React.createElement("div", { style: { padding: '10px', display: 'flex', flexDirection: 'column', gap: 7 } },
+    /*#__PURE__*/React.createElement("div", {
+      style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '7px 9px', borderRadius: 8, background: statusBg, border: '1px solid ' + statusBorder }
+    },
+    /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: 5 } },
+      /*#__PURE__*/React.createElement("div", { style: { width: 7, height: 7, borderRadius: '50%', background: dotColor, animation: isActive ? 'blink 1s ease-in-out infinite' : 'none' } }),
+      /*#__PURE__*/React.createElement("span", { style: { fontSize: 10, fontWeight: 800, color: '#f1f5f9' } }, statusLabel),
+      /*#__PURE__*/React.createElement("span", { style: { fontSize: 10, fontFamily: 'monospace', color: '#34d399' } }, fmt(secs))
+    ),
+    /*#__PURE__*/React.createElement("button", {
+      onClick: function () {
+        clearInterval(pollRef.current); clearInterval(timerRef.current);
+        setLive(false); setMsgs([]); setSecs(0); setCallId(null); setCallPhase('idle'); setGcsPath(null);
+        setActions([]); setCrmSync(null); setHubTab('brief');
+      },
+      style: { padding: '2px 8px', borderRadius: 5, border: 'none', cursor: 'pointer', background: callEnded ? 'rgba(100,116,139,0.1)' : 'rgba(239,68,68,0.1)', color: callEnded ? '#94a3b8' : '#f87171', fontSize: 9, fontWeight: 700, fontFamily: 'Inter,sans-serif' }
+    }, callEnded ? 'Close' : 'End')
+    ),
+    ch && /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: 6, padding: '5px 9px', borderRadius: 8, background: ch.bg } },
+      /*#__PURE__*/React.createElement("div", { style: { color: ch.color } }, /*#__PURE__*/React.createElement(Ico, { n: ch.icon, size: 11, sw: 2 })),
+      /*#__PURE__*/React.createElement("span", { style: { fontSize: 10, fontWeight: 700, color: '#f1f5f9', flex: 1 } }, ch.label),
+      client && /*#__PURE__*/React.createElement("span", { style: { fontSize: 8, color: ch.color, fontWeight: 600 } }, client.name)
+    ),
+    /*#__PURE__*/React.createElement("div", {
+      style: { borderRadius: 9, background: 'rgba(4,8,24,0.8)', border: '1px solid rgba(255,255,255,0.05)', padding: 8, minHeight: 160, maxHeight: 220, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 6 }
+    },
+    msgs.length === 0 ? /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: 6, padding: '16px 10px', color: '#475569' } },
+      /*#__PURE__*/React.createElement("span", { style: { fontSize: 12, animation: 'ai-shimmer 1.5s ease-in-out infinite' } }, sp),
+      /*#__PURE__*/React.createElement("span", { style: { fontSize: 10 } },
+        callPhase === 'calling' ? 'Connecting to Twilio…' : callPhase === 'ringing' ? 'Dialling — phone ringing, please answer…' : callPhase === 'live' ? 'Connected — listening for audio…' : callPhase === 'completed' ? 'Call completed' : callPhase === 'failed' ? 'Call not answered' : 'Starting session…'
+      )
+    ) : msgs.map(function (m, i) {
+      if (m.role === 'system') return /*#__PURE__*/React.createElement("div", { key: i, style: { padding: '8px 10px', borderRadius: 7, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', fontSize: 9, color: '#f87171', textAlign: 'center' } }, m.text);
+      var isAI = m.role === 'ai';
+      return /*#__PURE__*/React.createElement("div", { key: i, style: { display: 'flex', gap: 5, alignItems: 'flex-start', flexDirection: isAI ? 'row' : 'row-reverse' } },
+        /*#__PURE__*/React.createElement("div", { style: { width: 18, height: 18, minWidth: 18, borderRadius: 5, flexShrink: 0, background: isAI ? 'linear-gradient(135deg,#6366f1,#7c3aed)' : 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 7, fontWeight: 700, color: '#fff' } }, isAI ? 'G' : client ? client.initials[0] : 'C'),
+        /*#__PURE__*/React.createElement("div", { style: { maxWidth: '80%', padding: '5px 7px', borderRadius: 7, background: isAI ? 'rgba(99,102,241,0.12)' : 'rgba(255,255,255,0.06)', border: '1px solid ' + (isAI ? 'rgba(99,102,241,0.2)' : 'rgba(255,255,255,0.07)') } },
+          /*#__PURE__*/React.createElement("div", { style: { fontSize: 8, color: isAI ? '#818cf8' : '#94a3b8', fontWeight: 600, marginBottom: 1 } }, isAI ? 'Gemini AI' : client ? client.name : 'Client'),
+          /*#__PURE__*/React.createElement("div", { style: { fontSize: 9, color: '#e2e8f0', lineHeight: 1.45 } }, m.text)
+        ));
+    })
+    ),
+    /*#__PURE__*/React.createElement("div", { style: { display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 5 } },
+      [{ icon: 'mic', label: 'Mute', c: '#94a3b8' }, { icon: 'share2', label: 'Share', c: '#3b82f6' }, { icon: 'zap', label: 'Intervene', c: '#f59e0b' }].map(function (ctrl) {
+        return /*#__PURE__*/React.createElement("button", { key: ctrl.label, style: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, padding: '7px 0', borderRadius: 7, border: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.03)', color: ctrl.c, cursor: 'pointer', fontFamily: 'Inter,sans-serif' } },
+          /*#__PURE__*/React.createElement(Ico, { n: ctrl.icon, size: 12 }),
+          /*#__PURE__*/React.createElement("span", { style: { fontSize: 7, fontWeight: 600, color: '#64748b' } }, ctrl.label));
+      })
+    ),
+    gcsPath && /*#__PURE__*/React.createElement("div", { style: { marginTop: 2, padding: '6px 9px', borderRadius: 7, background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.2)', display: 'flex', alignItems: 'center', gap: 6 } },
+      /*#__PURE__*/React.createElement(Ico, { n: 'fileSearch', size: 10, cls: 'text-emerald-400' }),
+      /*#__PURE__*/React.createElement("span", { style: { fontSize: 8, color: '#34d399', fontFamily: 'monospace', wordBreak: 'break-all' } }, gcsPath)
+    )
+    );
+  }
+  function renderActionsTab() {
+    if (actionsLoading) {
+      return /*#__PURE__*/React.createElement("div", { style: { padding: '30px 14px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 } },
+        /*#__PURE__*/React.createElement("span", { style: { fontSize: 20, animation: 'ai-shimmer 1.5s ease-in-out infinite' } }, sp),
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 10, color: '#64748b', textAlign: 'center' } }, "Gemini is extracting action items…")
+      );
+    }
+    if (actions.length === 0) {
+      return /*#__PURE__*/React.createElement("div", { style: { padding: '30px 14px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 } },
+        /*#__PURE__*/React.createElement(Ico, { n: 'zap', size: 24, cls: 'text-slate-600' }),
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 10, color: '#64748b', textAlign: 'center' } }, "Action items appear here after the call ends")
+      );
+    }
+    var priColor = { HIGH: '#ef4444', MEDIUM: '#f59e0b', LOW: '#3b82f6' };
+    var catIcon = { Meeting: 'clock', Document: 'fileSearch', 'Follow-up': 'phone', Compliance: 'shield', Investment: 'trendUp' };
+    return /*#__PURE__*/React.createElement("div", { style: { padding: '10px', display: 'flex', flexDirection: 'column', gap: 6 } },
+      crmSync && crmSync !== 'cached' && /*#__PURE__*/React.createElement("div", { style: { padding: '5px 8px', borderRadius: 7, background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.15)', display: 'flex', alignItems: 'center', gap: 5 } },
+        /*#__PURE__*/React.createElement(Ico, { n: 'check', size: 9, cls: 'text-emerald-400', sw: 2.5 }),
+        /*#__PURE__*/React.createElement("span", { style: { fontSize: 8, color: '#34d399', fontWeight: 600 } }, "Synced to Salesforce CRM")
+      ),
+      actions.map(function (act, i) {
+        var pc = priColor[act.priority] || '#64748b';
+        var ci = catIcon[act.category] || 'check';
+        return /*#__PURE__*/React.createElement("div", { key: i, style: { padding: '8px 10px', borderRadius: 9, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' } },
+          /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: 5, marginBottom: 3 } },
+            /*#__PURE__*/React.createElement(Ico, { n: ci, size: 10, sw: 2 }),
+            /*#__PURE__*/React.createElement("span", { style: { fontSize: 10, fontWeight: 700, color: '#f1f5f9', flex: 1 } }, act.title),
+            /*#__PURE__*/React.createElement("span", { style: { fontSize: 7, fontWeight: 800, padding: '1px 5px', borderRadius: 4, background: pc + '18', color: pc, border: '1px solid ' + pc + '44' } }, act.priority)
+          ),
+          /*#__PURE__*/React.createElement("div", { style: { fontSize: 8, color: '#94a3b8', lineHeight: 1.4, marginBottom: 5 } }, act.description),
+          /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' } },
+            /*#__PURE__*/React.createElement("span", { style: { fontSize: 7, color: '#64748b', display: 'flex', alignItems: 'center', gap: 3 } }, /*#__PURE__*/React.createElement(Ico, { n: 'clock', size: 8, sw: 1.5 }), act.due),
+            /*#__PURE__*/React.createElement("span", { style: { fontSize: 7, color: '#64748b', display: 'flex', alignItems: 'center', gap: 3 } }, /*#__PURE__*/React.createElement(Ico, { n: 'user', size: 8, sw: 1.5 }), act.assignee),
+            act.crm_id && /*#__PURE__*/React.createElement("span", { style: { fontSize: 7, color: '#34d399', fontWeight: 700, background: 'rgba(16,185,129,0.08)', padding: '1px 5px', borderRadius: 4, border: '1px solid rgba(16,185,129,0.2)' } }, '✓ ' + act.crm_id)
+          )
+        );
+      })
+    );
+  }
+  function renderComplianceTab() {
+    if (!callEnded || !callId) {
+      return /*#__PURE__*/React.createElement("div", { style: { padding: '30px 14px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 } },
+        /*#__PURE__*/React.createElement(Ico, { n: 'shield', size: 28, cls: 'text-slate-600' }),
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 10, color: '#64748b', textAlign: 'center' } }, "Compliance vault is generated after the call ends")
+      );
+    }
+    return /*#__PURE__*/React.createElement("div", { style: { padding: '10px', display: 'flex', flexDirection: 'column', gap: 8 } },
+      /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: 7, padding: '8px 10px', borderRadius: 9, background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.15)' } },
+        /*#__PURE__*/React.createElement(Ico, { n: 'shield', size: 14, cls: 'text-emerald-400', sw: 2 }),
+        /*#__PURE__*/React.createElement("div", null,
+          /*#__PURE__*/React.createElement("div", { style: { fontSize: 10, fontWeight: 800, color: '#34d399' } }, "Compliance Vault"),
+          /*#__PURE__*/React.createElement("div", { style: { fontSize: 7, color: '#64748b' } }, "Audit-grade recording secured")
+        )
+      ),
+      /*#__PURE__*/React.createElement("div", { style: { padding: '8px 10px', borderRadius: 8, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' } },
+        [{ label: 'Call ID', value: callId }, { label: 'Client', value: client ? client.name : '—' }, { label: 'RM', value: 'Rohan Sharma' }, { label: 'Duration', value: fmt(secs) }].map(function (row) {
+          return /*#__PURE__*/React.createElement("div", { key: row.label, style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '3px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' } },
+            /*#__PURE__*/React.createElement("span", { style: { fontSize: 8, color: '#64748b', fontWeight: 600 } }, row.label),
+            /*#__PURE__*/React.createElement("span", { style: { fontSize: 8, color: '#e2e8f0', fontFamily: 'monospace' } }, row.value)
+          );
+        })
+      ),
+      gcsPath && /*#__PURE__*/React.createElement("div", { style: { padding: '7px 10px', borderRadius: 8, background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.15)' } },
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 7, fontWeight: 800, color: '#818cf8', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 4 } }, "Vault Storage"),
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 8, color: '#a5b4fc', fontFamily: 'monospace', wordBreak: 'break-all', lineHeight: 1.4 } }, gcsPath)
+      ),
+      /*#__PURE__*/React.createElement("div", null,
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 7, fontWeight: 800, color: '#fff', textTransform: 'uppercase', letterSpacing: '.12em', marginBottom: 6 } }, "Regulatory Record"),
+        [{ code: 'SEBI Reg 24', desc: 'Recorded & logged per SEBI IA Regs 2013' }, { code: 'TRAI TCCCPR', desc: 'DND list pre-verified · 18-month register' }, { code: 'DPDP Act 2023', desc: 'Consent on file · purpose-limited call' }].map(function (reg) {
+          return /*#__PURE__*/React.createElement("div", { key: reg.code, style: { display: 'flex', alignItems: 'flex-start', gap: 7, padding: '5px 8px', borderRadius: 7, marginBottom: 4, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' } },
+            /*#__PURE__*/React.createElement(Ico, { n: 'check', size: 10, cls: 'text-emerald-400', sw: 2.5 }),
+            /*#__PURE__*/React.createElement("div", null,
+              /*#__PURE__*/React.createElement("div", { style: { fontSize: 9, fontWeight: 700, color: '#e2e8f0' } }, reg.code),
+              /*#__PURE__*/React.createElement("div", { style: { fontSize: 7, color: '#64748b' } }, reg.desc)
+            )
+          );
+        })
+      )
+    );
+  }
+  return /*#__PURE__*/React.createElement("aside", {
+    style: {
+      width: 290,
+      minWidth: 290,
+      flexShrink: 0,
+      display: 'flex',
+      flexDirection: 'column',
+      borderLeft: '1px solid rgba(99,102,241,0.1)',
+      background: 'linear-gradient(180deg,#060920 0%,#030614 100%)',
+      overflow: 'hidden'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: '12px 14px 10px',
+      flexShrink: 0,
+      borderBottom: '1px solid rgba(255,255,255,0.05)',
+      background: 'linear-gradient(180deg,rgba(99,102,241,0.07) 0%,transparent 100%)'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 9
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: 7,
+      borderRadius: 10,
+      background: 'linear-gradient(135deg,rgba(99,102,241,.25),rgba(124,58,237,.25))',
+      border: '1px solid rgba(99,102,241,0.2)'
+    }
+  }, /*#__PURE__*/React.createElement(Ico, {
+    n: "sparkles",
+    size: 13,
+    cls: "text-indigo-300",
+    sw: 2
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      fontWeight: 800,
+      color: '#f1f5f9',
+      letterSpacing: '-.01em'
+    }
+  }, "Gemini Intelligence Hub"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 8,
+      color: '#818cf8',
+      fontWeight: 600
+    }
+  }, "Customer Actions")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 3,
+      padding: '2px 7px',
+      borderRadius: 20,
+      background: 'rgba(16,185,129,0.08)',
+      border: '1px solid rgba(16,185,129,0.15)'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 5,
+      height: 5,
+      borderRadius: '50%',
+      background: '#10b981',
+      animation: 'blink 1.5s ease-in-out infinite'
+    }
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 7,
+      fontWeight: 700,
+      color: '#34d399'
+    }
+  }, "LIVE"))), client ? /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 9,
+      padding: '6px 9px',
+      borderRadius: 8,
+      background: 'rgba(99,102,241,0.08)',
+      border: '1px solid rgba(99,102,241,0.15)',
+      display: 'flex',
+      alignItems: 'center',
+      gap: 7
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 22,
+      height: 22,
+      minWidth: 22,
+      borderRadius: 6,
+      background: 'linear-gradient(' + client.grad + ')',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontWeight: 700,
+      color: '#fff',
+      fontSize: 8
+    }
+  }, client.initials), /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1,
+      minWidth: 0
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 10,
+      fontWeight: 700,
+      color: '#f1f5f9',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap'
+    }
+  }, client.name), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 8,
+      color: '#6366f1',
+      fontWeight: 500
+    }
+  }, "Client in focus · Hub active")), /*#__PURE__*/React.createElement(UrgencyBadge, {
+    days: client.urgencyDays
+  })) : /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 9,
+      padding: '7px 9px',
+      borderRadius: 8,
+      background: 'rgba(255,255,255,0.02)',
+      border: '1px dashed rgba(255,255,255,0.07)',
+      display: 'flex',
+      alignItems: 'center',
+      gap: 6
+    }
+  }, /*#__PURE__*/React.createElement(Ico, {
+    n: "user",
+    size: 10,
+    cls: "text-slate-600"
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 9,
+      color: '#475569'
+    }
+  }, "Select a client from the table to activate")
+  )),
+  renderTabBar(),
+  /*#__PURE__*/React.createElement("div", {
+    style: { overflowY: 'visible' }
+  }, !client ? /*#__PURE__*/React.createElement("div", {
+    style: { padding: '24px 14px', textAlign: 'center', color: '#475569', fontSize: 10 }
+  }, "Select a client to begin") :
+  hubTab === 'live' ? renderLiveTab() :
+  hubTab === 'actions' ? renderActionsTab() :
+  hubTab === 'compliance' ? renderComplianceTab() :
+  renderBriefTab()
+  )
+  );
+}
+
+// ─── ERROR BOUNDARY ───────────────────────────────────────────────────────────
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      err: null
+    };
+  }
+  static getDerivedStateFromError(e) {
+    return {
+      err: e
+    };
+  }
+  render() {
+    if (this.state.err) {
+      return React.createElement('div', {
+        style: {
+          height: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: '#020617',
+          color: '#94a3b8',
+          fontFamily: 'Inter,sans-serif',
+          gap: 12,
+          padding: 32
+        }
+      }, React.createElement('div', {
+        style: {
+          fontSize: 28
+        }
+      }, '⚠'), React.createElement('div', {
+        style: {
+          fontSize: 14,
+          fontWeight: 600,
+          color: '#f1f5f9'
+        }
+      }, 'Dashboard Error'), React.createElement('pre', {
+        style: {
+          fontSize: 10,
+          color: '#64748b',
+          maxWidth: 500,
+          textAlign: 'left',
+          background: 'rgba(255,255,255,0.05)',
+          padding: 12,
+          borderRadius: 8,
+          overflow: 'auto',
+          lineHeight: 1.5
+        }
+      }, String(this.state.err)));
+    }
+    return this.props.children;
+  }
+}
+
+// ─── APP ──────────────────────────────────────────────────────────────────────
+// ─── GEMINI ENTERPRISE HUB (Agentspace) ────────────────────────────────────────
+var AGENTSPACE_URL = 'https://vertexaisearch.cloud.google.com/home/cid/8fcae23b-c0aa-4178-8c8a-3a4ff97140ab?hl=en_US';
+
+function EnterpriseHub() {
+  function launch() {
+    window.open(AGENTSPACE_URL, 'agentspace', 'width=1100,height=900,left=200,top=60,noopener');
+  }
+
+  return /*#__PURE__*/React.createElement("div", {
+    style: { width: 290, minWidth: 290, flexShrink: 0, display: 'flex', flexDirection: 'column', borderTop: '1px solid rgba(16,185,129,0.12)', background: 'linear-gradient(180deg,#020c09 0%,#010608 100%)', overflow: 'hidden' }
+  },
+    /*#__PURE__*/React.createElement("div", {
+      style: { padding: '10px 12px 8px', borderBottom: '1px solid rgba(16,185,129,0.08)', background: 'linear-gradient(180deg,rgba(16,185,129,0.06) 0%,transparent 100%)' }
+    },
+      /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: 7 } },
+        /*#__PURE__*/React.createElement("div", { style: { padding: 6, borderRadius: 8, background: 'linear-gradient(135deg,rgba(16,185,129,.2),rgba(5,150,105,.2))', border: '1px solid rgba(16,185,129,0.22)' } },
+          /*#__PURE__*/React.createElement(Ico, { n: 'cpu', size: 11, sw: 2 })
+        ),
+        /*#__PURE__*/React.createElement("div", null,
+          /*#__PURE__*/React.createElement("div", { style: { fontSize: 11, fontWeight: 800, color: '#f1f5f9', letterSpacing: '-.01em' } }, "Gemini Enterprise Hub"),
+          /*#__PURE__*/React.createElement("div", { style: { fontSize: 7.5, color: '#34d399', fontWeight: 600 } }, "Activate your powers")
+        )
+      )
+    ),
+    /*#__PURE__*/React.createElement("div", { style: { flex: 1, padding: '18px 14px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14 } },
+      /*#__PURE__*/React.createElement("div", { style: { width: 48, height: 48, borderRadius: 14, background: 'linear-gradient(135deg,#059669,#10b981)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 28px rgba(16,185,129,0.35)' } },
+        /*#__PURE__*/React.createElement(Ico, { n: 'cpu', size: 22, sw: 1.5 })
+      ),
+      /*#__PURE__*/React.createElement("div", { style: { textAlign: 'center' } },
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: '#f1f5f9', marginBottom: 5 } }, "Your Agents are ready"),
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 8.5, color: '#64748b', lineHeight: 1.6 } }, "Access your organisation's AI agents, enterprise search, and intelligent workflows — all in one place.")
+      ),
+      /*#__PURE__*/React.createElement("button", {
+        onClick: launch,
+        style: { display: 'flex', alignItems: 'center', gap: 7, padding: '9px 18px', borderRadius: 10, border: 'none', background: 'linear-gradient(135deg,#059669,#10b981)', color: '#fff', fontFamily: 'Inter,sans-serif', fontSize: 10, fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 16px rgba(16,185,129,0.3)', letterSpacing: '-.01em' }
+      },
+        /*#__PURE__*/React.createElement(Ico, { n: 'cpu', size: 11, sw: 2 }),
+        "Launch",
+        /*#__PURE__*/React.createElement(Ico, { n: 'chevRight', size: 10, sw: 2.5 })
+      ),
+      /*#__PURE__*/React.createElement("div", { style: { fontSize: 7, color: '#334155', textAlign: 'center', lineHeight: 1.5 } }, "Opens in a new window", /*#__PURE__*/React.createElement("br", null), "Authenticated via your Google credentials")
+    )
+  );
+}
+
+function App() {
+  var [nav, setNav] = useState('dashboard');
+  var [client, setClient] = useState(null);
+  var [activeCh, setActiveCh] = useState(null);
+  function handleClientSelect(c) {
+    setClient(c);
+    setActiveCh(c ? c.recommendedChannel : null);
+  }
+  function handleChannelSelect(c, channelId) {
+    setClient(c);
+    setActiveCh(channelId);
+  }
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      height: '100vh',
+      display: 'flex',
+      overflow: 'hidden',
+      fontFamily: 'Inter,sans-serif'
+    }
+  }, /*#__PURE__*/React.createElement(Sidebar, {
+    active: nav,
+    onNav: setNav
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1,
+      display: 'flex',
+      flexDirection: 'column',
+      minWidth: 0
+    }
+  }, /*#__PURE__*/React.createElement(Header, {
+    client: client,
+    notifCount: 5
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1,
+      display: 'flex',
+      overflow: 'hidden'
+    }
+  }, /*#__PURE__*/React.createElement("main", {
+    style: {
+      flex: 1,
+      overflowY: 'auto',
+      padding: '16px 18px',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 12
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(4,1fr)',
+      gap: 11
+    }
+  }, KPI_DATA.map(function (k) {
+    return /*#__PURE__*/React.createElement(KPICard, {
+      key: k.id,
+      k: k
+    });
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      gap: 12
+    }
+  }, /*#__PURE__*/React.createElement(PortfolioChart, null), /*#__PURE__*/React.createElement(MarketPulse, null)), /*#__PURE__*/React.createElement(ClientTable, {
+    selected: client,
+    onSelect: handleClientSelect,
+    activeCh: activeCh,
+    onChannelSelect: handleChannelSelect
+  })), /*#__PURE__*/React.createElement("div", {
+    style: { display: 'flex', flexDirection: 'column', height: '100%', overflowY: 'auto', borderLeft: '1px solid rgba(255,255,255,0.04)', gap: 72 }
+  }, /*#__PURE__*/React.createElement(EnterpriseHub, null), /*#__PURE__*/React.createElement(GeminiHub, {
+    client: client,
+    activeCh: activeCh
+  })))));
+}
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(ErrorBoundary, null, React.createElement(App, null)));
+</script>
+</body>
+</html>

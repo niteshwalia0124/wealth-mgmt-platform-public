@@ -1,0 +1,27 @@
+FROM python:3.12-slim
+WORKDIR /app
+
+RUN pip install --no-cache-dir \
+    google-genai>=1.0.0 \
+    google-cloud-storage>=2.17.0 \
+    fastapi>=0.115.0 \
+    uvicorn>=0.30.0 \
+    twilio>=9.0.0 \
+    websockets>=13.0 \
+    google-auth>=2.0.0 \
+    python-dotenv>=1.0.0 \
+    python-multipart>=0.0.9
+
+COPY voice/liveapi_broker.py ./voice/liveapi_broker.py
+COPY voice/__init__.py       ./voice/__init__.py
+COPY assets/                 ./assets/
+
+ENV PORT=8010
+ENV GCP_PROJECT=butterfly-987
+ENV GCP_LOCATION=global
+ENV GEMINI_LIVE_MODEL=gemini-3.1-flash-live-preview-04-2026
+ENV GCS_BUCKET=wealth-mgmt-voice-notes
+ENV TRANSCRIPT_BUCKET=wealth-mgmt-call-transcripts
+
+EXPOSE 8010
+CMD ["sh", "-c", "uvicorn voice.liveapi_broker:app --host 0.0.0.0 --port ${PORT:-8010}"]

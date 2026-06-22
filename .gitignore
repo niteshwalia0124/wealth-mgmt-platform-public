@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
+.venv/
+*.egg-info/
+
+# Env / secrets
+.env
+*.env.local
+
+# Build artefacts
+*.tgz
+*.zip
+
+# GCP / Cloud Build
+.cloudbuild/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.bak
