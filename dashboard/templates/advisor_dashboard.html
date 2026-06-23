@@ -106,73 +106,73 @@ var CLIENTS = [{
   riskC: '#f43f5e',
   nw: '₹45.2 Cr',
   aum: '₹38.4 Cr',
-  health: 72,
-  hC: '#f59e0b',
-  tag: 'PE Maturity',
+  health: 58,
+  hC: '#ef4444',
+  tag: 'Portfolio Drift',
   tagC: '#f59e0b',
-  alertL: 'urgent',
-  urgencyDays: 10,
+  alertL: 'high',
+  urgencyDays: 21,
   recommendedChannel: 'voice',
-  alert: '₹12 Cr Kotak Alternate Fund matures Jun 30',
-  story: '₹12 Cr PE fund matures in 10 days. Waterfall distribution triggers a single taxable event. Also holds ₹4.8 Cr unrealised LTCG in FAANG — netting window closing.',
+  alert: 'Portfolio lagging model by 6.6pp YTD · Tech 38% vs model 20% · Rebalance now',
+  story: 'Amit\'s tech-heavy portfolio is trailing the model by 6.6pp YTD (9.2% vs 15.8%). Financials (+32%) and healthcare (+24%) rallies largely missed. Rotating ₹8–10 Cr from tech into banking and pharma will close the gap and reduce concentration risk.',
   complianceNote: null,
-  geminiActions: ['Load Kotak Alternate Fund factsheet', 'Compute waterfall distribution breakdown', 'Draft 3 reinvestment scenarios (AIF Cat II / PMS / Liquid bridge)', 'Calculate LTCG netting with FAANG positions', 'Launch SEBI-compliant voice briefing', 'Auto-log outcome to CRM'],
-  talkingPoints: ['PE waterfall: ₹12 Cr principal + carry + interest explained', 'AIF Cat II reinvestment window closes Jun 30', 'LTCG netting opportunity: ₹4.8 Cr FAANG gain vs losses', 'TDS recovery timeline on PE distribution', '3 scenarios: conservative / balanced / aggressive redeployment'],
-  last: '3 days ago',
-  ctx: 'PE waterfall event · FAANG holdings · Tax planning needed',
+  geminiActions: ['Pull current vs model portfolio comparison', 'Compute sector drift: tech 38% vs model 20%', 'Quantify 6.6pp gap in rupee terms — ₹2.5 Cr missed return', 'Identify top rebalancing candidates from model portfolio', 'Draft rotation plan: reduce tech, add financials + healthcare', 'Auto-log recommendation to CRM'],
+  talkingPoints: ['Performance gap: portfolio +9.2% vs model +15.8% YTD — ₹2.5 Cr difference', 'Tech overweight: 38% vs model 20% — HDFC Bank alone up 34% this year', 'Financials underweight: you hold 12%, model says 28% — missed the rally', 'Healthcare underweight: you hold 8%, model says 18% — Cipla, Sun Pharma both up 24%', 'Rotation plan: ₹8–10 Cr shift into HDFC Bank, SBI, Cipla, Sun Pharma'],
+  last: '5 days ago',
+  ctx: 'Portfolio underperforming model · Tech overweight · Rebalancing opportunity',
   sessionScript: [{
     t: 4,
     role: 'ai',
-    text: 'Good afternoon, Mr. Patel. I am calling on behalf of Rohan Sharma from Cymbal Wealth regarding your Kotak Alternate Fund maturity on June 30th.'
+    text: 'Good afternoon, Mr. Patel. I am calling from Cymbal Wealth on behalf of Rohan Sharma. I have run your portfolio against our model and there is something important I would like to share with you.'
   }, {
-    t: 11,
+    t: 12,
     role: 'client',
-    text: 'Yes, I was expecting this call. The fund is maturing in 10 days and I haven\'t decided where to reinvest.'
+    text: 'Sure, go ahead. I have been meaning to review things but have been caught up with the new venture.'
   }, {
-    t: 18,
+    t: 19,
     role: 'ai',
-    text: 'Understood. The distribution will include ₹9.8 Cr principal, ₹1.4 Cr carry, and ₹0.8 Cr interest — all in one taxable event. I have prepared three reinvestment scenarios for you.'
+    text: 'Your portfolio is up 9.2% this year. That sounds reasonable — but the model portfolio for your risk profile is up 15.8%. That is a 6.6 percentage point gap, which on your corpus works out to roughly ₹2.5 Crore in returns you have not captured this year.'
   }, {
-    t: 27,
+    t: 31,
     role: 'client',
-    text: 'What about the LTCG on my US tech stocks? I was thinking of booking some losses.'
+    text: 'That is a big difference. What is causing the gap?'
   }, {
-    t: 34,
+    t: 38,
     role: 'ai',
-    text: 'Excellent timing. You have ₹4.8 Cr in unrealised LTCG on FAANG. Booking STCL in two positions would reduce your net LTCG liability by ₹1.2 Cr. Shall I walk through scenario two which factors this in?'
+    text: 'Your technology allocation is 38% of your portfolio. The model says 20%. While your tech holdings have been flat, financials have returned 32% this year and healthcare 24%. HDFC Bank, SBI, Cipla, and Sun Pharma have all run strongly — and you are significantly underweight all of them.'
   }, {
-    t: 41,
+    t: 52,
     role: 'client',
-    text: 'Yes, please. And what about the AIF Cat II option Rohan mentioned?'
+    text: 'I see the point. I stuck with what I know but the market rotated. What does Rohan suggest?'
   }, {
-    t: 48,
+    t: 58,
     role: 'ai',
-    text: 'AIF Cat II offers a 10-year lock-in with projected 14–16% IRR and pass-through tax treatment — ideal for your risk profile. The commitment window closes June 28. I am connecting Rohan now for the final decision.'
+    text: 'Rohan recommends shifting ₹8 to 10 Crore out of tech and into banking and pharma — HDFC Bank, SBI, Cipla, and Sun Pharma. Your tech weight comes down to 22%, financials move up to 26%, and the model gap closes significantly. I am connecting Rohan now to walk you through the specific fund choices.'
   }],
   portfolio: {
-    ytdReturn: 18.4,
+    ytdReturn: 9.2,
     benchmarkReturn: 11.8,
-    healthScore: 62,
-    marketCap: { large: 55, mid: 30, small: 15 },
+    healthScore: 58,
+    marketCap: { large: 48, mid: 30, small: 22 },
     sectors: [
-      { name: 'Technology', pct: 42, model: 28 },
-      { name: 'Financials', pct: 18, model: 22 },
-      { name: 'Alt Investments', pct: 12, model: 10 },
-      { name: 'Healthcare', pct: 12, model: 15 },
-      { name: 'Consumer', pct: 10, model: 18 },
-      { name: 'Cash & Equiv', pct: 6, model: 7 }
+      { name: 'Technology', pct: 38, model: 20 },
+      { name: 'Financials', pct: 12, model: 28 },
+      { name: 'Alt Investments', pct: 20, model: 12 },
+      { name: 'Healthcare', pct: 8, model: 18 },
+      { name: 'Consumer', pct: 14, model: 16 },
+      { name: 'Cash & Equiv', pct: 8, model: 6 }
     ],
     style: 'Growth',
-    liquidity: { high: 45, medium: 30, low: 25 },
+    liquidity: { high: 40, medium: 28, low: 32 },
     holdings: [
-      { name: 'Kotak Alternate Fund (PE)', pct: 12.1, change: null },
-      { name: 'Infosys', pct: 9.2, change: 3.1 },
-      { name: 'TCS', pct: 8.7, change: 1.8 },
-      { name: 'HCL Technologies', pct: 7.4, change: -0.9 },
-      { name: 'Apple Inc (US Equity)', pct: 4.8, change: 2.3 }
+      { name: 'Infosys', pct: 11.2, change: -1.4 },
+      { name: 'TCS', pct: 9.8, change: -0.6 },
+      { name: 'HCL Technologies', pct: 8.4, change: -2.1 },
+      { name: 'Kotak PE Fund (AIF)', pct: 14.2, change: null },
+      { name: 'Apple Inc (US Equity)', pct: 6.8, change: 1.2 }
     ],
-    riskScore: 8.2,
-    aiInsight: 'Technology overweight at 42% vs 28% model creates concentration risk ahead of ₹12 Cr PE maturity event on June 30. Recommend rotating PE proceeds into diversified large-cap and booking STCL in FAANG positions to net ₹1.2 Cr of LTCG liability before the tax window closes.'
+    riskScore: 7.8,
+    aiInsight: 'Portfolio trailing model by 6.6pp YTD (9.2% vs 15.8%) — technology at 38% vs model 20% while financials (held at 12% vs model 28%) and healthcare (8% vs 18%) have rallied 32% and 24% respectively this year. Rotating ₹8–10 Cr into HDFC Bank, SBI, Cipla, and Sun Pharma would close the performance gap and reduce tech concentration risk.'
   }
 }, {
   id: 2,
@@ -186,73 +186,73 @@ var CLIENTS = [{
   riskC: '#3b82f6',
   nw: '₹28.7 Cr',
   aum: '₹21.3 Cr',
-  health: 61,
-  hC: '#ef4444',
-  tag: 'Compliance Breach',
-  tagC: '#ef4444',
-  alertL: 'critical',
-  urgencyDays: 16,
+  health: 74,
+  hC: '#f59e0b',
+  tag: 'SIP Maturity',
+  tagC: '#818cf8',
+  alertL: 'high',
+  urgencyDays: 38,
   recommendedChannel: 'voice',
-  alert: 'AA lapsed 14d · IPS drift 14% · SEBI Day 14/30',
-  story: 'Account Agreement consent lapsed 14 days ago. IPS shows 14% drift — real estate at 65% vs 40% limit. SEBI Circular requires documented advisor outreach before Day 30. Day 14/30.',
-  complianceNote: 'SEBI/HO/MIRSD/2021 — 16 days remaining to create a documented compliance record. Gemini reads a pre-approved script verbatim. Every word is timestamp-logged.',
-  geminiActions: ['Pull IPS drift report from portfolio system', 'Load SEBI Circular SEBI/HO/MIRSD/2021 language', 'Draft SEBI-compliant script (zero deviation allowed)', 'Call client with full timestamp logging', 'Generate compliance evidence record', 'Flag for RM countersign in portal'],
-  talkingPoints: ['Account Agreement: renewal steps via DigiLocker', 'IPS rebalancing: reduce real estate 65% → 40%', 'SEBI disclosure acknowledgment (verbal + written)', '3 rebalancing options: gradual / structured / immediate', '16-day action window — firm exposure if unlogged'],
-  last: '12 days ago',
-  ctx: 'AA renewal urgent · Real estate overweight 65% · SEBI risk',
+  alert: '3 SIPs maturing Jul 31 · ₹48K/month reinvestment decision pending',
+  story: '3 goal-based SIPs completing 5-year tenure by July 31 — HDFC Large Cap (₹25K/mo), SBI Balanced Advantage (₹15K/mo), ICICI Tech (₹8K/mo). Without guidance Priya will auto-renew into underperforming funds. Better options available to match her 2027 education corpus goal.',
+  complianceNote: null,
+  geminiActions: ['Pull SIP maturity schedule from CDSL/RTA records', 'Run fund performance comparison vs category peers', 'Identify 3 replacement SIPs aligned to 2027 education goal', 'Compute corpus projection: current funds vs recommended switch', 'Draft switch instruction form with pre-filled fund details', 'Auto-log reinvestment recommendation to CRM'],
+  talkingPoints: ['3 SIPs ending July 31: HDFC Large Cap, SBI Balanced Advantage, ICICI Tech', 'HDFC Large Cap underperforming category by 3.2% over 18 months', 'Recommended switch: Parag Parikh Flexi Cap — global diversification, consistent performer', 'HDFC Manufacturing Fund: PLI-driven industrial theme, up 28% in its category this year', 'Mirae ELSS: replaces ICICI Tech SIP + adds ₹96,000 annual 80C deduction'],
+  last: '8 days ago',
+  ctx: 'SIP maturity · 3 funds ending Jul 31 · Reinvestment into better options',
   sessionScript: [{
     t: 4,
     role: 'ai',
-    text: 'Good morning, Ms. Kapoor. I am calling on behalf of Rohan Sharma from Cymbal Wealth regarding your Investment Policy Statement and Account Agreement status.'
+    text: 'Good morning, Ms. Kapoor. I am calling from Cymbal Wealth on behalf of Rohan Sharma. Your three SIPs — HDFC Large Cap, SBI Balanced Advantage, and ICICI Pru Technology — are completing their 5-year tenure this July 31st.'
   }, {
-    t: 12,
+    t: 13,
     role: 'client',
-    text: 'Oh yes, I have been meaning to call. My real estate allocation has gone up a lot with the Whitefield property appreciation.'
+    text: 'Oh, I did not realise they were ending. I thought SIPs just continue automatically.'
   }, {
-    t: 19,
+    t: 20,
     role: 'ai',
-    text: 'That is correct. Your real estate exposure is currently 65% of portfolio value, against your IPS limit of 40%. Under SEBI regulations, we are required to document this conversation as formal notification of the drift. Do you acknowledge understanding this?'
+    text: 'These were set up as goal-based SIPs for your daughter\'s education corpus with a 5-year horizon. They have done their job well — the corpus is on track. But at maturity you have a choice: renew the same funds, or switch to better-performing options suited to where the market is today.'
   }, {
-    t: 30,
+    t: 33,
     role: 'client',
-    text: 'Yes, I understand. What are my options to rebalance?'
+    text: 'What is wrong with the current funds? Should I not just continue with them?'
   }, {
-    t: 36,
+    t: 40,
     role: 'ai',
-    text: 'There are three approaches. First, a gradual rebalancing over 6 months — lowest tax impact. Second, a structured exit via a REIT conversion — maintains real estate exposure with better liquidity. Third, an immediate rebalancing with a tax-loss offset strategy in your equity portfolio.'
+    text: 'The HDFC Large Cap Fund has underperformed its category by 3.2% over the last 18 months. The ICICI Technology SIP made sense when tech was booming — but that theme has faded. Rohan recommends switching to Parag Parikh Flexi Cap for global diversification, and HDFC Manufacturing Fund, which is riding the government\'s industrial push and is up 28% in its category this year.'
   }, {
-    t: 47,
+    t: 55,
     role: 'client',
-    text: 'I think gradual rebalancing makes sense. Can Rohan send me the plan?'
+    text: 'That sounds sensible. What about my tax saving? I pay quite a lot of income tax.'
   }, {
-    t: 52,
+    t: 61,
     role: 'ai',
-    text: 'Absolutely. I am logging this conversation as your formal SEBI acknowledgment. Rohan will send a written rebalancing plan within 48 hours. Your Account Agreement renewal link is also being sent to your registered email now.'
+    text: 'Replacing the ICICI Tech SIP with Mirae Asset ELSS keeps the same ₹8,000 monthly SIP but adds an annual deduction of ₹96,000 under Section 80C. On your tax slab that saves approximately ₹28,800 per year — while building the education corpus in a stronger-performing fund. Shall I send the switch instructions to your email for Rohan\'s countersign?'
   }],
   portfolio: {
-    ytdReturn: 9.1,
+    ytdReturn: 12.8,
     benchmarkReturn: 11.8,
-    healthScore: 58,
-    marketCap: { large: 35, mid: 25, small: 40 },
+    healthScore: 74,
+    marketCap: { large: 52, mid: 32, small: 16 },
     sectors: [
-      { name: 'Real Estate', pct: 38, model: 15 },
-      { name: 'Technology', pct: 20, model: 22 },
-      { name: 'Financials', pct: 16, model: 25 },
-      { name: 'Healthcare', pct: 10, model: 18 },
-      { name: 'Consumer', pct: 8, model: 12 },
-      { name: 'Bonds & Debt', pct: 8, model: 8 }
+      { name: 'Technology', pct: 22, model: 20 },
+      { name: 'Financials', pct: 24, model: 25 },
+      { name: 'Healthcare', pct: 16, model: 15 },
+      { name: 'Consumer Disc', pct: 18, model: 18 },
+      { name: 'Industrials', pct: 12, model: 14 },
+      { name: 'Debt & Cash', pct: 8, model: 8 }
     ],
     style: 'Blend',
-    liquidity: { high: 30, medium: 25, low: 45 },
+    liquidity: { high: 72, medium: 20, low: 8 },
     holdings: [
-      { name: 'Whitefield Commercial Property', pct: 22.4, change: null },
-      { name: 'Embassy REIT', pct: 7.8, change: -1.2 },
-      { name: 'HDFC Bank', pct: 8.1, change: 0.6 },
-      { name: 'Mirae Asset Large Cap Fund', pct: 6.4, change: 1.1 },
-      { name: 'ICICI Tech Fund', pct: 5.9, change: 2.4 }
+      { name: 'HDFC Large Cap Fund (Maturing)', pct: 14.2, change: 0.8 },
+      { name: 'SBI Balanced Advantage (Maturing)', pct: 11.8, change: 0.4 },
+      { name: 'ICICI Pru Technology (Maturing)', pct: 8.2, change: -1.1 },
+      { name: 'HDFC Bank', pct: 9.4, change: 0.6 },
+      { name: 'Mirae Asset Large Cap', pct: 7.6, change: 1.2 }
     ],
-    riskScore: 6.8,
-    aiInsight: 'Real estate concentration at 38% breaches IPS limit of 15% — SEBI compliance window is Day 14/30, requiring documented advisor outreach before Day 30. Gradual rebalancing via REIT conversion recommended to maintain real estate exposure within policy bounds while creating a timestamped compliance record.'
+    riskScore: 5.2,
+    aiInsight: 'Three goal-based SIPs (₹48,000/month combined) complete their 5-year tenure by July 31 — HDFC Large Cap underperforming category by 3.2%, ICICI Tech theme faded. Recommend switching to Parag Parikh Flexi Cap for global diversification, HDFC Manufacturing Fund for PLI-theme returns (+28% category), and Mirae ELSS to add ₹96,000 annual 80C deduction on the same monthly SIP amount.'
   }
 }, {
   id: 3,
