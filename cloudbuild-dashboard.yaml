@@ -1,5 +1,5 @@
 steps:
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/butterfly-987/wealth-mgmt-dashboard', '-f', 'Dockerfile.dashboard', '.']
+    args: ['build', '-t', 'gcr.io/butterfly-987/wealth-mgmt-demo2-dashboard', '-f', 'Dockerfile.dashboard', '.']
 images:
-  - 'gcr.io/butterfly-987/wealth-mgmt-dashboard'
+  - 'gcr.io/butterfly-987/wealth-mgmt-demo2-dashboard'

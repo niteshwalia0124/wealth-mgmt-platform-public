@@ -824,7 +824,7 @@ async def ws_proxy_endpoint(websocket: WebSocket):
 
 # ── Wealth Management Voice Call ──────────────────────────────────────────────
 
-BROKER_URL       = os.getenv("LIVEAPI_BROKER_URL",  "https://wealth-mgmt-broker-1058427839055.us-central1.run.app")
+BROKER_URL       = os.getenv("LIVEAPI_BROKER_URL",  "https://wealth-mgmt-broker-1058427839055.us-central1.run.app")  # shared broker, unchanged
 TWILIO_SID       = os.getenv("TWILIO_ACCOUNT_SID",  "")
 TWILIO_TOKEN     = os.getenv("TWILIO_AUTH_TOKEN",    "")
 TWILIO_FROM      = os.getenv("TWILIO_FROM_NUMBER",   "")
@@ -1010,7 +1010,7 @@ _WM_VOICE_NOTE_SCRIPTS: dict[str, str] = {
     ),
 }
 
-DASHBOARD_URL = os.getenv("DASHBOARD_URL", "https://wealth-mgmt-dashboard-1058427839055.us-central1.run.app")
+DASHBOARD_URL = os.getenv("DASHBOARD_URL", "https://wealth-mgmt-demo2-dashboard-1058427839055.us-central1.run.app")
 TWILIO_WHATSAPP_FROM = os.getenv("TWILIO_WHATSAPP_FROM", "whatsapp:+14155238886")
 
 
@@ -1874,6 +1874,64 @@ async def agentspace_chat(request: Request):
         import traceback
         traceback.print_exc()
         return JSONResponse({"error": str(exc)}, status_code=500)
+
+
+# ── Video Meet Link ───────────────────────────────────────────────────────────
+
+@app.post("/api/wealth/video-meet/send")
+async def wealth_video_meet_send(request: Request):
+    """
+    Generate a Jitsi Meet room URL and send it to the client via WhatsApp.
+    Returns the same meet_url so the RM can open it on their side.
+    """
+    import uuid as _uuid
+    body        = await request.json()
+    client_key  = body.get("client_key", "")
+    client_name = body.get("client_name", client_key.replace("_", " ").title())
+    mobile      = body.get("mobile", "")
+
+    room_id  = f"CymbalWealth-{_uuid.uuid4().hex[:8].upper()}"
+    meet_url = f"https://meet.jit.si/{room_id}"
+
+    message = (
+        f"🎥 *Cymbal Wealth · Video Meeting*\n\n"
+        f"Namaste *{client_name}* ji!\n\n"
+        f"Your advisor Rohan Sharma has invited you to a quick video meeting.\n\n"
+        f"👉 *Join here:* {meet_url}\n\n"
+        f"No app download needed — opens directly in your browser.\n"
+        f"_Sent via Cymbal Wealth Management_"
+    )
+
+    twilio_sid_val = ""
+    wa_status = "simulated"
+
+    if TWILIO_SID:
+        dial_to = DEMO_MOBILE or mobile
+        wa_to   = f"whatsapp:{dial_to}"   if not dial_to.startswith("whatsapp:")   else dial_to
+        wa_from = TWILIO_WHATSAPP_FROM if TWILIO_WHATSAPP_FROM.startswith("whatsapp:") else f"whatsapp:{TWILIO_WHATSAPP_FROM}"
+        try:
+            import httpx as _httpx
+            r = _httpx.post(
+                f"https://api.twilio.com/2010-04-01/Accounts/{TWILIO_SID}/Messages.json",
+                auth=(TWILIO_SID, TWILIO_TOKEN),
+                data={"From": wa_from, "To": wa_to, "Body": message},
+                timeout=15,
+            )
+            r.raise_for_status()
+            twilio_sid_val = r.json().get("sid", "")
+            wa_status = "sent"
+            log.info("Video meet link sent to %s: %s (Twilio %s)", wa_to, meet_url, twilio_sid_val)
+        except Exception as exc:
+            log.error("Twilio WhatsApp send failed for video meet: %s", exc)
+            return JSONResponse({"error": str(exc)}, status_code=500)
+
+    return {
+        "status":      wa_status,
+        "meet_url":    meet_url,
+        "twilio_sid":  twilio_sid_val,
+        "client_name": client_name,
+        "note": "Twilio credentials not set — simulated" if wa_status == "simulated" else "",
+    }
 
 
 if __name__ == "__main__":
