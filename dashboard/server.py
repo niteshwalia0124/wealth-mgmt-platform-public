@@ -2,15 +2,19 @@
 Distributor Dashboard — FastAPI server for distributor-scoped call visibility.
 """
 
+import asyncio
 import logging
 import os
 import uuid
 from datetime import datetime
 
-from fastapi import FastAPI, Query, Request
+import websockets
+from fastapi import FastAPI, Query, Request, WebSocket
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from google.auth import default as gauth_default
+from google.auth.transport.requests import Request as GAuthRequest
 from google.cloud import bigquery
 
 log = logging.getLogger("dashboard")
@@ -55,6 +59,12 @@ async def index(request: Request, arn: str = ""):
 @app.get("/advisor", response_class=HTMLResponse)
 async def advisor_dashboard():
     path = os.path.join(os.path.dirname(__file__), "templates", "advisor_dashboard.html")
+    return FileResponse(path, media_type="text/html")
+
+
+@app.get("/priya", response_class=HTMLResponse)
+async def priya_persona():
+    path = os.path.join(os.path.dirname(__file__), "templates", "priya_persona.html")
     return FileResponse(path, media_type="text/html")
 
 
@@ -544,10 +554,272 @@ async def api_video_call(request: Request):
     return {"call_id": call_id, "video_url": video_url}
 
 
+_CLIENT_PORTFOLIOS = {
+    "amit_patel": {
+        "name": "Amit Patel", "salutation": "Mr. Patel",
+        "loc": "Mumbai", "age": 52, "risk": "Aggressive", "aum": "₹38.4 Cr", "nw": "₹45.2 Cr",
+        "portfolio": {
+            "ytdReturn": 9.2, "benchmarkReturn": 15.8, "healthScore": 58,
+            "sectors": [
+                {"name": "Technology", "pct": 38, "model": 20},
+                {"name": "Financials", "pct": 12, "model": 28},
+                {"name": "Alt Investments", "pct": 20, "model": 12},
+                {"name": "Healthcare", "pct": 8, "model": 18},
+                {"name": "Consumer", "pct": 14, "model": 16},
+                {"name": "Cash & Equiv", "pct": 8, "model": 6},
+            ],
+            "holdings": [
+                {"name": "Infosys", "pct": 11.2}, {"name": "TCS", "pct": 9.8},
+                {"name": "HCL Technologies", "pct": 8.4}, {"name": "Kotak PE Fund (AIF)", "pct": 14.2},
+                {"name": "Apple Inc (US Equity)", "pct": 6.8},
+            ],
+            "riskScore": 7.8,
+            "aiInsight": "Portfolio trailing model by 6.6pp YTD (9.2% vs 15.8%) — technology at 38% vs model 20% while financials (held at 12% vs model 28%) and healthcare (8% vs 18%) have rallied 32% and 24% respectively this year. Rotating ₹8–10 Cr into HDFC Bank, SBI, Cipla, and Sun Pharma would close the performance gap and reduce tech concentration risk.",
+            "talkingPoints": [
+                "Gap: Your portfolio +9.2% vs Model +15.8% YTD → ₹2.5 Cr uncaptured returns in 2026",
+                "Tech at 38% vs model 20% → holding 18pp too much in a sector that has gone flat",
+                "Financials only 12% vs model 28% → missed the 32% rally in HDFC Bank and SBI",
+                "Healthcare only 8% vs model 18% → missed 24% rally in Cipla and Sun Pharma this year",
+                "Rebalance: rotate ₹8–10 Cr from Tech into Banking and Healthcare to close the gap",
+            ],
+        },
+    },
+    "priya_kapoor": {
+        "name": "Priya Kapoor", "salutation": "Ms. Kapoor",
+        "loc": "Bengaluru", "age": 44, "risk": "Balanced", "aum": "₹21.3 Cr", "nw": "₹28.7 Cr",
+        "portfolio": {
+            "ytdReturn": 12.8, "benchmarkReturn": 11.8, "healthScore": 74,
+            "sectors": [
+                {"name": "Technology", "pct": 22, "model": 20},
+                {"name": "Financials", "pct": 24, "model": 25},
+                {"name": "Healthcare", "pct": 16, "model": 15},
+                {"name": "Consumer Disc", "pct": 18, "model": 18},
+                {"name": "Industrials", "pct": 12, "model": 14},
+                {"name": "Debt & Cash", "pct": 8, "model": 8},
+            ],
+            "holdings": [
+                {"name": "HDFC Large Cap Fund (Maturing)", "pct": 14.2},
+                {"name": "SBI Balanced Advantage (Maturing)", "pct": 11.8},
+                {"name": "ICICI Pru Technology (Maturing)", "pct": 8.2},
+                {"name": "HDFC Bank", "pct": 9.4}, {"name": "Mirae Asset Large Cap", "pct": 7.6},
+            ],
+            "riskScore": 5.2,
+            "aiInsight": "Three goal-based SIPs (₹48,000/month combined) complete their 5-year tenure by July 31 — HDFC Large Cap underperforming category by 3.2%, ICICI Tech theme faded. Recommend switching to Parag Parikh Flexi Cap for global diversification, HDFC Manufacturing Fund for PLI-theme returns (+28% category), and Mirae ELSS to add ₹96,000 annual 80C deduction on the same monthly SIP amount.",
+            "talkingPoints": [
+                "3 SIPs (₹48,000/month) mature Jul 31 — HDFC Large Cap, SBI Balanced Adv, ICICI Tech",
+                "HDFC Large Cap: 10.4% vs category 13.6% → −3.2pp gap over 18 months",
+                "Switch to Parag Parikh Flexi Cap (16.2%) and HDFC Manufacturing Fund (18.4%)",
+                "Mirae ELSS: same ₹8,000/month SIP + ₹96,000 annual 80C tax deduction added",
+            ],
+        },
+    },
+    "vikram_nair": {
+        "name": "Vikram Nair", "salutation": "Mr. Nair",
+        "loc": "Chennai", "age": 48, "risk": "Growth", "aum": "₹26.8 Cr", "nw": "₹31.6 Cr",
+        "portfolio": {
+            "ytdReturn": 22.3, "benchmarkReturn": 11.8, "healthScore": 84,
+            "sectors": [
+                {"name": "Technology", "pct": 28, "model": 25},
+                {"name": "Consumer Disc", "pct": 22, "model": 18},
+                {"name": "Financials", "pct": 20, "model": 25},
+                {"name": "Industrials", "pct": 14, "model": 12},
+                {"name": "Healthcare", "pct": 10, "model": 14},
+                {"name": "Materials", "pct": 6, "model": 6},
+            ],
+            "holdings": [
+                {"name": "Mirae Asset Mid Cap Fund", "pct": 11.2}, {"name": "Axis Growth Opp Fund", "pct": 9.8},
+                {"name": "HDFC Mid-Cap Opp Fund", "pct": 8.6}, {"name": "Reliance Industries", "pct": 7.4},
+                {"name": "Bajaj Finance", "pct": 6.1},
+            ],
+            "riskScore": 7.1,
+            "aiInsight": "Mid-cap concentration at 52% has driven exceptional +22.3% YTD returns outperforming benchmark by 10.5pp, but 12 SIP mandates totalling ₹8.4 Cr/month expire within 30 days. Mandate disruption at current NAV levels would break rupee-cost averaging during peak momentum — renewal is the single highest-priority action this week.",
+            "talkingPoints": [
+                "Portfolio up +22.3% YTD — outperforming benchmark by 10.5pp, outstanding performance",
+                "12 SIP mandates expire in 30 days — ₹8.4 Cr/month at risk of disruption",
+                "Mid-cap at 52% has driven returns but increases volatility risk",
+                "Recommend mandate renewal immediately + consider partial large-cap allocation for stability",
+            ],
+        },
+    },
+    "rajiv_singhania": {
+        "name": "Rajiv Singhania", "salutation": "Mr. Singhania",
+        "loc": "NRI · Dubai", "age": 61, "risk": "HNW Global", "aum": "₹58.7 Cr", "nw": "₹62.1 Cr",
+        "portfolio": {
+            "ytdReturn": 14.9, "benchmarkReturn": 11.8, "healthScore": 78,
+            "sectors": [
+                {"name": "Alt Investments (AIF)", "pct": 38, "model": 30},
+                {"name": "Technology (US)", "pct": 18, "model": 15},
+                {"name": "Financials", "pct": 16, "model": 20},
+                {"name": "Healthcare", "pct": 12, "model": 15},
+                {"name": "Consumer", "pct": 10, "model": 12},
+                {"name": "Cash & Bonds", "pct": 6, "model": 8},
+            ],
+            "holdings": [
+                {"name": "ICICI Pru AIF Cat III", "pct": 18.6}, {"name": "Apple Inc (US Equity)", "pct": 8.4},
+                {"name": "Microsoft Corp (US)", "pct": 6.2}, {"name": "HDFC Balanced Advantage", "pct": 7.1},
+                {"name": "Kotak Emerging Equity", "pct": 5.8},
+            ],
+            "riskScore": 6.4,
+            "aiInsight": "AIF Cat III exposure at 38% exceeds model target of 30%, creating illiquidity risk for a global portfolio that requires FEMA repatriation flexibility. DTAA Form 67 deadline Jul 31 represents a ₹42 L tax saving on US equity LTCG under India-UAE treaty — immediate filing action required before the Section 90 claim window closes.",
+            "talkingPoints": [
+                "Portfolio up +14.9% YTD — 3.1pp above benchmark, solid performance",
+                "AIF Cat III at 38% vs model 30% → illiquidity risk with FEMA repatriation upcoming",
+                "DTAA Form 67 deadline Jul 31 — ₹42 L treaty benefit (10% vs 20% LTCG) at stake",
+                "FEMA repatriation plan needed: ₹9 Cr Dubai property proceeds, USD 1M/year limit",
+            ],
+        },
+    },
+    "sunita_mehrotra": {
+        "name": "Sunita Mehrotra", "salutation": "Ms. Mehrotra",
+        "loc": "Pune", "age": 58, "risk": "Conservative", "aum": "₹15.2 Cr", "nw": "₹18.4 Cr",
+        "portfolio": {
+            "ytdReturn": 6.8, "benchmarkReturn": 11.8, "healthScore": 71,
+            "sectors": [
+                {"name": "Bonds & Debt", "pct": 52, "model": 35},
+                {"name": "Financials", "pct": 18, "model": 25},
+                {"name": "Healthcare", "pct": 10, "model": 15},
+                {"name": "Consumer Staples", "pct": 8, "model": 12},
+                {"name": "Technology", "pct": 6, "model": 8},
+                {"name": "Cash & FDs", "pct": 6, "model": 5},
+            ],
+            "holdings": [
+                {"name": "HDFC FD (Maturing Jul 15)", "pct": 16.4}, {"name": "SBI Corporate Bond Fund", "pct": 11.2},
+                {"name": "ICICI Pru Bluechip Fund", "pct": 8.6}, {"name": "Kotak Banking & PSU Fund", "pct": 7.4},
+                {"name": "HDFC Short Term Debt Fund", "pct": 6.8},
+            ],
+            "riskScore": 3.2,
+            "aiInsight": "Debt over-concentration at 52% exceeds conservative model target of 35%, and the ₹2.5 Cr HDFC FD matures July 15 at a reduced 6.5% rate versus the locked 7.2%. Switching to HDFC Floating Rate Fund before maturity captures 7.8% post-tax yield with indexation — an additional ₹14.2 L over 3 years with equivalent AAA credit quality.",
+            "talkingPoints": [
+                "Portfolio up +6.8% YTD — below benchmark but aligned to conservative mandate",
+                "Debt at 52% vs model 35% — over-concentrated, reducing equity growth potential",
+                "₹2.5 Cr HDFC FD matures Jul 15 — new rate 6.5% vs current 7.2%, a step down",
+                "Recommend HDFC Floating Rate Fund: 7.8% post-tax, AAA-rated, T+2 liquidity vs FD",
+                "Over 3 years with indexation: ₹14.2 L more than renewing the FD",
+            ],
+        },
+    },
+}
+
+
+@app.get("/api/wealth/client/{client_id}/portfolio")
+async def get_client_portfolio(client_id: str):
+    data = _CLIENT_PORTFOLIOS.get(client_id)
+    if not data:
+        return JSONResponse({"error": "Client not found"}, status_code=404)
+    return JSONResponse(data)
+
+
 @app.get("/video-call", response_class=HTMLResponse)
 async def video_call_page(request: Request):
-    """Serve the full-screen Priya avatar video call page."""
+    """Serve the Rohan avatar video call page."""
     return templates.TemplateResponse(request, "video_call.html", {})
+
+
+@app.websocket("/ws-proxy")
+async def ws_proxy_endpoint(websocket: WebSocket):
+    """Proxy browser WebSocket to Vertex AI Live API with server-side auth."""
+    target = websocket.query_params.get("target")
+    if not target or "LlmBidiService/BidiGenerateContent" not in target:
+        await websocket.close(code=1008)
+        return
+
+    try:
+        credentials, project = gauth_default(
+            scopes=["https://www.googleapis.com/auth/cloud-platform"]
+        )
+        credentials.refresh(GAuthRequest())
+        token = credentials.token
+    except Exception as exc:
+        log.error("WS proxy auth error: %s", exc)
+        await websocket.close(code=1011)
+        return
+
+    location = os.getenv("GOOGLE_CLOUD_LOCATION", "us-central1")
+    if location == "global":
+        location = "us-central1"
+    gcp_project = project or os.getenv("GOOGLE_CLOUD_PROJECT", "butterfly-987")
+
+    upstream_url = (
+        f"wss://{location}-aiplatform.googleapis.com"
+        f"//ws/google.cloud.aiplatform.v1beta1.LlmBidiService/BidiGenerateContent"
+    )
+
+    print(f"[WS-PROXY] wslib={websockets.__version__} token_len={len(token)} project={gcp_project} location={location}", flush=True)
+    print(f"[WS-PROXY] upstream_url={upstream_url}", flush=True)
+
+    await websocket.accept()
+
+    try:
+        async with websockets.connect(
+            upstream_url,
+            extra_headers={
+                "Authorization": f"Bearer {token}",
+                "X-Goog-User-Project": gcp_project,
+            },
+        ) as upstream:
+            print("[WS-PROXY] upstream connected OK", flush=True)
+
+            async def client_to_upstream():
+                import json as _json
+                try:
+                    while True:
+                        data = await websocket.receive()
+                        if "bytes" in data and data["bytes"] is not None:
+                            await upstream.send(data["bytes"])
+                        elif "text" in data and data["text"] is not None:
+                            text = data["text"]
+                            try:
+                                msg = _json.loads(text)
+                                if "setup" in msg and "model" in msg["setup"]:
+                                    import re as _re
+                                    short_model = _re.sub(
+                                        r'^projects/[^/]+/locations/[^/]+/', '',
+                                        msg["setup"]["model"]
+                                    )
+                                    fq = f"projects/{gcp_project}/locations/{location}/{short_model}"
+                                    msg["setup"]["model"] = fq
+                                    text = _json.dumps(msg)
+                                    print(f"[WS-PROXY] setup rewritten → {fq}", flush=True)
+                                else:
+                                    print(f"[WS-PROXY] client msg keys={list(msg.keys())}", flush=True)
+                            except Exception as je:
+                                print(f"[WS-PROXY] json parse err: {je}", flush=True)
+                            await upstream.send(text)
+                except Exception as e:
+                    print(f"[WS-PROXY] client_to_upstream ended: {e}", flush=True)
+
+            async def upstream_to_client():
+                try:
+                    async for msg in upstream:
+                        if isinstance(msg, bytes):
+                            await websocket.send_bytes(msg)
+                        else:
+                            print(f"[WS-PROXY] upstream→client text: {str(msg)[:200]}", flush=True)
+                            await websocket.send_text(msg)
+                except Exception as e:
+                    print(f"[WS-PROXY] upstream_to_client ended: {e}", flush=True)
+                try:
+                    print(f"[WS-PROXY] upstream close code={getattr(upstream,'close_code','?')} reason={getattr(upstream,'close_reason','?')}", flush=True)
+                except Exception:
+                    pass
+
+            tasks = [
+                asyncio.create_task(client_to_upstream()),
+                asyncio.create_task(upstream_to_client()),
+            ]
+            done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
+            for t in pending:
+                t.cancel()
+            for t in done:
+                if t.exception():
+                    print(f"[WS-PROXY] task exception: {t.exception()}", flush=True)
+    except Exception as exc:
+        log.error("WS proxy error: %s", exc)
+    finally:
+        try:
+            await websocket.close()
+        except Exception:
+            pass
 
 
 # ── Wealth Management Voice Call ──────────────────────────────────────────────
@@ -574,45 +846,45 @@ You are calling Amit Patel on behalf of his Relationship Manager, Rohan Sharma.
 OPENING: "Good afternoon Mr. Patel. I am Priya calling from Cymbal Wealth Management on behalf of your advisor Rohan Sharma. This call is being recorded for quality and compliance purposes. Do you have a moment to speak?"
 If NO: "Of course, no problem. Have a good day." — end immediately.
 
-YOUR BRIEF: Amit's ₹12 Crore position in the Kotak Alternate Fund matures on June 30th — just 10 days away. The waterfall distribution will include principal, carried interest, and accrued income as a single taxable event. He also holds FAANG equity with ₹4.8 Crore in unrealised long-term capital gains — the netting window is closing.
+YOUR BRIEF: Amit's portfolio is up 9.2% this year but the model portfolio for his risk profile is up 15.8% — a gap of 6.6 percentage points. On his ₹38.4 Crore corpus, that gap represents approximately ₹2.5 Crore in returns he has not captured this year. The root cause: his technology allocation stands at 38% of his portfolio, against a model target of 20%. Meanwhile financials (which he holds at only 12% vs model 28%) have returned 32% this year, and healthcare (held at 8% vs model 18%) has returned 24%.
 
-PRESENT THESE THREE SCENARIOS (one at a time, let him respond):
-1. AIF Category II Bridge: Reinvest into a new AIF Cat II fund before June 28 — pass-through tax treatment, 10-year lock-in, projected 14-16% IRR
-2. PMS with LTCG netting: Move proceeds to Portfolio Management Service while booking FAANG losses to offset ₹1.2 Crore in LTCG liability
-3. Liquid Plus bridge: Park in liquid fund for 30 days while Rohan prepares a detailed reinvestment proposal
+KEY TALKING POINTS (present one at a time, listen before moving to the next):
+1. The performance gap: "Your portfolio is up 9.2% this year. The model portfolio for your risk profile is up 15.8%. That 6.6 percentage point difference works out to roughly ₹2.5 Crore in returns you have not captured."
+2. The cause: "The main reason is technology. You hold 38% in tech — Infosys, TCS, HCL — but the model says 20%. Tech has been flat while financials and healthcare have rallied strongly."
+3. What was missed: "HDFC Bank is up 34% this year. SBI is up 28%. Cipla and Sun Pharma are both up 24%. You are significantly underweight all of them."
+4. The action: "Rohan recommends rotating ₹8 to 10 Crore from tech into banking and pharma. Your tech weight comes down to around 22%, financials move up to 26%, and the gap to the model closes substantially."
 
 RULES:
-- Present scenarios, never recommend. Say "Rohan can walk you through which suits your goals best."
+- Present talking points one at a time — say it, then pause and listen
+- Never recommend specific funds — say "Rohan will walk you through the specific names"
 - Never collect account numbers, OTPs, or PAN
 - Never process or promise any transaction
-- If asked anything outside this brief: "Rohan will personally guide you on that."
-- End: "Thank you Mr. Patel. Rohan will send a written summary within 24 hours. Goodbye."
+- If asked anything outside this brief: "Rohan will personally guide you on that"
+- End: "Thank you Mr. Patel. Rohan will send you the detailed rebalancing proposal within 24 hours. Goodbye."
 """,
 
-    "priya_kapoor": """You are Priya, a compliance-trained AI voice assistant for Cymbal Wealth Management.
+    "priya_kapoor": """You are Priya, a professional AI voice assistant for Cymbal Wealth Management.
 You are calling Priya Kapoor on behalf of her Relationship Manager, Rohan Sharma.
 
-CRITICAL: This is a COMPLIANCE CALL. You must follow this script exactly. Zero deviation allowed.
+OPENING: "Good morning Ms. Kapoor. I am Priya calling from Cymbal Wealth Management on behalf of your advisor Rohan Sharma. This call is being recorded for quality purposes. Do you have a few minutes to speak?"
+If NO: "Of course, no problem. Rohan will send you a message with the details. Have a good day." — end immediately.
 
-OPENING (read verbatim): "Good morning Ms. Kapoor. I am Priya, an AI assistant calling from Cymbal Wealth Management on behalf of your advisor Rohan Sharma. This call is being recorded for compliance and regulatory purposes under SEBI guidelines. Do you have a moment to speak?"
-If NO: "Of course. A written notice will follow by email. Goodbye." — end immediately.
+YOUR BRIEF: Priya has three goal-based SIPs totalling ₹48,000 per month that are completing their 5-year tenure on July 31st — just weeks away. The three SIPs are: HDFC Large Cap Fund at ₹25,000 per month, SBI Balanced Advantage Fund at ₹15,000 per month, and ICICI Prudential Technology Fund at ₹8,000 per month. All three have been underperforming their category peers. Without guidance she will auto-renew into the same underperforming funds. Rohan has identified better alternatives.
 
-STEP 1 — SEBI DISCLOSURE (read verbatim):
-"Ms. Kapoor, I am required to formally notify you that your Investment Policy Statement shows a portfolio drift of 14 percentage points. Your real estate allocation is currently at 65 percent against your agreed IPS limit of 40 percent. Under SEBI Circular SEBI/HO/MIRSD/2021, we are required to document this notification. Do you acknowledge understanding this?"
-→ Wait for acknowledgment before proceeding.
+KEY TALKING POINTS (present one at a time, listen before moving to the next):
+1. The maturity alert: "Ms. Kapoor, your three goal-based SIPs — HDFC Large Cap, SBI Balanced Advantage, and ICICI Technology — complete their 5-year tenure on July 31st. At maturity you have a window to reinvest into better options rather than auto-renewing."
+2. The fund quality gap: "The HDFC Large Cap Fund has underperformed its category average by 3.2 percentage points over the past 18 months. The ICICI Technology SIP was well-timed when the theme was active, but technology as a theme has cooled and that fund is now 4.8 percentage points behind its category."
+3. The recommended switches: "Rohan recommends switching HDFC Large Cap to Parag Parikh Flexi Cap, which gives you global diversification and has consistently outperformed. For SBI Balanced Advantage he suggests HDFC Manufacturing Fund, which is riding the government's industrial push and is up 28 percent in its category this year."
+4. The tax benefit: "For the ICICI Tech SIP, Rohan recommends switching to Mirae Asset ELSS. Same ₹8,000 per month — but you gain a Section 80C deduction of ₹96,000 per year. On your tax slab that saves roughly ₹28,000 in tax annually while building your corpus in a stronger fund."
 
-STEP 2 — ACCOUNT AGREEMENT (read verbatim):
-"Additionally, your Account Agreement consent has lapsed. Your advisor Rohan will send a renewal link to your registered email within 24 hours. Please complete it at your earliest convenience to ensure uninterrupted advisory services."
-
-STEP 3 — REBALANCING OPTIONS (brief, factual):
-"Rohan has prepared three rebalancing options to bring your portfolio back within IPS limits. He will share these in writing within 48 hours for your review."
-
-CLOSING (read verbatim): "Ms. Kapoor, this conversation has been logged as your formal SEBI notification under the applicable circular. Thank you for your time. Goodbye."
-
-ABSOLUTE RULES:
-- Never say anything not in this script
-- Never give investment advice or recommend any asset
-- Do not engage in free-form conversation — redirect everything to Rohan
+RULES:
+- Present talking points one at a time — say it, then pause and listen
+- Never confirm or execute a switch — say "Rohan will send you the switch instruction form for your approval"
+- Never collect account numbers, folio numbers, or OTP
+- Never process any transaction
+- Deadline framing only: "The July 31st maturity creates a natural decision window"
+- If asked anything outside this brief: "Rohan will personally guide you on that"
+- End: "Thank you Ms. Kapoor. Rohan will send you the fund comparison and switch instructions on WhatsApp today. Goodbye."
 """,
 
     "vikram_nair": """You are Priya, a bilingual AI voice assistant for Cymbal Wealth Management.
@@ -688,18 +960,22 @@ _WM_VOICE_NOTE_SCRIPTS: dict[str, str] = {
     "amit_patel": (
         "Good afternoon, Mister Patel. This is Priya from Cymbal Wealth Management, "
         "calling on behalf of your advisor Rohan Sharma. "
-        "Your twelve crore rupee Kotak Alternate Fund position matures on June thirtieth — just ten days away. "
-        "Rohan has prepared three personalised reinvestment scenarios for you, "
-        "including an AIF Category Two bridge with LTCG tax pass-through advantages. "
-        "Please check your WhatsApp for Rohan's detailed proposal. Thank you, and have a great day."
+        "Rohan has completed a review of your portfolio against the model portfolio for your risk profile. "
+        "Your portfolio is up nine point two percent this year — but the model is up fifteen point eight percent. "
+        "That six point six percentage point gap works out to roughly two point five crore rupees in returns not yet captured. "
+        "The main reason is your technology allocation at thirty eight percent, while the model says twenty percent. "
+        "Financials and healthcare have both rallied strongly this year and you are underweight both. "
+        "Rohan has a rebalancing proposal ready — rotating eight to ten crore from tech into banking and pharma. "
+        "Please check your WhatsApp for his detailed note. Thank you, and have a great day."
     ),
     "priya_kapoor": (
         "Good morning, Ms. Kapoor. This is Priya from Cymbal Wealth Management "
-        "calling on behalf of Rohan Sharma with a formal compliance notification. "
-        "Your portfolio's real estate allocation is currently at sixty five percent, "
-        "which exceeds your agreed IPS limit of forty percent. "
-        "Under SEBI Investment Advisor Regulations, Rohan is required to document this notification. "
-        "He has three rebalancing proposals ready for your review and will reach out to you today. "
+        "calling on behalf of your advisor Rohan Sharma. "
+        "This is a quick alert about your three SIP investments — HDFC Large Cap, SBI Balanced Advantage, and ICICI Technology. "
+        "All three are completing their five year tenure on July thirty first — just a few weeks away. "
+        "Rohan has reviewed these funds and found they have been underperforming their category peers. "
+        "He has identified better alternatives — including one that adds a ninety six thousand rupee annual tax deduction under Section Eighty C. "
+        "Please check your WhatsApp for Rohan's fund switch recommendations before the July thirty first deadline. "
         "Thank you for your time."
     ),
     "vikram_nair": (
@@ -1095,9 +1371,12 @@ async def wealth_whatsapp_vn_generate(request: Request):
             contents=script,
             config=GenerateContentConfig(
                 response_modalities=["AUDIO"],
-                speech_config=SpeechConfig(voice_config=VoiceConfig(
-                    prebuilt_voice_config=PrebuiltVoiceConfig(voice_name="Autonoe")
-                )),
+                speech_config=SpeechConfig(
+                    language_code="en-IN",
+                    voice_config=VoiceConfig(
+                        prebuilt_voice_config=PrebuiltVoiceConfig(voice_name="Autonoe")
+                    )
+                ),
             ),
         )
         pcm_bytes   = tts_resp.candidates[0].content.parts[0].inline_data.data
@@ -1224,6 +1503,7 @@ async def wealth_whatsapp_voice_note(request: Request):
             config=GenerateContentConfig(
                 response_modalities=["AUDIO"],
                 speech_config=SpeechConfig(
+                    language_code="en-IN",
                     voice_config=VoiceConfig(
                         prebuilt_voice_config=PrebuiltVoiceConfig(voice_name="Autonoe")
                     )

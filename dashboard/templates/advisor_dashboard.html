@@ -117,7 +117,7 @@ var CLIENTS = [{
   story: 'Amit\'s tech-heavy portfolio is trailing the model by 6.6pp YTD (9.2% vs 15.8%). Financials (+32%) and healthcare (+24%) rallies largely missed. Rotating ₹8–10 Cr from tech into banking and pharma will close the gap and reduce concentration risk.',
   complianceNote: null,
   geminiActions: ['Pull current vs model portfolio comparison', 'Compute sector drift: tech 38% vs model 20%', 'Quantify 6.6pp gap in rupee terms — ₹2.5 Cr missed return', 'Identify top rebalancing candidates from model portfolio', 'Draft rotation plan: reduce tech, add financials + healthcare', 'Auto-log recommendation to CRM'],
-  talkingPoints: ['Performance gap: portfolio +9.2% vs model +15.8% YTD — ₹2.5 Cr difference', 'Tech overweight: 38% vs model 20% — HDFC Bank alone up 34% this year', 'Financials underweight: you hold 12%, model says 28% — missed the rally', 'Healthcare underweight: you hold 8%, model says 18% — Cipla, Sun Pharma both up 24%', 'Rotation plan: ₹8–10 Cr shift into HDFC Bank, SBI, Cipla, Sun Pharma'],
+  talkingPoints: ['Gap: Your portfolio +9.2% vs Model +15.8% YTD → ₹2.5 Cr uncaptured returns in 2026', 'Tech at 38% vs model 20% → holding 18pp too much in a sector that has gone flat', 'Financials only 12% vs model 28% → missed the 32% rally in HDFC Bank and SBI', 'Healthcare only 8% vs model 18% → missed 24% rally in Cipla and Sun Pharma this year', 'Rebalance: rotate ₹8–10 Cr from Tech into Banking and Healthcare to close the gap'],
   last: '5 days ago',
   ctx: 'Portfolio underperforming model · Tech overweight · Rebalancing opportunity',
   sessionScript: [{
@@ -172,7 +172,18 @@ var CLIENTS = [{
       { name: 'Apple Inc (US Equity)', pct: 6.8, change: 1.2 }
     ],
     riskScore: 7.8,
-    aiInsight: 'Portfolio trailing model by 6.6pp YTD (9.2% vs 15.8%) — technology at 38% vs model 20% while financials (held at 12% vs model 28%) and healthcare (8% vs 18%) have rallied 32% and 24% respectively this year. Rotating ₹8–10 Cr into HDFC Bank, SBI, Cipla, and Sun Pharma would close the performance gap and reduce tech concentration risk.'
+    aiInsight: 'Portfolio trailing model by 6.6pp YTD (9.2% vs 15.8%) — technology at 38% vs model 20% while financials (held at 12% vs model 28%) and healthcare (8% vs 18%) have rallied 32% and 24% respectively this year. Rotating ₹8–10 Cr into HDFC Bank, SBI, Cipla, and Sun Pharma would close the performance gap and reduce tech concentration risk.',
+    gapInsight: {
+      type: 'performance',
+      title: 'Portfolio vs Model — Performance Gap',
+      subtitle: 'YTD Return 2026',
+      current: { label: 'Your Portfolio', value: 9.2, color: '#f59e0b' },
+      model: { label: 'Model Portfolio', value: 15.8, color: '#10b981' },
+      benchmark: { label: 'NIFTY 50', value: 11.8 },
+      gap: 6.6,
+      gapRupees: '₹2.5 Cr',
+      action: 'Rotate ₹8–10 Cr: Tech → Financials & Healthcare'
+    }
   }
 }, {
   id: 2,
@@ -197,7 +208,7 @@ var CLIENTS = [{
   story: '3 goal-based SIPs completing 5-year tenure by July 31 — HDFC Large Cap (₹25K/mo), SBI Balanced Advantage (₹15K/mo), ICICI Tech (₹8K/mo). Without guidance Priya will auto-renew into underperforming funds. Better options available to match her 2027 education corpus goal.',
   complianceNote: null,
   geminiActions: ['Pull SIP maturity schedule from CDSL/RTA records', 'Run fund performance comparison vs category peers', 'Identify 3 replacement SIPs aligned to 2027 education goal', 'Compute corpus projection: current funds vs recommended switch', 'Draft switch instruction form with pre-filled fund details', 'Auto-log reinvestment recommendation to CRM'],
-  talkingPoints: ['3 SIPs ending July 31: HDFC Large Cap, SBI Balanced Advantage, ICICI Tech', 'HDFC Large Cap underperforming category by 3.2% over 18 months', 'Recommended switch: Parag Parikh Flexi Cap — global diversification, consistent performer', 'HDFC Manufacturing Fund: PLI-driven industrial theme, up 28% in its category this year', 'Mirae ELSS: replaces ICICI Tech SIP + adds ₹96,000 annual 80C deduction'],
+  talkingPoints: ['3 SIPs (₹48,000/month) mature Jul 31 — HDFC Large Cap, SBI Balanced Adv, ICICI Tech', 'HDFC Large Cap: 10.4% vs category 13.6% → −3.2pp gap over 18 months', 'ICICI Pru Tech: 8.6% vs category 13.4% → −4.8pp gap, theme has faded', 'Switch to Parag Parikh Flexi Cap (16.2%) and HDFC Manufacturing Fund (18.4%)', 'Mirae ELSS: same ₹8,000/month SIP + ₹96,000 annual 80C tax deduction added'],
   last: '8 days ago',
   ctx: 'SIP maturity · 3 funds ending Jul 31 · Reinvestment into better options',
   sessionScript: [{
@@ -252,7 +263,18 @@ var CLIENTS = [{
       { name: 'Mirae Asset Large Cap', pct: 7.6, change: 1.2 }
     ],
     riskScore: 5.2,
-    aiInsight: 'Three goal-based SIPs (₹48,000/month combined) complete their 5-year tenure by July 31 — HDFC Large Cap underperforming category by 3.2%, ICICI Tech theme faded. Recommend switching to Parag Parikh Flexi Cap for global diversification, HDFC Manufacturing Fund for PLI-theme returns (+28% category), and Mirae ELSS to add ₹96,000 annual 80C deduction on the same monthly SIP amount.'
+    aiInsight: 'Three goal-based SIPs (₹48,000/month combined) complete their 5-year tenure by July 31 — HDFC Large Cap underperforming category by 3.2%, ICICI Tech theme faded. Recommend switching to Parag Parikh Flexi Cap for global diversification, HDFC Manufacturing Fund for PLI-theme returns (+28% category), and Mirae ELSS to add ₹96,000 annual 80C deduction on the same monthly SIP amount.',
+    gapInsight: {
+      type: 'funds',
+      title: 'Maturing SIPs — Fund Quality Gap',
+      subtitle: '5-Year Annualised Return vs Category Average',
+      funds: [
+        { current: 'HDFC Large Cap Fund', currentReturn: 10.4, currentGap: -3.2, recommended: 'Parag Parikh Flexi Cap', recReturn: 16.2, monthly: '₹25,000' },
+        { current: 'SBI Balanced Advantage', currentReturn: 11.2, currentGap: -1.1, recommended: 'HDFC Manufacturing Fund', recReturn: 18.4, monthly: '₹15,000' },
+        { current: 'ICICI Pru Technology', currentReturn: 8.6, currentGap: -4.8, recommended: 'Mirae Asset ELSS', recReturn: 14.1, monthly: '₹8,000', bonus: '+₹96K 80C' }
+      ],
+      action: 'Total ₹48,000/month reinvestment · Deadline: July 31'
+    }
   }
 }, {
   id: 3,
@@ -655,13 +677,13 @@ function Sidebar({
     }
   }, "W"), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     style: {
-      fontSize: 12,
+      fontSize: 13,
       fontWeight: 700,
       color: '#f1f5f9'
     }
   }, "Cymbal Wealth Platform"), /*#__PURE__*/React.createElement("div", {
     style: {
-      fontSize: 8,
+      fontSize: 9,
       color: '#34d399',
       fontWeight: 600
     }
@@ -685,7 +707,7 @@ function Sidebar({
     }
   }), /*#__PURE__*/React.createElement("span", {
     style: {
-      fontSize: 8,
+      fontSize: 9,
       fontWeight: 700,
       color: '#34d399'
     }
@@ -697,7 +719,7 @@ function Sidebar({
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      fontSize: 8,
+      fontSize: 9,
       fontWeight: 700,
       color: '#334155',
       textTransform: 'uppercase',
@@ -734,12 +756,12 @@ function Sidebar({
     }), /*#__PURE__*/React.createElement("span", {
       style: {
         flex: 1,
-        fontSize: 11,
+        fontSize: 12,
         fontWeight: on ? 600 : 500
       }
     }, item.label), item.badge && /*#__PURE__*/React.createElement("span", {
       style: {
-        fontSize: 8,
+        fontSize: 9,
         fontWeight: 800,
         padding: '1px 5px',
         borderRadius: 20,
@@ -753,7 +775,7 @@ function Sidebar({
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      fontSize: 8,
+      fontSize: 9,
       fontWeight: 700,
       color: '#334155',
       textTransform: 'uppercase',
@@ -792,12 +814,12 @@ function Sidebar({
       }
     }, /*#__PURE__*/React.createElement("span", {
       style: {
-        fontSize: 9,
+        fontSize: 10,
         color: '#475569'
       }
     }, m.l), /*#__PURE__*/React.createElement("span", {
       style: {
-        fontSize: 9,
+        fontSize: 10,
         fontWeight: 700,
         color: m.up ? '#34d399' : '#f87171'
       }
@@ -834,7 +856,7 @@ function Sidebar({
       justifyContent: 'center',
       fontWeight: 700,
       color: '#fff',
-      fontSize: 9
+      fontSize: 10
     }
   }, "RS"), /*#__PURE__*/React.createElement("div", {
     style: {
@@ -843,7 +865,7 @@ function Sidebar({
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      fontSize: 10,
+      fontSize: 11,
       fontWeight: 600,
       color: '#e2e8f0',
       overflow: 'hidden',
@@ -852,7 +874,7 @@ function Sidebar({
     }
   }, "Rohan Sharma"), /*#__PURE__*/React.createElement("div", {
     style: {
-      fontSize: 8,
+      fontSize: 9,
       color: '#475569'
     }
   }, "ARN-0047")), /*#__PURE__*/React.createElement(Ico, {
@@ -891,7 +913,7 @@ function Header({
     }
   }, "Priority Outreach · Today"), /*#__PURE__*/React.createElement("div", {
     style: {
-      fontSize: 9,
+      fontSize: 10,
       color: '#475569'
     }
   }, "5 HNW clients · ₹187.2 Cr AUM · Gemini Hub active")), /*#__PURE__*/React.createElement("div", {
@@ -918,7 +940,7 @@ function Header({
     }
   }), /*#__PURE__*/React.createElement("span", {
     style: {
-      fontSize: 10,
+      fontSize: 11,
       fontWeight: 700,
       color: '#a5b4fc'
     }
@@ -951,7 +973,7 @@ function Header({
       background: 'rgba(255,255,255,0.04)',
       color: '#e2e8f0',
       fontFamily: 'Inter,sans-serif',
-      fontSize: 10,
+      fontSize: 11,
       outline: 'none'
     }
   })), /*#__PURE__*/React.createElement("button", {
@@ -983,7 +1005,7 @@ function Header({
       borderRadius: 20,
       background: '#ef4444',
       color: '#fff',
-      fontSize: 8,
+      fontSize: 9,
       fontWeight: 800,
       display: 'flex',
       alignItems: 'center',
@@ -1010,17 +1032,17 @@ function Header({
       justifyContent: 'center',
       fontWeight: 700,
       color: '#fff',
-      fontSize: 10
+      fontSize: 11
     }
   }, "RS"), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     style: {
-      fontSize: 10,
+      fontSize: 11,
       fontWeight: 600,
       color: '#f1f5f9'
     }
   }, "Rohan Sharma"), /*#__PURE__*/React.createElement("div", {
     style: {
-      fontSize: 8,
+      fontSize: 9,
       color: '#475569'
     }
   }, "Principal Director"))));
@@ -1041,9 +1063,9 @@ function ClientList({ clients, selected, onSelect }) {
         display: 'flex', alignItems: 'center', justifyContent: 'space-between'
       }
     },
-      React.createElement('div', { style: { fontSize: 11, fontWeight: 700, color: '#f1f5f9' } }, 'Portfolio Review'),
+      React.createElement('div', { style: { fontSize: 12, fontWeight: 700, color: '#f1f5f9' } }, 'Portfolio Review'),
       React.createElement('div', {
-        style: { padding: '2px 7px', borderRadius: 20, background: 'rgba(99,102,241,0.15)', color: '#a5b4fc', fontSize: 9, fontWeight: 700 }
+        style: { padding: '2px 7px', borderRadius: 20, background: 'rgba(99,102,241,0.15)', color: '#a5b4fc', fontSize: 10, fontWeight: 700 }
       }, clients.length + ' clients')
     ),
     React.createElement('div', { style: { display: 'flex', flexDirection: 'column', padding: '6px' } },
@@ -1067,12 +1089,12 @@ function ClientList({ clients, selected, onSelect }) {
                 width: 28, height: 28, minWidth: 28, borderRadius: '50%',
                 background: 'linear-gradient(' + c.grad + ')',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 9, fontWeight: 800, color: '#fff', flexShrink: 0
+                fontSize: 10, fontWeight: 800, color: '#fff', flexShrink: 0
               }
             }, c.initials),
             React.createElement('div', { style: { flex: 1, minWidth: 0 } },
-              React.createElement('div', { style: { fontSize: 11, fontWeight: 700, color: '#f1f5f9', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' } }, c.name),
-              React.createElement('div', { style: { fontSize: 8, color: '#475569' } }, c.aum + ' · ' + c.risk)
+              React.createElement('div', { style: { fontSize: 12, fontWeight: 700, color: '#f1f5f9', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' } }, c.name),
+              React.createElement('div', { style: { fontSize: 9, color: '#475569' } }, c.aum + ' · ' + c.risk)
             ),
             React.createElement(UrgencyBadge, { days: c.urgencyDays })
           ),
@@ -1080,9 +1102,9 @@ function ClientList({ clients, selected, onSelect }) {
             React.createElement('div', { style: { flex: 1, height: 3, borderRadius: 3, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' } },
               React.createElement('div', { style: { height: '100%', width: hp + '%', background: hCol, borderRadius: 3 } })
             ),
-            React.createElement('span', { style: { fontSize: 8, fontWeight: 700, color: hCol } }, hp)
+            React.createElement('span', { style: { fontSize: 9, fontWeight: 700, color: hCol } }, hp)
           ),
-          React.createElement('div', { style: { fontSize: 8, color: '#64748b', marginTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, c.alert)
+          React.createElement('div', { style: { fontSize: 9, color: '#64748b', marginTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, c.alert)
         );
       })
     )
@@ -1097,7 +1119,7 @@ function renderRiskTab(client, p) {
   return React.createElement('div', null,
     React.createElement('div', { style: { marginBottom: 14 } },
       React.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 } },
-        React.createElement('span', { style: { fontSize: 10, fontWeight: 700, color: '#94a3b8' } }, 'Risk Score'),
+        React.createElement('span', { style: { fontSize: 11, fontWeight: 700, color: '#94a3b8' } }, 'Risk Score'),
         React.createElement('span', { style: { fontSize: 18, fontWeight: 900, color: nColor } }, score.toFixed(1) + ' / 10')
       ),
       React.createElement('div', { style: { position: 'relative', height: 10, borderRadius: 6, overflow: 'hidden', marginBottom: 6 } },
@@ -1109,27 +1131,27 @@ function renderRiskTab(client, p) {
           }
         })
       ),
-      React.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', fontSize: 8, color: '#334155' } },
+      React.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', fontSize: 9, color: '#334155' } },
         React.createElement('span', null, '0 · Conservative'),
         React.createElement('span', null, '5 · Moderate'),
         React.createElement('span', null, '10 · Aggressive')
       )
     ),
     React.createElement('div', { style: { padding: '10px 12px', borderRadius: 8, background: 'rgba(99,102,241,0.07)', border: '1px solid rgba(99,102,241,0.15)' } },
-      React.createElement('div', { style: { fontSize: 11, fontWeight: 700, color: '#a5b4fc', marginBottom: 4 } }, lbl),
-      React.createElement('div', { style: { fontSize: 9, color: '#64748b', lineHeight: 1.5 } }, desc)
+      React.createElement('div', { style: { fontSize: 12, fontWeight: 700, color: '#a5b4fc', marginBottom: 4 } }, lbl),
+      React.createElement('div', { style: { fontSize: 10, color: '#64748b', lineHeight: 1.5 } }, desc)
     )
   );
 }
 
 function renderModelTab(client, p) {
   return React.createElement('div', null,
-    React.createElement('div', { style: { fontSize: 9, color: '#475569', marginBottom: 10 } }, 'Target sector allocation for ' + client.risk + ' profile'),
+    React.createElement('div', { style: { fontSize: 10, color: '#475569', marginBottom: 10 } }, 'Target sector allocation for ' + client.risk + ' profile'),
     p.sectors.map(function(s) {
       return React.createElement('div', { key: s.name, style: { marginBottom: 6 } },
         React.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: 2 } },
-          React.createElement('span', { style: { fontSize: 9, color: '#64748b' } }, s.name),
-          React.createElement('span', { style: { fontSize: 9, fontWeight: 700, color: '#34d399' } }, s.model + '%')
+          React.createElement('span', { style: { fontSize: 10, color: '#64748b' } }, s.name),
+          React.createElement('span', { style: { fontSize: 10, fontWeight: 700, color: '#34d399' } }, s.model + '%')
         ),
         React.createElement('div', { style: { height: 5, borderRadius: 3, background: 'rgba(255,255,255,0.05)', overflow: 'hidden' } },
           React.createElement('div', { style: { height: '100%', width: s.model + '%', background: '#10b981', borderRadius: 3 } })
@@ -1143,12 +1165,12 @@ function renderCompareTab(client, p) {
   return React.createElement('div', null,
     React.createElement('div', { style: { display: 'grid', gridTemplateColumns: '1fr 44px 1fr', gap: 8, alignItems: 'start' } },
       React.createElement('div', null,
-        React.createElement('div', { style: { fontSize: 9, fontWeight: 700, color: '#a5b4fc', marginBottom: 8, textAlign: 'center' } }, 'Your Portfolio'),
+        React.createElement('div', { style: { fontSize: 10, fontWeight: 700, color: '#a5b4fc', marginBottom: 8, textAlign: 'center' } }, 'Your Portfolio'),
         p.sectors.map(function(s) {
           return React.createElement('div', { key: 'c' + s.name, style: { marginBottom: 7 } },
             React.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: 2 } },
-              React.createElement('span', { style: { fontSize: 8, color: '#64748b' } }, s.name),
-              React.createElement('span', { style: { fontSize: 8, fontWeight: 700, color: '#f1f5f9' } }, s.pct + '%')
+              React.createElement('span', { style: { fontSize: 9, color: '#64748b' } }, s.name),
+              React.createElement('span', { style: { fontSize: 9, fontWeight: 700, color: '#f1f5f9' } }, s.pct + '%')
             ),
             React.createElement('div', { style: { height: 6, borderRadius: 3, background: 'rgba(255,255,255,0.05)', overflow: 'hidden' } },
               React.createElement('div', { style: { height: '100%', width: Math.min(s.pct, 100) + '%', background: '#6366f1', borderRadius: 3 } })
@@ -1162,17 +1184,17 @@ function renderCompareTab(client, p) {
           var dc = Math.abs(d) <= 5 ? '#475569' : d > 0 ? '#f59e0b' : '#38bdf8';
           return React.createElement('div', {
             key: 'd' + s.name,
-            style: { fontSize: 8, fontWeight: 700, color: dc, textAlign: 'center', marginBottom: 7, lineHeight: '21px' }
+            style: { fontSize: 9, fontWeight: 700, color: dc, textAlign: 'center', marginBottom: 7, lineHeight: '21px' }
           }, (d > 0 ? '+' : '') + d + 'pp');
         })
       ),
       React.createElement('div', null,
-        React.createElement('div', { style: { fontSize: 9, fontWeight: 700, color: '#34d399', marginBottom: 8, textAlign: 'center' } }, 'Model Portfolio'),
+        React.createElement('div', { style: { fontSize: 10, fontWeight: 700, color: '#34d399', marginBottom: 8, textAlign: 'center' } }, 'Model Portfolio'),
         p.sectors.map(function(s) {
           return React.createElement('div', { key: 'm' + s.name, style: { marginBottom: 7 } },
             React.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: 2 } },
-              React.createElement('span', { style: { fontSize: 8, fontWeight: 700, color: '#34d399' } }, s.model + '%'),
-              React.createElement('span', { style: { fontSize: 8, color: '#64748b' } }, s.name)
+              React.createElement('span', { style: { fontSize: 9, fontWeight: 700, color: '#34d399' } }, s.model + '%'),
+              React.createElement('span', { style: { fontSize: 9, color: '#64748b' } }, s.name)
             ),
             React.createElement('div', { style: { height: 6, borderRadius: 3, background: 'rgba(255,255,255,0.05)', overflow: 'hidden', direction: 'rtl' } },
               React.createElement('div', { style: { height: '100%', width: Math.min(s.model, 100) + '%', background: '#10b981', borderRadius: 3 } })
@@ -1184,6 +1206,131 @@ function renderCompareTab(client, p) {
   );
 }
 
+function renderGapCard(p) {
+  var g = p && p.gapInsight;
+  if (!g) return null;
+
+  if (g.type === 'performance') {
+    var maxV = g.model.value * 1.08;
+    var curW = (g.current.value / maxV * 100).toFixed(1);
+    var modW = (g.model.value / maxV * 100).toFixed(1);
+    var bmW = (g.benchmark.value / maxV * 100).toFixed(1);
+    return React.createElement('div', {
+      style: {
+        borderRadius: 12, padding: '14px 16px',
+        background: 'rgba(239,68,68,0.06)',
+        border: '1px solid rgba(239,68,68,0.2)',
+        borderTop: '3px solid #ef4444'
+      }
+    },
+      React.createElement('div', { style: { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 14 } },
+        React.createElement('div', null,
+          React.createElement('div', { style: { fontSize: 11, fontWeight: 700, color: '#f1f5f9', marginBottom: 2 } }, g.title),
+          React.createElement('div', { style: { fontSize: 10, color: '#64748b' } }, g.subtitle)
+        ),
+        React.createElement('div', {
+          style: { padding: '4px 10px', borderRadius: 20, background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.35)', fontSize: 12, fontWeight: 800, color: '#f87171', whiteSpace: 'nowrap' }
+        }, '−' + g.gap + 'pp gap')
+      ),
+      React.createElement('div', { style: { display: 'flex', flexDirection: 'column', gap: 10 } },
+        [
+          { label: g.current.label, value: g.current.value, width: curW, color: g.current.color },
+          { label: g.model.label, value: g.model.value, width: modW, color: g.model.color },
+          { label: g.benchmark.label, value: g.benchmark.value, width: bmW, color: '#94a3b8', dashed: true }
+        ].map(function(row, i) {
+          return React.createElement('div', { key: i },
+            React.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: 4, alignItems: 'center' } },
+              React.createElement('span', { style: { fontSize: 10, color: row.dashed ? '#64748b' : '#94a3b8' } }, row.label),
+              React.createElement('span', { style: { fontSize: 13, fontWeight: 800, color: row.color } }, '+' + row.value + '%')
+            ),
+            React.createElement('div', { style: { height: row.dashed ? 3 : 18, borderRadius: 4, background: 'rgba(255,255,255,0.05)', overflow: 'hidden', position: 'relative' } },
+              React.createElement('div', {
+                style: {
+                  height: '100%', width: row.width + '%',
+                  background: row.dashed ? 'repeating-linear-gradient(90deg,' + row.color + ' 0px,' + row.color + ' 6px,transparent 6px,transparent 12px)' : 'linear-gradient(90deg,' + row.color + '66,' + row.color + ')',
+                  borderRadius: 4
+                }
+              })
+            )
+          );
+        })
+      ),
+      React.createElement('div', {
+        style: { marginTop: 12, paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6 }
+      },
+        React.createElement('div', { style: { fontSize: 11, fontWeight: 700, color: '#f87171' } }, g.gapRupees + ' in missed returns this year'),
+        React.createElement('div', { style: { fontSize: 9, color: '#64748b' } }, g.action)
+      )
+    );
+  }
+
+  if (g.type === 'funds') {
+    return React.createElement('div', {
+      style: {
+        borderRadius: 12, padding: '14px 16px',
+        background: 'rgba(129,108,248,0.06)',
+        border: '1px solid rgba(129,108,248,0.2)',
+        borderTop: '3px solid #818cf8'
+      }
+    },
+      React.createElement('div', { style: { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 12 } },
+        React.createElement('div', null,
+          React.createElement('div', { style: { fontSize: 11, fontWeight: 700, color: '#f1f5f9', marginBottom: 2 } }, g.title),
+          React.createElement('div', { style: { fontSize: 10, color: '#64748b' } }, g.subtitle)
+        ),
+        React.createElement('div', {
+          style: { padding: '4px 10px', borderRadius: 20, background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.3)', fontSize: 10, fontWeight: 700, color: '#fbbf24', whiteSpace: 'nowrap' }
+        }, 'Jul 31 deadline')
+      ),
+      React.createElement('div', {
+        style: { display: 'grid', gridTemplateColumns: '1fr 28px 1fr', gap: '6px 4px', marginBottom: 10, paddingBottom: 6, borderBottom: '1px solid rgba(255,255,255,0.05)', alignItems: 'center' }
+      },
+        React.createElement('span', { style: { fontSize: 8, fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '.08em' } }, 'Current (Maturing)'),
+        React.createElement('span', null),
+        React.createElement('span', { style: { fontSize: 8, fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '.08em', textAlign: 'right' } }, 'Recommended Switch')
+      ),
+      g.funds.map(function(f, i) {
+        return React.createElement('div', {
+          key: i,
+          style: {
+            display: 'grid', gridTemplateColumns: '1fr 28px 1fr', gap: '0 4px',
+            padding: '8px 0', alignItems: 'center',
+            borderBottom: i < g.funds.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none'
+          }
+        },
+          React.createElement('div', null,
+            React.createElement('div', { style: { fontSize: 10, fontWeight: 600, color: '#f1f5f9', marginBottom: 3 } }, f.current),
+            React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: 5 } },
+              React.createElement('span', { style: { fontSize: 12, fontWeight: 800, color: '#f87171' } }, f.currentReturn + '%'),
+              React.createElement('span', {
+                style: { fontSize: 8, fontWeight: 600, color: '#f59e0b', padding: '1px 5px', borderRadius: 10, background: 'rgba(245,158,11,0.12)' }
+              }, f.currentGap + 'pp vs cat')
+            )
+          ),
+          React.createElement('div', { style: { textAlign: 'center', fontSize: 16, color: '#818cf8' } }, '→'),
+          React.createElement('div', { style: { textAlign: 'right' } },
+            React.createElement('div', { style: { fontSize: 10, fontWeight: 600, color: '#34d399', marginBottom: 3 } },
+              f.recommended,
+              f.bonus ? React.createElement('span', {
+                style: { marginLeft: 4, fontSize: 8, fontWeight: 700, color: '#818cf8', padding: '1px 5px', borderRadius: 10, background: 'rgba(129,108,248,0.15)' }
+              }, f.bonus) : null
+            ),
+            React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: 5, justifyContent: 'flex-end' } },
+              React.createElement('span', { style: { fontSize: 12, fontWeight: 800, color: '#34d399' } }, f.recReturn + '%'),
+              React.createElement('span', { style: { fontSize: 9, color: '#64748b' } }, f.monthly + '/mo')
+            )
+          )
+        );
+      }),
+      React.createElement('div', {
+        style: { marginTop: 10, paddingTop: 8, borderTop: '1px solid rgba(255,255,255,0.05)', fontSize: 9, fontWeight: 600, color: '#818cf8' }
+      }, '→ ' + g.action)
+    );
+  }
+
+  return null;
+}
+
 function PortfolioDetail({ client }) {
   var [activeTab, setActiveTab] = useState('compare');
   if (!client) {
@@ -1192,7 +1339,7 @@ function PortfolioDetail({ client }) {
     },
       React.createElement(Ico, { n: 'portfolios', size: 36, sw: 1, cls: 'text-slate-700' }),
       React.createElement('div', { style: { fontSize: 13, fontWeight: 600, color: '#334155' } }, 'Select a client to begin portfolio review'),
-      React.createElement('div', { style: { fontSize: 10, color: '#1e293b' } }, 'Click any client in the queue to view portfolio analytics')
+      React.createElement('div', { style: { fontSize: 11, color: '#1e293b' } }, 'Click any client in the queue to view portfolio analytics')
     );
   }
   var p = client.portfolio;
@@ -1208,7 +1355,7 @@ function PortfolioDetail({ client }) {
   ];
   var aumNum = parseFloat(client.aum.replace(/[^0-9.]/g, ''));
   return React.createElement('div', {
-    style: { flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 10, padding: '14px 14px 14px 12px', minWidth: 0 }
+    style: { flex: 1, height: '100%', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 10, padding: '14px 14px 14px 12px', minWidth: 0, boxSizing: 'border-box' }
   },
     React.createElement('div', {
       style: {
@@ -1223,29 +1370,29 @@ function PortfolioDetail({ client }) {
             width: 36, height: 36, borderRadius: '50%',
             background: 'linear-gradient(' + client.grad + ')',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 12, fontWeight: 800, color: '#fff', flexShrink: 0
+            fontSize: 13, fontWeight: 800, color: '#fff', flexShrink: 0
           }
         }, client.initials),
         React.createElement('div', null,
           React.createElement('div', { style: { fontSize: 13, fontWeight: 700, color: '#f1f5f9' } }, client.name),
-          React.createElement('div', { style: { fontSize: 9, color: client.riskC } }, client.risk + ' · ' + client.loc)
+          React.createElement('div', { style: { fontSize: 10, color: client.riskC } }, client.risk + ' · ' + client.loc)
         )
       ),
       React.createElement('div', { style: { width: 1, height: 28, background: 'rgba(255,255,255,0.06)', flexShrink: 0 } }),
       React.createElement('div', null,
-        React.createElement('div', { style: { fontSize: 8, color: '#475569', marginBottom: 2 } }, 'AUM'),
+        React.createElement('div', { style: { fontSize: 9, color: '#475569', marginBottom: 2 } }, 'AUM'),
         React.createElement('div', { style: { fontSize: 14, fontWeight: 800, color: '#f1f5f9' } }, client.aum)
       ),
       React.createElement('div', null,
-        React.createElement('div', { style: { fontSize: 8, color: '#475569', marginBottom: 2 } }, 'YTD Return'),
+        React.createElement('div', { style: { fontSize: 9, color: '#475569', marginBottom: 2 } }, 'YTD Return'),
         React.createElement('div', { style: { fontSize: 14, fontWeight: 800, color: ytdC } }, (p.ytdReturn >= 0 ? '+' : '') + p.ytdReturn + '%')
       ),
       React.createElement('div', null,
-        React.createElement('div', { style: { fontSize: 8, color: '#475569', marginBottom: 2 } }, 'vs NIFTY 50'),
+        React.createElement('div', { style: { fontSize: 9, color: '#475569', marginBottom: 2 } }, 'vs NIFTY 50'),
         React.createElement('div', { style: { fontSize: 14, fontWeight: 800, color: bC } }, (bDelta >= 0 ? '+' : '') + bDelta + 'pp')
       ),
       React.createElement('div', null,
-        React.createElement('div', { style: { fontSize: 8, color: '#475569', marginBottom: 2 } }, 'Portfolio Health'),
+        React.createElement('div', { style: { fontSize: 9, color: '#475569', marginBottom: 2 } }, 'Portfolio Health'),
         React.createElement('div', {
           style: {
             display: 'inline-flex', alignItems: 'center', gap: 5,
@@ -1258,9 +1405,10 @@ function PortfolioDetail({ client }) {
         )
       )
     ),
+    renderGapCard(p),
     React.createElement('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 } },
       React.createElement('div', { style: { borderRadius: 12, padding: '12px 13px', background: 'rgba(14,20,48,0.6)', border: '1px solid rgba(255,255,255,0.06)' } },
-        React.createElement('div', { style: { fontSize: 10, fontWeight: 700, color: '#64748b', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '.07em' } }, 'Market Cap'),
+        React.createElement('div', { style: { fontSize: 11, fontWeight: 700, color: '#64748b', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '.07em' } }, 'Market Cap'),
         React.createElement('div', { style: { height: 10, borderRadius: 6, overflow: 'hidden', display: 'flex', marginBottom: 10 } },
           React.createElement('div', { style: { width: p.marketCap.large + '%', background: '#6366f1' } }),
           React.createElement('div', { style: { width: p.marketCap.mid + '%', background: '#f59e0b' } }),
@@ -1269,19 +1417,19 @@ function PortfolioDetail({ client }) {
         [['Large Cap', '#6366f1', p.marketCap.large], ['Mid Cap', '#f59e0b', p.marketCap.mid], ['Small Cap', '#f43f5e', p.marketCap.small]].map(function(item) {
           return React.createElement('div', { key: item[0], style: { display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 } },
             React.createElement('div', { style: { width: 8, height: 8, borderRadius: 2, background: item[1], flexShrink: 0 } }),
-            React.createElement('span', { style: { fontSize: 9, color: '#64748b', flex: 1 } }, item[0]),
-            React.createElement('span', { style: { fontSize: 9, fontWeight: 700, color: '#f1f5f9' } }, item[2] + '%')
+            React.createElement('span', { style: { fontSize: 10, color: '#64748b', flex: 1 } }, item[0]),
+            React.createElement('span', { style: { fontSize: 10, fontWeight: 700, color: '#f1f5f9' } }, item[2] + '%')
           );
         })
       ),
       React.createElement('div', { style: { borderRadius: 12, padding: '12px 13px', background: 'rgba(14,20,48,0.6)', border: '1px solid rgba(255,255,255,0.06)' } },
-        React.createElement('div', { style: { fontSize: 10, fontWeight: 700, color: '#64748b', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '.07em' } }, 'Sector Exposure'),
+        React.createElement('div', { style: { fontSize: 11, fontWeight: 700, color: '#64748b', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '.07em' } }, 'Sector Exposure'),
         p.sectors.slice(0, 5).map(function(s) {
           var over = s.pct > s.model + 5;
           return React.createElement('div', { key: s.name, style: { marginBottom: 5 } },
             React.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: 2 } },
-              React.createElement('span', { style: { fontSize: 8, color: '#64748b' } }, s.name),
-              React.createElement('span', { style: { fontSize: 8, fontWeight: 700, color: over ? '#f59e0b' : '#94a3b8' } }, s.pct + '%')
+              React.createElement('span', { style: { fontSize: 9, color: '#64748b' } }, s.name),
+              React.createElement('span', { style: { fontSize: 9, fontWeight: 700, color: over ? '#f59e0b' : '#94a3b8' } }, s.pct + '%')
             ),
             React.createElement('div', { style: { height: 4, borderRadius: 3, background: 'rgba(255,255,255,0.05)', overflow: 'hidden' } },
               React.createElement('div', { style: { height: '100%', width: s.pct + '%', background: over ? '#f59e0b' : '#6366f1', borderRadius: 3 } })
@@ -1290,17 +1438,17 @@ function PortfolioDetail({ client }) {
         })
       ),
       React.createElement('div', { style: { borderRadius: 12, padding: '12px 13px', background: 'rgba(14,20,48,0.6)', border: '1px solid rgba(255,255,255,0.06)' } },
-        React.createElement('div', { style: { fontSize: 10, fontWeight: 700, color: '#64748b', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '.07em' } }, 'Style & Liquidity'),
+        React.createElement('div', { style: { fontSize: 11, fontWeight: 700, color: '#64748b', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '.07em' } }, 'Style & Liquidity'),
         React.createElement('div', { style: { marginBottom: 10 } },
-          React.createElement('div', { style: { fontSize: 8, color: '#475569', marginBottom: 5 } }, 'Investment Style'),
+          React.createElement('div', { style: { fontSize: 9, color: '#475569', marginBottom: 5 } }, 'Investment Style'),
           React.createElement('div', { style: { display: 'flex', gap: 4 } },
             ['Growth', 'Blend', 'Value'].map(function(st) {
               var active = p.style === st;
-              return React.createElement('div', { key: st, style: { padding: '3px 8px', borderRadius: 6, fontSize: 9, fontWeight: 700, background: active ? 'rgba(99,102,241,0.15)' : 'transparent', border: '1px solid ' + (active ? '#6366f1' : 'rgba(255,255,255,0.07)'), color: active ? '#a5b4fc' : '#334155' } }, st);
+              return React.createElement('div', { key: st, style: { padding: '3px 8px', borderRadius: 6, fontSize: 10, fontWeight: 700, background: active ? 'rgba(99,102,241,0.15)' : 'transparent', border: '1px solid ' + (active ? '#6366f1' : 'rgba(255,255,255,0.07)'), color: active ? '#a5b4fc' : '#334155' } }, st);
             })
           )
         ),
-        React.createElement('div', { style: { fontSize: 8, color: '#475569', marginBottom: 5 } }, 'Liquidity Profile'),
+        React.createElement('div', { style: { fontSize: 9, color: '#475569', marginBottom: 5 } }, 'Liquidity Profile'),
         React.createElement('div', { style: { height: 10, borderRadius: 6, overflow: 'hidden', display: 'flex', marginBottom: 6 } },
           React.createElement('div', { style: { width: p.liquidity.high + '%', background: '#10b981' } }),
           React.createElement('div', { style: { width: p.liquidity.medium + '%', background: '#f59e0b' } }),
@@ -1310,18 +1458,18 @@ function PortfolioDetail({ client }) {
           [['High', '#10b981', p.liquidity.high], ['Med', '#f59e0b', p.liquidity.medium], ['Low', '#f43f5e', p.liquidity.low]].map(function(item) {
             return React.createElement('div', { key: item[0], style: { display: 'flex', alignItems: 'center', gap: 3 } },
               React.createElement('div', { style: { width: 6, height: 6, borderRadius: 2, background: item[1] } }),
-              React.createElement('span', { style: { fontSize: 8, color: '#64748b' } }, item[0]),
-              React.createElement('span', { style: { fontSize: 8, fontWeight: 700, color: '#94a3b8' } }, item[2] + '%')
+              React.createElement('span', { style: { fontSize: 9, color: '#64748b' } }, item[0]),
+              React.createElement('span', { style: { fontSize: 9, fontWeight: 700, color: '#94a3b8' } }, item[2] + '%')
             );
           })
         )
       )
     ),
     React.createElement('div', { style: { borderRadius: 12, padding: '12px 13px', background: 'rgba(14,20,48,0.6)', border: '1px solid rgba(255,255,255,0.06)' } },
-      React.createElement('div', { style: { fontSize: 10, fontWeight: 700, color: '#64748b', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '.07em' } }, 'Top Holdings'),
+      React.createElement('div', { style: { fontSize: 11, fontWeight: 700, color: '#64748b', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '.07em' } }, 'Top Holdings'),
       React.createElement('div', { style: { display: 'grid', gridTemplateColumns: '1fr 64px 80px 60px', gap: 8, paddingBottom: 6, borderBottom: '1px solid rgba(255,255,255,0.05)', marginBottom: 4 } },
         ['SCHEME / STOCK', 'ALLOC', 'VALUE', 'DAY CHG'].map(function(h) {
-          return React.createElement('span', { key: h, style: { fontSize: 7, fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '.09em', textAlign: h === 'SCHEME / STOCK' ? 'left' : 'right' } }, h);
+          return React.createElement('span', { key: h, style: { fontSize: 8, fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '.09em', textAlign: h === 'SCHEME / STOCK' ? 'left' : 'right' } }, h);
         })
       ),
       p.holdings.map(function(h) {
@@ -1332,15 +1480,15 @@ function PortfolioDetail({ client }) {
           key: h.name,
           style: { display: 'grid', gridTemplateColumns: '1fr 64px 80px 60px', gap: 8, padding: '6px 0', borderBottom: '1px solid rgba(255,255,255,0.03)', alignItems: 'center' }
         },
-          React.createElement('span', { style: { fontSize: 10, fontWeight: 600, color: '#e2e8f0' } }, h.name),
+          React.createElement('span', { style: { fontSize: 11, fontWeight: 600, color: '#e2e8f0' } }, h.name),
           React.createElement('div', { style: { textAlign: 'right' } },
-            React.createElement('span', { style: { fontSize: 10, fontWeight: 700, color: '#f1f5f9' } }, h.pct + '%')
+            React.createElement('span', { style: { fontSize: 11, fontWeight: 700, color: '#f1f5f9' } }, h.pct + '%')
           ),
           React.createElement('div', { style: { textAlign: 'right' } },
-            React.createElement('span', { style: { fontSize: 9, color: '#94a3b8' } }, '₹' + valCr + ' Cr')
+            React.createElement('span', { style: { fontSize: 10, color: '#94a3b8' } }, '₹' + valCr + ' Cr')
           ),
           React.createElement('div', {
-            style: { textAlign: 'right', padding: '2px 6px', borderRadius: 6, background: h.change === null ? 'transparent' : h.change >= 0 ? 'rgba(52,211,153,0.1)' : 'rgba(248,113,113,0.1)', color: chgC, fontSize: 9, fontWeight: 700 }
+            style: { textAlign: 'right', padding: '2px 6px', borderRadius: 6, background: h.change === null ? 'transparent' : h.change >= 0 ? 'rgba(52,211,153,0.1)' : 'rgba(248,113,113,0.1)', color: chgC, fontSize: 10, fontWeight: 700 }
           }, chgTxt)
         );
       })
@@ -1352,7 +1500,7 @@ function PortfolioDetail({ client }) {
           return React.createElement('button', {
             key: tab.id,
             onClick: function() { setActiveTab(tab.id); },
-            style: { flex: 1, padding: '10px 8px', fontSize: 10, fontWeight: 700, color: active ? '#a5b4fc' : '#475569', background: active ? 'rgba(99,102,241,0.1)' : 'transparent', border: 'none', borderBottom: active ? '2px solid #6366f1' : '2px solid transparent', cursor: 'pointer', fontFamily: 'Inter,sans-serif', transition: 'all .15s ease' }
+            style: { flex: 1, padding: '10px 8px', fontSize: 11, fontWeight: 700, color: active ? '#a5b4fc' : '#475569', background: active ? 'rgba(99,102,241,0.1)' : 'transparent', border: 'none', borderBottom: active ? '2px solid #6366f1' : '2px solid transparent', cursor: 'pointer', fontFamily: 'Inter,sans-serif', transition: 'all .15s ease' }
           }, tab.label);
         })
       ),
@@ -1387,7 +1535,7 @@ function UrgencyBadge({
     sw: 2
   }), /*#__PURE__*/React.createElement("span", {
     style: {
-      fontSize: 8,
+      fontSize: 9,
       fontWeight: 800,
       color: color,
       whiteSpace: 'nowrap'
@@ -1403,13 +1551,13 @@ function ChannelDropdown({ client, selectedChannelId, onSelect }) {
       style: { display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 6px 3px 7px', borderRadius: 20, background: ch.color + '18', border: '1px solid ' + ch.color + '40', color: ch.color, cursor: 'pointer', fontFamily: 'Inter,sans-serif', whiteSpace: 'nowrap' }
     },
       /*#__PURE__*/React.createElement(Ico, { n: ch.icon, size: 9, sw: 2 }),
-      /*#__PURE__*/React.createElement("span", { style: { fontSize: 8, fontWeight: 700 } }, ch.label),
+      /*#__PURE__*/React.createElement("span", { style: { fontSize: 9, fontWeight: 700 } }, ch.label),
       /*#__PURE__*/React.createElement(Ico, { n: 'chevDown', size: 8, sw: 2 })
     ),
     open && /*#__PURE__*/React.createElement("div", {
       style: { position: 'absolute', left: 0, top: '100%', marginTop: 3, background: '#0d1627', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 9, padding: '4px', zIndex: 9999, minWidth: 182, boxShadow: '0 10px 30px rgba(0,0,0,0.6)' }
     },
-      /*#__PURE__*/React.createElement("div", { style: { fontSize: 6.5, fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '.1em', padding: '3px 8px 5px' } }, "Select AI Channel"),
+      /*#__PURE__*/React.createElement("div", { style: { fontSize: 7, fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '.1em', padding: '3px 8px 5px' } }, "Select AI Channel"),
       CHANNELS.map(function (c) {
         var isSel = c.id === selectedChannelId;
         var isRec = c.id === client.recommendedChannel;
@@ -1419,8 +1567,8 @@ function ChannelDropdown({ client, selectedChannelId, onSelect }) {
           style: { display: 'flex', alignItems: 'center', gap: 6, width: '100%', padding: '5px 8px', borderRadius: 6, border: 'none', cursor: 'pointer', fontFamily: 'Inter,sans-serif', textAlign: 'left', background: isSel ? c.color + '22' : 'transparent', color: isSel ? c.color : '#94a3b8', marginBottom: 1 }
         },
           /*#__PURE__*/React.createElement(Ico, { n: c.icon, size: 9, sw: 2 }),
-          /*#__PURE__*/React.createElement("span", { style: { fontSize: 8, fontWeight: isSel ? 700 : 500, flex: 1 } }, c.label),
-          isRec && /*#__PURE__*/React.createElement("span", { style: { fontSize: 6, fontWeight: 800, padding: '1px 4px', borderRadius: 3, background: 'rgba(99,102,241,0.18)', color: '#a5b4fc' } }, "★ AI Pick")
+          /*#__PURE__*/React.createElement("span", { style: { fontSize: 9, fontWeight: isSel ? 700 : 500, flex: 1 } }, c.label),
+          isRec && /*#__PURE__*/React.createElement("span", { style: { fontSize: 7, fontWeight: 800, padding: '1px 4px', borderRadius: 3, background: 'rgba(99,102,241,0.18)', color: '#a5b4fc' } }, "★ AI Pick")
         );
       })
     )
@@ -1444,6 +1592,8 @@ function GeminiHub({
   var [crmSync, setCrmSync] = useState(null);
   var [actionsLoading, setActionsLoading] = useState(false);
   var [voiceNote, setVoiceNote] = useState(null);
+  var [videoPhase, setVideoPhase] = useState('idle');
+  var [callHistory, setCallHistory] = useState([]);
   var timerRef = useRef(null);
   var pollRef = useRef(null);
   useEffect(function () {
@@ -1460,6 +1610,8 @@ function GeminiHub({
     setCrmSync(null);
     setActionsLoading(false);
     setVoiceNote(null);
+    setVideoPhase('idle');
+    setCallHistory([]);
     if (!client) return;
     fetch('/api/wealth/client/' + client.clientKey + '/history')
       .then(function (r) { return r.json(); })
@@ -1482,7 +1634,7 @@ function GeminiHub({
         if (data.completed) {
           setCallPhase('completed');
           setLive(true);
-          setHubTab(data.actions && data.actions.length > 0 ? 'actions' : 'compliance');
+          // keep Brief tab selected — user navigates manually
         }
       })
       .catch(function () {});
@@ -1543,12 +1695,12 @@ function GeminiHub({
   }, [callId]);
   useEffect(function () {
     if (callPhase !== 'completed' || !callId) return;
+    setCallHistory(function(h) { return [{ type:'voice', ts: new Date().toISOString(), label:'Voice Call', status:'Completed', secs: secs }].concat(h); });
     setActionsLoading(true);
     fetch('/api/wealth/call/' + callId + '/actions', { method: 'POST' })
       .then(function (r) { return r.json(); })
       .then(function (data) {
         if (data.actions) { setActions(data.actions); setCrmSync(data.crm_sync || null); }
-        setTimeout(function () { setHubTab('actions'); }, 1500);
       })
       .catch(function () {})
       .finally(function () { setActionsLoading(false); });
@@ -1603,7 +1755,8 @@ function GeminiHub({
       { id: 'brief', label: 'Brief', icon: 'sparkles' },
       { id: 'live', label: 'Live Call', icon: 'phone' },
       { id: 'actions', label: 'Actions', icon: 'zap', badge: actions.length > 0 ? String(actions.length) : null },
-      { id: 'compliance', label: 'Vault', icon: 'shield', locked: !callEnded }
+      { id: 'compliance', label: 'Vault', icon: 'shield' },
+      { id: 'history', label: 'History', icon: 'clock' }
     ];
     return /*#__PURE__*/React.createElement("div", {
       style: { display: 'flex', gap: 2, padding: '6px 8px 0', borderBottom: '1px solid rgba(255,255,255,0.05)', flexShrink: 0 }
@@ -1616,7 +1769,7 @@ function GeminiHub({
         style: {
           flex: 1, padding: '4px 3px', borderRadius: '5px 5px 0 0', border: 'none',
           cursor: disabled ? 'default' : 'pointer', fontFamily: 'Inter,sans-serif',
-          fontSize: 7.5, fontWeight: isActive ? 700 : 600,
+          fontSize: 8, fontWeight: isActive ? 700 : 600,
           color: isActive ? '#a5b4fc' : disabled ? '#334155' : '#64748b',
           background: isActive ? 'rgba(99,102,241,0.12)' : 'transparent',
           borderBottom: isActive ? '2px solid #6366f1' : '2px solid transparent',
@@ -1626,22 +1779,255 @@ function GeminiHub({
       /*#__PURE__*/React.createElement(Ico, { n: t.icon, size: 8, sw: 2 }),
       t.label,
       t.badge ? /*#__PURE__*/React.createElement("span", {
-        style: { background: '#6366f1', color: '#fff', borderRadius: 10, fontSize: 7, fontWeight: 800, padding: '0 4px', lineHeight: '14px', minWidth: 14, textAlign: 'center' }
+        style: { background: '#6366f1', color: '#fff', borderRadius: 10, fontSize: 8, fontWeight: 800, padding: '0 4px', lineHeight: '14px', minWidth: 14, textAlign: 'center' }
       }, t.badge) : null);
     }));
   }
+  function renderDualOutreachPanel() {
+    var vnStatus    = voiceNote ? voiceNote.status : 'idle';
+    var vnGenerating = vnStatus === 'generating';
+    var vnPreview    = vnStatus === 'preview';
+    var vnSending    = vnStatus === 'sending';
+    var vnDone       = vnStatus === 'sent' || vnStatus === 'sent_text_fallback' || vnStatus === 'simulated';
+    var vnError      = vnStatus === 'error';
+    var vnAudioUrl   = (voiceNote && voiceNote.note_id)
+      ? (window.location.origin + '/api/wealth/voice-note/' + voiceNote.note_id + '/audio') : null;
+    var scriptText   = voiceNote && voiceNote.script ? voiceNote.script : '';
+    var scriptPrev   = scriptText.slice(0, 120) + (scriptText.length > 120 ? '…' : '');
+    var showScript   = vnPreview || vnSending || vnDone;
+
+    function doGenerateNote() {
+      if (!client || vnGenerating) return;
+      setVoiceNote({ status: 'generating' });
+      fetch('/api/wealth/whatsapp/voice-note/generate', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ client_key: client.clientKey, client_name: client.name })
+      }).then(function(r){ return r.json(); })
+        .then(function(d){ setVoiceNote({ note_id: d.note_id, status: 'preview', script: d.script, has_audio: d.has_audio }); })
+        .catch(function(){ setVoiceNote({ status: 'error' }); });
+    }
+    function doSendNote() {
+      if (!voiceNote || !voiceNote.note_id || vnSending) return;
+      var prev = voiceNote;
+      setVoiceNote({ note_id: prev.note_id, status: 'sending', script: prev.script, has_audio: prev.has_audio });
+      fetch('/api/wealth/whatsapp/voice-note/send', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ note_id: prev.note_id, client_key: client.clientKey })
+      }).then(function(r){ return r.json(); })
+        .then(function(d){
+          setVoiceNote({ note_id: prev.note_id, status: d.status, script: prev.script, twilio_sid: d.twilio_sid, has_audio: prev.has_audio });
+          setCallHistory(function(h){ return [{ type:'note', ts: new Date().toISOString(), label:'Voice Note', status:'Sent', preview: prev.script ? prev.script.slice(0,80) : '' }].concat(h); });
+        })
+        .catch(function(){ setVoiceNote({ note_id: prev.note_id, status: 'error', script: prev.script }); });
+    }
+
+    function SectionCard(borderColor, bgColor, children) {
+      return React.createElement('div', {
+        style: { borderRadius: 12, overflow: 'hidden', border: '1px solid ' + borderColor + '33', borderTop: '3px solid ' + borderColor, background: bgColor }
+      }, children);
+    }
+    function SectionHead(icon, title, badge, badgeColor, extra) {
+      return React.createElement('div', {
+        style: { padding: '10px 12px 9px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', gap: 6 }
+      },
+        React.createElement(Ico, { n: icon, size: 11, sw: 2 }),
+        React.createElement('span', { style: { fontSize: 11, fontWeight: 800, color: '#f1f5f9', flex: 1 } }, title),
+        React.createElement('span', { style: { fontSize: 7, fontWeight: 800, padding: '2px 7px', borderRadius: 10, background: badgeColor + '18', border: '1px solid ' + badgeColor + '44', color: badgeColor } }, badge),
+        extra || null
+      );
+    }
+
+    // ── 1. VOICE CALL ────────────────────────────────────────────
+    var voiceCard = SectionCard('#6366f1', 'rgba(99,102,241,0.04)',
+      React.createElement('div', null,
+        SectionHead('phone', 'GEMINI VOICE CALL', 'Gemini 3.1 Live', '#818cf8'),
+        React.createElement('div', { style: { padding: '10px 12px', display: 'flex', flexDirection: 'column', gap: 8 } },
+          React.createElement('div', null,
+            React.createElement('div', { style: { fontSize: 8, fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 5 } }, 'Talking Points'),
+            (client.talkingPoints || []).slice(0, 3).map(function(tp, i) {
+              return React.createElement('div', { key: i, style: { display: 'flex', alignItems: 'flex-start', gap: 5, marginBottom: 3 } },
+                React.createElement('div', { style: { width: 4, height: 4, borderRadius: '50%', background: '#6366f1', marginTop: 4, flexShrink: 0 } }),
+                React.createElement('span', { style: { fontSize: 9, color: '#94a3b8', lineHeight: 1.4 } }, tp)
+              );
+            })
+          ),
+          React.createElement('div', { style: { display: 'flex', gap: 4, flexWrap: 'wrap', alignItems: 'center' } },
+            [['Portfolio Data','#3b82f6'],['Compliance','#10b981'],['Gemini 3.1 Live','#6366f1'],['Twilio','#f59e0b']].map(function(n,i){
+              return React.createElement('div', { key: i, style: { display: 'flex', alignItems: 'center', gap: 3 } },
+                React.createElement('div', { style: { width: 5, height: 5, borderRadius: '50%', background: n[1] } }),
+                React.createElement('span', { style: { fontSize: 8, color: '#475569' } }, n[0]),
+                i < 3 ? React.createElement('span', { style: { fontSize: 8, color: '#1e293b', marginLeft: 1 } }, '→') : null
+              );
+            })
+          ),
+          React.createElement('div', { style: { borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: 8, display: 'flex', flexDirection: 'column', gap: 6 } },
+            callPhase !== 'idle' && React.createElement('div', {
+              style: { padding: '6px 10px', borderRadius: 8, display: 'flex', alignItems: 'center', gap: 8,
+                background: callPhase === 'completed' ? 'rgba(99,102,241,0.08)' : 'rgba(16,185,129,0.08)',
+                border: '1px solid ' + (callPhase === 'completed' ? 'rgba(99,102,241,0.2)' : 'rgba(16,185,129,0.2)')
+              }
+            },
+              callPhase === 'completed'
+                ? React.createElement(Ico, { n: 'check', size: 9, sw: 2.5, cls: 'text-indigo-400' })
+                : React.createElement('div', { style: { width: 6, height: 6, borderRadius: '50%', background: '#10b981', flexShrink: 0 } }),
+              React.createElement('div', null,
+                React.createElement('div', { style: { fontSize: 10, fontWeight: 700, color: callPhase === 'completed' ? '#a5b4fc' : '#34d399' } },
+                  callPhase === 'completed' ? '✓ Call logged — History & Vault updated' :
+                  (callPhase === 'calling' || callPhase === 'ringing' || callPhase === 'initiating') ? (sp + ' Dialling — please answer') :
+                  ('● Live · ' + Math.floor(secs/60) + ':' + String(secs%60).padStart(2,'0'))
+                ),
+                callId && React.createElement('div', { style: { fontSize: 8, color: '#475569' } }, callId)
+              )
+            ),
+            (function() {
+              var isActive = callPhase === 'calling' || callPhase === 'ringing' || callPhase === 'live' || callPhase === 'initiating' || callPhase === 'active';
+              return React.createElement('button', {
+                onClick: function() { setCallId(null); setGcsPath(null); setSecs(0); doLaunch('voice'); },
+                disabled: isActive,
+                style: { width: '100%', padding: '9px', borderRadius: 9, border: 'none', cursor: isActive ? 'default' : 'pointer',
+                  fontFamily: 'Inter,sans-serif', fontSize: 12, fontWeight: 800, color: '#fff',
+                  background: 'linear-gradient(135deg,#4f46e5,#7c3aed)',
+                  boxShadow: isActive ? 'none' : '0 4px 20px rgba(99,102,241,0.45)',
+                  opacity: isActive ? 0.4 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }
+              }, React.createElement(Ico, { n: 'phone', size: 12, sw: 2.5 }), '✦ Launch Gemini Voice Call →');
+            })()
+          )
+        )
+      )
+    );
+
+    // ── 2. VOICE NOTE ─────────────────────────────────────────────
+    var noteCard = SectionCard('#25D366', 'rgba(37,211,102,0.03)',
+      React.createElement('div', null,
+        SectionHead('mic', 'GEMINI VOICE NOTE', 'Gemini 3.1 TTS · WhatsApp', '#4ade80'),
+        React.createElement('div', { style: { padding: '10px 12px', display: 'flex', flexDirection: 'column', gap: 8 } },
+          React.createElement('div', { style: { fontSize: 10, color: '#64748b', lineHeight: 1.4 } },
+            'AI generates a 30-sec voice brief. RM listens, then sends to client\'s WhatsApp before the call.'
+          ),
+          showScript && React.createElement('div', {
+            style: { padding: '8px 10px', borderRadius: 8, background: 'rgba(37,211,102,0.05)', border: '1px solid rgba(37,211,102,0.2)' }
+          },
+            React.createElement('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 5 } },
+              React.createElement('span', { style: { fontSize: 8, fontWeight: 800, color: '#4ade80', textTransform: 'uppercase', letterSpacing: '.08em' } }, 'Script Preview · ~30 sec'),
+              vnAudioUrl && React.createElement('button', {
+                onClick: function(){ try{ var a = new Audio(vnAudioUrl); a.play(); }catch(e){} },
+                style: { display: 'inline-flex', alignItems: 'center', gap: 3, padding: '2px 8px', borderRadius: 20, border: '1px solid rgba(37,211,102,0.35)', background: 'rgba(37,211,102,0.1)', cursor: 'pointer', fontFamily: 'Inter,sans-serif', color: '#34d399', fontSize: 8, fontWeight: 700 }
+              }, '▶ Listen')
+            ),
+            React.createElement('div', { style: { fontSize: 9, color: '#94a3b8', lineHeight: 1.5, fontStyle: 'italic' } }, '"' + scriptPrev + '"'),
+            vnDone && voiceNote.twilio_sid && React.createElement('div', {
+              style: { marginTop: 5, display: 'flex', alignItems: 'center', gap: 5 }
+            },
+              React.createElement(Ico, { n: 'check', size: 9, sw: 2.5, cls: 'text-emerald-400' }),
+              React.createElement('span', { style: { fontSize: 8, fontWeight: 700, color: '#34d399' } }, 'Delivered'),
+              React.createElement('span', { style: { fontSize: 8, color: '#475569' } }, '· SID …' + voiceNote.twilio_sid.slice(-8))
+            )
+          ),
+          !showScript && React.createElement('div', {
+            style: { padding: '7px 9px', borderRadius: 8, background: 'rgba(37,211,102,0.03)', border: '1px dashed rgba(37,211,102,0.15)', fontSize: 9, color: '#334155', fontStyle: 'italic' }
+          }, 'Click Generate — Priya\'s voice brief will appear here for review before sending.'),
+          React.createElement('div', { style: { display: 'flex', flexDirection: 'column', gap: 5 } },
+            vnDone && React.createElement('div', { style: { padding: '6px 10px', borderRadius: 8, background: 'rgba(37,211,102,0.07)', border: '1px solid rgba(37,211,102,0.2)', display: 'flex', alignItems: 'center', gap: 6 } },
+              React.createElement(Ico, { n: 'check', size: 9, sw: 2.5, cls: 'text-emerald-400' }),
+              React.createElement('div', null,
+                React.createElement('div', { style: { fontSize: 10, fontWeight: 700, color: '#34d399' } }, '✓ Voice note sent — logged in History'),
+                voiceNote && voiceNote.twilio_sid && React.createElement('div', { style: { fontSize: 8, color: '#475569' } }, 'SID …' + voiceNote.twilio_sid.slice(-8))
+              )
+            ),
+            (vnPreview || vnSending) && React.createElement('button', {
+              onClick: doSendNote, disabled: vnSending,
+              style: { width: '100%', padding: '9px', borderRadius: 9, border: 'none', cursor: vnSending ? 'default' : 'pointer', fontFamily: 'Inter,sans-serif', fontSize: 12, fontWeight: 800, color: '#fff', background: vnSending ? 'rgba(37,211,102,0.2)' : 'linear-gradient(135deg,#059669,#10b981)', boxShadow: vnSending ? 'none' : '0 4px 20px rgba(16,185,129,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, opacity: vnSending ? 0.6 : 1 }
+            },
+              React.createElement(Ico, { n: 'share2', size: 12, sw: 2.5 }),
+              vnSending ? (sp + ' Sending…') : '✦ Send to WhatsApp'
+            ),
+            !vnPreview && !vnSending && React.createElement('button', {
+              onClick: doGenerateNote, disabled: vnGenerating,
+              style: { width: '100%', padding: '9px', borderRadius: 9, border: 'none', cursor: vnGenerating ? 'default' : 'pointer', fontFamily: 'Inter,sans-serif', fontSize: 12, fontWeight: 800, color: '#fff', background: vnGenerating ? 'rgba(37,211,102,0.2)' : 'linear-gradient(135deg,#059669,#25D366)', boxShadow: vnGenerating ? 'none' : '0 4px 20px rgba(37,211,102,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, opacity: vnGenerating ? 0.6 : 1 }
+            },
+              React.createElement(Ico, { n: 'mic', size: 12, sw: 2.5 }),
+              vnGenerating ? (sp + ' Generating…') : '✦ Generate Voice Note'
+            )
+          )
+        )
+      )
+    );
+
+    // ── 3. VIDEO CALL (dummy) ─────────────────────────────────────
+    var videoCard = SectionCard('#a78bfa', 'rgba(139,92,246,0.04)',
+      React.createElement('div', null,
+        SectionHead('video', 'GEMINI VIDEO CALL', 'Live Avatar', '#c4b5fd',
+          React.createElement('span', { style: { fontSize: 7, fontWeight: 800, padding: '2px 6px', borderRadius: 10, background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.3)', color: '#818cf8', marginLeft: 4 } }, 'PREVIEW')
+        ),
+        React.createElement('div', { style: { padding: '10px 12px', display: 'flex', flexDirection: 'column', gap: 8 } },
+          React.createElement('div', {
+            style: { borderRadius: 8, background: 'rgba(139,92,246,0.07)', border: '1px solid rgba(167,139,250,0.15)', padding: '10px', display: 'flex', gap: 10, alignItems: 'center' }
+          },
+            React.createElement('div', {
+              style: { width: 42, height: 42, borderRadius: 10, background: 'linear-gradient(135deg,#4338ca,#6d28d9,#a21caf)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 16, fontWeight: 900, color: '#fff' }
+            }, 'P'),
+            React.createElement('div', null,
+              React.createElement('div', { style: { fontSize: 11, fontWeight: 700, color: '#f1f5f9', marginBottom: 2 } }, 'Rohan — AI Avatar'),
+              React.createElement('div', { style: { fontSize: 9, color: '#64748b', lineHeight: 1.4 } }, 'Animated avatar · face-to-face with ' + client.name + ' · real-time portfolio walkthrough')
+            )
+          ),
+          React.createElement('div', { style: { display: 'flex', gap: 5, flexWrap: 'wrap' } },
+            [['video','Rohan Avatar'],['share2','Screen Share'],['portfolios','Portfolio View'],['shield','Recorded & Vaulted']].map(function(f,i){
+              return React.createElement('div', { key: i, style: { display: 'flex', alignItems: 'center', gap: 3, padding: '3px 8px', borderRadius: 20, background: 'rgba(167,139,250,0.08)', border: '1px solid rgba(167,139,250,0.15)' } },
+                React.createElement(Ico, { n: f[0], size: 8, sw: 2 }),
+                React.createElement('span', { style: { fontSize: 8, color: '#94a3b8', fontWeight: 600 } }, f[1])
+              );
+            })
+          ),
+          React.createElement('div', { style: { display: 'flex', flexDirection: 'column', gap: 6 } },
+            videoPhase === 'ready' && React.createElement('div', { style: { padding: '6px 10px', borderRadius: 8, background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(167,139,250,0.2)', display: 'flex', alignItems: 'center', gap: 8 } },
+              React.createElement(Ico, { n: 'check', size: 9, sw: 2.5, cls: 'text-purple-400' }),
+              React.createElement('div', null,
+                React.createElement('div', { style: { fontSize: 10, fontWeight: 700, color: '#c4b5fd' } }, '✓ Session ready — logged in History'),
+                React.createElement('a', { href: '/video-call?client=' + client.clientKey, target: '_blank', style: { fontSize: 9, color: '#a78bfa', fontWeight: 700, textDecoration: 'underline', cursor: 'pointer' } }, '↗ Open Video Call Session')
+              )
+            ),
+            (function() {
+              var isPreparing = videoPhase === 'preparing';
+              return React.createElement('button', {
+                onClick: function(){
+                  setVideoPhase('preparing');
+                  setCallHistory(function(h){ return [{ type:'video', ts: new Date().toISOString(), label:'Video Call', status:'Launched' }].concat(h); });
+                  setTimeout(function(){ setVideoPhase('ready'); }, 1800);
+                },
+                disabled: isPreparing,
+                style: { width: '100%', padding: '9px', borderRadius: 9, border: 'none', cursor: isPreparing ? 'default' : 'pointer',
+                  fontFamily: 'Inter,sans-serif', fontSize: 12, fontWeight: 800, color: '#fff',
+                  background: 'linear-gradient(135deg,#5b21b6,#a855f7)',
+                  boxShadow: isPreparing ? 'none' : '0 4px 20px rgba(139,92,246,0.38)',
+                  opacity: isPreparing ? 0.4 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }
+              }, React.createElement(Ico, { n: 'video', size: 12, sw: 2.5 }),
+                isPreparing ? (sp + ' Preparing session…') : '✦ Launch Gemini Video Call →'
+              );
+            })()
+          )
+        )
+      )
+    );
+
+    return React.createElement('div', {
+      style: { padding: 10, display: 'flex', flexDirection: 'column', gap: 10, overflowY: 'auto' }
+    },
+      PortfolioBrief(),
+      voiceCard,
+      noteCard,
+      videoCard
+    );
+  }
+
   function renderBriefTab() {
     if (!client) return null;
-    var channel = activeCh || client.recommendedChannel;
-    if (channel === 'whatsapp') return renderWACard();
-    if (channel === 'video')    return renderVideoCard();
-    if (channel === 'docai')    return renderDocAICard();
-    return renderVoiceCard();
+    return renderDualOutreachPanel();
   }
 
   function PoweredBadge(label, color) {
     return /*#__PURE__*/React.createElement("span", {
-      style: { fontSize: 6.5, fontWeight: 800, padding: '2px 6px', borderRadius: 10, background: color + '1a', border: '1px solid ' + color + '44', color: color, letterSpacing: '.06em', whiteSpace: 'nowrap' }
+      style: { fontSize: 7, fontWeight: 800, padding: '2px 6px', borderRadius: 10, background: color + '1a', border: '1px solid ' + color + '44', color: color, letterSpacing: '.06em', whiteSpace: 'nowrap' }
     }, label);
   }
 
@@ -1651,7 +2037,7 @@ function GeminiHub({
     },
       /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: 5 } },
         /*#__PURE__*/React.createElement(Ico, { n: icon, size: 10, sw: 2, cls: 'text-slate-300' }),
-        /*#__PURE__*/React.createElement("span", { style: { fontSize: 9, fontWeight: 800, color: '#f1f5f9', letterSpacing: '.04em' } }, title)
+        /*#__PURE__*/React.createElement("span", { style: { fontSize: 10, fontWeight: 800, color: '#f1f5f9', letterSpacing: '.04em' } }, title)
       ),
       PoweredBadge(powered, poweredColor)
     );
@@ -1661,34 +2047,88 @@ function GeminiHub({
     return /*#__PURE__*/React.createElement("div", {
       style: { padding: '7px 9px', borderRadius: 8, background: 'rgba(251,191,36,0.06)', border: '1px solid rgba(251,191,36,0.2)' }
     },
-      /*#__PURE__*/React.createElement("div", { style: { fontSize: 7, fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 3 } }, "Client Alert · " + client.urgencyDays + " days"),
-      /*#__PURE__*/React.createElement("div", { style: { fontSize: 9, color: '#e2e8f0', lineHeight: 1.45 } }, client.alert || client.story || '')
+      /*#__PURE__*/React.createElement("div", { style: { fontSize: 8, fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 3 } }, "Client Alert · " + client.urgencyDays + " days"),
+      /*#__PURE__*/React.createElement("div", { style: { fontSize: 10, color: '#e2e8f0', lineHeight: 1.45 } }, client.alert || client.story || '')
     );
   }
 
   function PortfolioBrief() {
     if (!client || !client.portfolio) return null;
     var p = client.portfolio;
+    var g = p.gapInsight;
     var bDelta = +(p.ytdReturn - p.benchmarkReturn).toFixed(1);
     var bC = bDelta >= 0 ? '#34d399' : '#f87171';
     var hC = p.healthScore >= 80 ? '#10b981' : p.healthScore >= 65 ? '#f59e0b' : '#ef4444';
+
+    var gapBlock = null;
+    if (g && g.type === 'performance') {
+      var maxV = g.model.value * 1.08;
+      gapBlock = React.createElement('div', {
+        style: { padding: '7px 8px', borderRadius: 7, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.22)', marginBottom: 7 }
+      },
+        React.createElement('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 } },
+          React.createElement('span', { style: { fontSize: 8, fontWeight: 800, color: '#f87171', textTransform: 'uppercase', letterSpacing: '.08em' } }, 'Performance Gap'),
+          React.createElement('span', { style: { fontSize: 10, fontWeight: 800, color: '#f87171' } }, '−' + g.gap + 'pp · ' + g.gapRupees)
+        ),
+        [g.current, g.model].map(function(item, i) {
+          var w = (item.value / maxV * 100).toFixed(1);
+          return React.createElement('div', { key: i, style: { marginBottom: i === 0 ? 5 : 0 } },
+            React.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: 2 } },
+              React.createElement('span', { style: { fontSize: 9, color: '#94a3b8' } }, item.label),
+              React.createElement('span', { style: { fontSize: 10, fontWeight: 800, color: item.color } }, '+' + item.value + '%')
+            ),
+            React.createElement('div', { style: { height: 6, borderRadius: 3, background: 'rgba(255,255,255,0.05)', overflow: 'hidden' } },
+              React.createElement('div', { style: { height: '100%', width: w + '%', background: 'linear-gradient(90deg,' + item.color + '88,' + item.color + ')', borderRadius: 3 } })
+            )
+          );
+        }),
+        React.createElement('div', { style: { marginTop: 5, fontSize: 8, color: '#64748b' } }, g.action)
+      );
+    }
+
+    if (g && g.type === 'funds') {
+      gapBlock = React.createElement('div', {
+        style: { padding: '7px 8px', borderRadius: 7, background: 'rgba(129,108,248,0.08)', border: '1px solid rgba(129,108,248,0.22)', marginBottom: 7 }
+      },
+        React.createElement('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 } },
+          React.createElement('span', { style: { fontSize: 8, fontWeight: 800, color: '#818cf8', textTransform: 'uppercase', letterSpacing: '.08em' } }, 'Fund Quality Gap'),
+          React.createElement('span', { style: { fontSize: 9, fontWeight: 700, color: '#fbbf24' } }, 'Jul 31 deadline')
+        ),
+        g.funds.map(function(f, i) {
+          return React.createElement('div', { key: i, style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: i < 2 ? 4 : 0 } },
+            React.createElement('div', null,
+              React.createElement('span', { style: { fontSize: 9, color: '#c7d2fe' } }, f.current),
+              React.createElement('span', { style: { fontSize: 7, color: '#64748b', marginLeft: 3 } }, f.monthly + '/mo')
+            ),
+            React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: 4 } },
+              React.createElement('span', { style: { fontSize: 10, fontWeight: 700, color: '#f87171' } }, f.currentReturn + '%'),
+              React.createElement('span', { style: { fontSize: 8, fontWeight: 600, color: '#f59e0b' } }, f.currentGap + 'pp vs cat'),
+              React.createElement('span', { style: { fontSize: 10, color: '#64748b' } }, '→'),
+              React.createElement('span', { style: { fontSize: 10, fontWeight: 700, color: '#34d399' } }, f.recReturn + '%')
+            )
+          );
+        })
+      );
+    }
+
     return /*#__PURE__*/React.createElement("div", {
       style: { padding: '8px 10px', borderRadius: 8, background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.2)' }
     },
-      /*#__PURE__*/React.createElement("div", { style: { fontSize: 7, fontWeight: 800, color: '#818cf8', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 5 } }, "AI Portfolio Brief"),
-      /*#__PURE__*/React.createElement("div", { style: { fontSize: 9, color: '#c7d2fe', lineHeight: 1.5, marginBottom: 7 } }, p.aiInsight),
+      /*#__PURE__*/React.createElement("div", { style: { fontSize: 8, fontWeight: 800, color: '#818cf8', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 6 } }, "AI Portfolio Brief"),
+      gapBlock,
+      /*#__PURE__*/React.createElement("div", { style: { fontSize: 10, color: '#c7d2fe', lineHeight: 1.5, marginBottom: 7 } }, p.aiInsight),
       /*#__PURE__*/React.createElement("div", { style: { display: 'flex', gap: 10, flexWrap: 'wrap' } },
         /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: 3 } },
-          /*#__PURE__*/React.createElement("span", { style: { fontSize: 8, color: '#475569' } }, "Health:"),
-          /*#__PURE__*/React.createElement("span", { style: { fontSize: 8, fontWeight: 700, color: hC } }, p.healthScore + "/100")
+          /*#__PURE__*/React.createElement("span", { style: { fontSize: 9, color: '#475569' } }, "Health:"),
+          /*#__PURE__*/React.createElement("span", { style: { fontSize: 9, fontWeight: 700, color: hC } }, p.healthScore + "/100")
         ),
         /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: 3 } },
-          /*#__PURE__*/React.createElement("span", { style: { fontSize: 8, color: '#475569' } }, "YTD:"),
-          /*#__PURE__*/React.createElement("span", { style: { fontSize: 8, fontWeight: 700, color: p.ytdReturn >= 0 ? '#34d399' : '#f87171' } }, (p.ytdReturn >= 0 ? '+' : '') + p.ytdReturn + "%")
+          /*#__PURE__*/React.createElement("span", { style: { fontSize: 9, color: '#475569' } }, "YTD:"),
+          /*#__PURE__*/React.createElement("span", { style: { fontSize: 9, fontWeight: 700, color: p.ytdReturn >= 0 ? '#34d399' : '#f87171' } }, (p.ytdReturn >= 0 ? '+' : '') + p.ytdReturn + "%")
         ),
         /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: 3 } },
-          /*#__PURE__*/React.createElement("span", { style: { fontSize: 8, color: '#475569' } }, "vs NIFTY:"),
-          /*#__PURE__*/React.createElement("span", { style: { fontSize: 8, fontWeight: 700, color: bC } }, (bDelta >= 0 ? '+' : '') + bDelta + "pp")
+          /*#__PURE__*/React.createElement("span", { style: { fontSize: 9, color: '#475569' } }, "vs NIFTY:"),
+          /*#__PURE__*/React.createElement("span", { style: { fontSize: 9, fontWeight: 700, color: bC } }, (bDelta >= 0 ? '+' : '') + bDelta + "pp")
         )
       )
     );
@@ -1697,7 +2137,7 @@ function GeminiHub({
   function LaunchBtn(label, color, gradientEnd, glow, channelId) {
     return /*#__PURE__*/React.createElement("button", {
       onClick: function () { doLaunch(channelId); },
-      style: { width: '100%', padding: '9px', borderRadius: 9, border: 'none', cursor: 'pointer', fontFamily: 'Inter,sans-serif', fontSize: 11, fontWeight: 800, color: '#fff', background: 'linear-gradient(135deg,' + color + ',' + gradientEnd + ')', boxShadow: '0 4px 20px ' + glow }
+      style: { width: '100%', padding: '9px', borderRadius: 9, border: 'none', cursor: 'pointer', fontFamily: 'Inter,sans-serif', fontSize: 12, fontWeight: 800, color: '#fff', background: 'linear-gradient(135deg,' + color + ',' + gradientEnd + ')', boxShadow: '0 4px 20px ' + glow }
     }, label);
   }
 
@@ -1713,14 +2153,14 @@ function GeminiHub({
       PortfolioBrief(),
       AlertCard(),
       /*#__PURE__*/React.createElement("div", null,
-        /*#__PURE__*/React.createElement("div", { style: { fontSize: 7, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 5 } }, "Script Intelligence Chain"),
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 8, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 5 } }, "Script Intelligence Chain"),
         nodes.map(function (node, idx) {
           return /*#__PURE__*/React.createElement("div", { key: idx },
             /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: 7, padding: '5px 8px', borderRadius: 7, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' } },
               /*#__PURE__*/React.createElement("div", { style: { width: 6, height: 6, borderRadius: '50%', background: node.color, flexShrink: 0 } }),
               /*#__PURE__*/React.createElement("div", { style: { flex: 1 } },
-                /*#__PURE__*/React.createElement("div", { style: { fontSize: 9, fontWeight: 700, color: '#e2e8f0' } }, node.label),
-                /*#__PURE__*/React.createElement("div", { style: { fontSize: 7, color: '#64748b' } }, node.detail)
+                /*#__PURE__*/React.createElement("div", { style: { fontSize: 10, fontWeight: 700, color: '#e2e8f0' } }, node.label),
+                /*#__PURE__*/React.createElement("div", { style: { fontSize: 8, color: '#64748b' } }, node.detail)
               ),
               idx < 3 ? /*#__PURE__*/React.createElement(Ico, { n: 'chevRight', size: 8, cls: 'text-slate-600' }) : null
             ),
@@ -1729,11 +2169,11 @@ function GeminiHub({
         })
       ),
       /*#__PURE__*/React.createElement("div", null,
-        /*#__PURE__*/React.createElement("div", { style: { fontSize: 7, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 4 } }, "Talking Points"),
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 8, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 4 } }, "Talking Points"),
         (client.talkingPoints || []).slice(0, 4).map(function (tp, i) {
           return /*#__PURE__*/React.createElement("div", { key: i, style: { display: 'flex', alignItems: 'flex-start', gap: 5, marginBottom: 4 } },
             /*#__PURE__*/React.createElement("div", { style: { width: 4, height: 4, borderRadius: '50%', background: '#6366f1', marginTop: 4, flexShrink: 0 } }),
-            /*#__PURE__*/React.createElement("span", { style: { fontSize: 9, color: '#94a3b8', lineHeight: 1.4 } }, tp));
+            /*#__PURE__*/React.createElement("span", { style: { fontSize: 10, color: '#94a3b8', lineHeight: 1.4 } }, tp));
         })
       ),
       /*#__PURE__*/React.createElement("div", { style: { borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 8 } },
@@ -1797,24 +2237,24 @@ function GeminiHub({
         style: { padding: '9px 10px', borderRadius: 8, background: 'rgba(37,211,102,0.05)', border: '1px solid rgba(37,211,102,0.2)' }
       },
         /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 5 } },
-          /*#__PURE__*/React.createElement("span", { style: { fontSize: 7, fontWeight: 800, color: '#25D366', textTransform: 'uppercase', letterSpacing: '.1em' } }, "AI-Generated Script · Autonoe · ~30 sec"),
+          /*#__PURE__*/React.createElement("span", { style: { fontSize: 8, fontWeight: 800, color: '#25D366', textTransform: 'uppercase', letterSpacing: '.1em' } }, "AI-Generated Script · Autonoe · ~30 sec"),
           vnAudioUrl && /*#__PURE__*/React.createElement("button", {
             onClick: doPlay,
-            style: { display: 'inline-flex', alignItems: 'center', gap: 3, padding: '2px 8px', borderRadius: 20, border: '1px solid rgba(37,211,102,0.35)', background: 'rgba(37,211,102,0.1)', cursor: 'pointer', fontFamily: 'Inter,sans-serif', color: '#34d399', fontSize: 7.5, fontWeight: 700 }
+            style: { display: 'inline-flex', alignItems: 'center', gap: 3, padding: '2px 8px', borderRadius: 20, border: '1px solid rgba(37,211,102,0.35)', background: 'rgba(37,211,102,0.1)', cursor: 'pointer', fontFamily: 'Inter,sans-serif', color: '#34d399', fontSize: 8, fontWeight: 700 }
           },
             /*#__PURE__*/React.createElement(Ico, { n: 'mic', size: 8, sw: 2 }),
             '▶ Listen'
           )
         ),
-        /*#__PURE__*/React.createElement("div", { style: { fontSize: 8.5, color: '#cbd5e1', lineHeight: 1.55, fontStyle: 'italic' } },
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 9, color: '#cbd5e1', lineHeight: 1.55, fontStyle: 'italic' } },
           '“' + scriptPreview + '”'
         ),
         vnDone && voiceNote.twilio_sid && /*#__PURE__*/React.createElement("div", {
           style: { marginTop: 6, display: 'flex', alignItems: 'center', gap: 5 }
         },
           /*#__PURE__*/React.createElement(Ico, { n: 'check', size: 9, sw: 2.5, cls: 'text-emerald-400' }),
-          /*#__PURE__*/React.createElement("span", { style: { fontSize: 7, fontWeight: 700, color: '#34d399' } }, "Delivered"),
-          /*#__PURE__*/React.createElement("span", { style: { fontSize: 7, color: '#475569' } }, '·  SID …' + voiceNote.twilio_sid.slice(-8))
+          /*#__PURE__*/React.createElement("span", { style: { fontSize: 8, fontWeight: 700, color: '#34d399' } }, "Delivered"),
+          /*#__PURE__*/React.createElement("span", { style: { fontSize: 8, color: '#475569' } }, '·  SID …' + voiceNote.twilio_sid.slice(-8))
         )
       ),
 
@@ -1826,10 +2266,10 @@ function GeminiHub({
           [['mic','Gemini 3.1 TTS'], ['globe','WhatsApp delivery'], ['check','Read receipts']].map(function (f) {
             return /*#__PURE__*/React.createElement("div", { key: f[0], style: { display: 'flex', alignItems: 'center', gap: 3 } },
               /*#__PURE__*/React.createElement(Ico, { n: f[0], size: 8, sw: 2, cls: 'text-slate-500' }),
-              /*#__PURE__*/React.createElement("span", { style: { fontSize: 7, color: '#475569' } }, f[1]));
+              /*#__PURE__*/React.createElement("span", { style: { fontSize: 8, color: '#475569' } }, f[1]));
           })
         ),
-        /*#__PURE__*/React.createElement("div", { style: { marginTop: 5, fontSize: 8, color: '#334155', fontStyle: 'italic' } },
+        /*#__PURE__*/React.createElement("div", { style: { marginTop: 5, fontSize: 9, color: '#334155', fontStyle: 'italic' } },
           'Click Generate to create a personalised ' + (client.name || 'client') + ' voice note'
         )
       ),
@@ -1840,7 +2280,7 @@ function GeminiHub({
         !vnPreview && !vnSending && !vnDone && /*#__PURE__*/React.createElement("button", {
           onClick: doGenerate,
           disabled: vnGenerating,
-          style: { width: '100%', padding: '9px', borderRadius: 9, border: 'none', cursor: vnGenerating ? 'default' : 'pointer', fontFamily: 'Inter,sans-serif', fontSize: 11, fontWeight: 800, color: '#fff', background: vnGenerating ? 'rgba(37,211,102,0.2)' : 'linear-gradient(135deg,#059669,#25D366)', boxShadow: vnGenerating ? 'none' : '0 4px 20px rgba(37,211,102,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, opacity: vnGenerating ? 0.6 : 1 }
+          style: { width: '100%', padding: '9px', borderRadius: 9, border: 'none', cursor: vnGenerating ? 'default' : 'pointer', fontFamily: 'Inter,sans-serif', fontSize: 12, fontWeight: 800, color: '#fff', background: vnGenerating ? 'rgba(37,211,102,0.2)' : 'linear-gradient(135deg,#059669,#25D366)', boxShadow: vnGenerating ? 'none' : '0 4px 20px rgba(37,211,102,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, opacity: vnGenerating ? 0.6 : 1 }
         },
           /*#__PURE__*/React.createElement(Ico, { n: 'mic', size: 12, sw: 2.5 }),
           vnGenerating ? (sp + ' Generating script & audio…') : vnError ? '↺ Retry Generate' : '✦ Generate Voice Note'
@@ -1849,7 +2289,7 @@ function GeminiHub({
         (vnPreview || vnSending) && /*#__PURE__*/React.createElement("button", {
           onClick: doSend,
           disabled: vnSending,
-          style: { width: '100%', padding: '9px', borderRadius: 9, border: 'none', cursor: vnSending ? 'default' : 'pointer', fontFamily: 'Inter,sans-serif', fontSize: 11, fontWeight: 800, color: '#fff', background: vnSending ? 'rgba(37,211,102,0.2)' : 'linear-gradient(135deg,#059669,#10b981)', boxShadow: vnSending ? 'none' : '0 4px 20px rgba(16,185,129,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, opacity: vnSending ? 0.6 : 1 }
+          style: { width: '100%', padding: '9px', borderRadius: 9, border: 'none', cursor: vnSending ? 'default' : 'pointer', fontFamily: 'Inter,sans-serif', fontSize: 12, fontWeight: 800, color: '#fff', background: vnSending ? 'rgba(37,211,102,0.2)' : 'linear-gradient(135deg,#059669,#10b981)', boxShadow: vnSending ? 'none' : '0 4px 20px rgba(16,185,129,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, opacity: vnSending ? 0.6 : 1 }
         },
           /*#__PURE__*/React.createElement(Ico, { n: 'share2', size: 12, sw: 2.5 }),
           vnSending ? (sp + ' Sending via WhatsApp…') : '✦ Send to WhatsApp'
@@ -1857,7 +2297,7 @@ function GeminiHub({
         /* Resend option when delivered */
         vnDone && /*#__PURE__*/React.createElement("button", {
           onClick: doGenerate,
-          style: { width: '100%', padding: '6px', borderRadius: 7, border: '1px solid rgba(37,211,102,0.2)', cursor: 'pointer', fontFamily: 'Inter,sans-serif', fontSize: 9, fontWeight: 600, color: '#475569', background: 'transparent' }
+          style: { width: '100%', padding: '6px', borderRadius: 7, border: '1px solid rgba(37,211,102,0.2)', cursor: 'pointer', fontFamily: 'Inter,sans-serif', fontSize: 10, fontWeight: 600, color: '#475569', background: 'transparent' }
         }, '↺ Generate & Resend')
       )
     );
@@ -1875,13 +2315,13 @@ function GeminiHub({
       PortfolioBrief(),
       AlertCard(),
       /*#__PURE__*/React.createElement("div", null,
-        /*#__PURE__*/React.createElement("div", { style: { fontSize: 7, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 5 } }, "What Gemini Avatar Does"),
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 8, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 5 } }, "What Gemini Avatar Does"),
         features.map(function (f) {
           return /*#__PURE__*/React.createElement("div", { key: f.label, style: { display: 'flex', alignItems: 'flex-start', gap: 7, padding: '5px 8px', borderRadius: 7, background: 'rgba(59,130,246,0.04)', border: '1px solid rgba(59,130,246,0.1)', marginBottom: 4 } },
             /*#__PURE__*/React.createElement(Ico, { n: f.icon, size: 10, sw: 2, cls: 'text-blue-400' }),
             /*#__PURE__*/React.createElement("div", null,
-              /*#__PURE__*/React.createElement("div", { style: { fontSize: 9, fontWeight: 700, color: '#e2e8f0' } }, f.label),
-              /*#__PURE__*/React.createElement("div", { style: { fontSize: 7, color: '#64748b' } }, f.detail)
+              /*#__PURE__*/React.createElement("div", { style: { fontSize: 10, fontWeight: 700, color: '#e2e8f0' } }, f.label),
+              /*#__PURE__*/React.createElement("div", { style: { fontSize: 8, color: '#64748b' } }, f.detail)
             )
           );
         })
@@ -1904,13 +2344,13 @@ function GeminiHub({
       PortfolioBrief(),
       AlertCard(),
       /*#__PURE__*/React.createElement("div", null,
-        /*#__PURE__*/React.createElement("div", { style: { fontSize: 7, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 5 } }, "Documents to Analyze"),
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 8, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 5 } }, "Documents to Analyze"),
         docs.map(function (d) {
           return /*#__PURE__*/React.createElement("div", { key: d.label, style: { display: 'flex', alignItems: 'flex-start', gap: 7, padding: '5px 8px', borderRadius: 7, background: 'rgba(139,92,246,0.04)', border: '1px solid rgba(139,92,246,0.1)', marginBottom: 4 } },
             /*#__PURE__*/React.createElement(Ico, { n: d.icon, size: 10, sw: 2, cls: 'text-violet-400' }),
             /*#__PURE__*/React.createElement("div", null,
-              /*#__PURE__*/React.createElement("div", { style: { fontSize: 9, fontWeight: 700, color: '#e2e8f0' } }, d.label),
-              /*#__PURE__*/React.createElement("div", { style: { fontSize: 7, color: '#64748b' } }, d.detail)
+              /*#__PURE__*/React.createElement("div", { style: { fontSize: 10, fontWeight: 700, color: '#e2e8f0' } }, d.label),
+              /*#__PURE__*/React.createElement("div", { style: { fontSize: 8, color: '#64748b' } }, d.detail)
             )
           );
         })
@@ -1931,7 +2371,7 @@ function GeminiHub({
         style: { padding: '30px 14px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, color: '#475569' }
       },
       /*#__PURE__*/React.createElement(Ico, { n: 'phone', size: 24, cls: 'text-slate-600' }),
-      /*#__PURE__*/React.createElement("div", { style: { fontSize: 10, textAlign: 'center', color: '#64748b' } }, "Launch a voice call from the Brief tab to see the live transcript here")
+      /*#__PURE__*/React.createElement("div", { style: { fontSize: 11, textAlign: 'center', color: '#64748b' } }, "Launch a voice call from the Brief tab to see the live transcript here")
       );
     }
     return /*#__PURE__*/React.createElement("div", { style: { padding: '10px', display: 'flex', flexDirection: 'column', gap: 7 } },
@@ -1940,8 +2380,8 @@ function GeminiHub({
     },
     /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: 5 } },
       /*#__PURE__*/React.createElement("div", { style: { width: 7, height: 7, borderRadius: '50%', background: dotColor, animation: isActive ? 'blink 1s ease-in-out infinite' : 'none' } }),
-      /*#__PURE__*/React.createElement("span", { style: { fontSize: 10, fontWeight: 800, color: '#f1f5f9' } }, statusLabel),
-      /*#__PURE__*/React.createElement("span", { style: { fontSize: 10, fontFamily: 'monospace', color: '#34d399' } }, fmt(secs))
+      /*#__PURE__*/React.createElement("span", { style: { fontSize: 11, fontWeight: 800, color: '#f1f5f9' } }, statusLabel),
+      /*#__PURE__*/React.createElement("span", { style: { fontSize: 11, fontFamily: 'monospace', color: '#34d399' } }, fmt(secs))
     ),
     /*#__PURE__*/React.createElement("button", {
       onClick: function () {
@@ -1949,30 +2389,30 @@ function GeminiHub({
         setLive(false); setMsgs([]); setSecs(0); setCallId(null); setCallPhase('idle'); setGcsPath(null);
         setActions([]); setCrmSync(null); setHubTab('brief');
       },
-      style: { padding: '2px 8px', borderRadius: 5, border: 'none', cursor: 'pointer', background: callEnded ? 'rgba(100,116,139,0.1)' : 'rgba(239,68,68,0.1)', color: callEnded ? '#94a3b8' : '#f87171', fontSize: 9, fontWeight: 700, fontFamily: 'Inter,sans-serif' }
+      style: { padding: '2px 8px', borderRadius: 5, border: 'none', cursor: 'pointer', background: callEnded ? 'rgba(100,116,139,0.1)' : 'rgba(239,68,68,0.1)', color: callEnded ? '#94a3b8' : '#f87171', fontSize: 10, fontWeight: 700, fontFamily: 'Inter,sans-serif' }
     }, callEnded ? 'Close' : 'End')
     ),
     ch && /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: 6, padding: '5px 9px', borderRadius: 8, background: ch.bg } },
       /*#__PURE__*/React.createElement("div", { style: { color: ch.color } }, /*#__PURE__*/React.createElement(Ico, { n: ch.icon, size: 11, sw: 2 })),
-      /*#__PURE__*/React.createElement("span", { style: { fontSize: 10, fontWeight: 700, color: '#f1f5f9', flex: 1 } }, ch.label),
-      client && /*#__PURE__*/React.createElement("span", { style: { fontSize: 8, color: ch.color, fontWeight: 600 } }, client.name)
+      /*#__PURE__*/React.createElement("span", { style: { fontSize: 11, fontWeight: 700, color: '#f1f5f9', flex: 1 } }, ch.label),
+      client && /*#__PURE__*/React.createElement("span", { style: { fontSize: 9, color: ch.color, fontWeight: 600 } }, client.name)
     ),
     /*#__PURE__*/React.createElement("div", {
       style: { borderRadius: 9, background: 'rgba(4,8,24,0.8)', border: '1px solid rgba(255,255,255,0.05)', padding: 8, minHeight: 160, maxHeight: 220, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 6 }
     },
     msgs.length === 0 ? /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: 6, padding: '16px 10px', color: '#475569' } },
-      /*#__PURE__*/React.createElement("span", { style: { fontSize: 12, animation: 'ai-shimmer 1.5s ease-in-out infinite' } }, sp),
-      /*#__PURE__*/React.createElement("span", { style: { fontSize: 10 } },
+      /*#__PURE__*/React.createElement("span", { style: { fontSize: 13, animation: 'ai-shimmer 1.5s ease-in-out infinite' } }, sp),
+      /*#__PURE__*/React.createElement("span", { style: { fontSize: 11 } },
         callPhase === 'calling' ? 'Connecting to Twilio…' : callPhase === 'ringing' ? 'Dialling — phone ringing, please answer…' : callPhase === 'live' ? 'Connected — listening for audio…' : callPhase === 'completed' ? 'Call completed' : callPhase === 'failed' ? 'Call not answered' : 'Starting session…'
       )
     ) : msgs.map(function (m, i) {
-      if (m.role === 'system') return /*#__PURE__*/React.createElement("div", { key: i, style: { padding: '8px 10px', borderRadius: 7, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', fontSize: 9, color: '#f87171', textAlign: 'center' } }, m.text);
+      if (m.role === 'system') return /*#__PURE__*/React.createElement("div", { key: i, style: { padding: '8px 10px', borderRadius: 7, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', fontSize: 10, color: '#f87171', textAlign: 'center' } }, m.text);
       var isAI = m.role === 'ai';
       return /*#__PURE__*/React.createElement("div", { key: i, style: { display: 'flex', gap: 5, alignItems: 'flex-start', flexDirection: isAI ? 'row' : 'row-reverse' } },
-        /*#__PURE__*/React.createElement("div", { style: { width: 18, height: 18, minWidth: 18, borderRadius: 5, flexShrink: 0, background: isAI ? 'linear-gradient(135deg,#6366f1,#7c3aed)' : 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 7, fontWeight: 700, color: '#fff' } }, isAI ? 'G' : client ? client.initials[0] : 'C'),
+        /*#__PURE__*/React.createElement("div", { style: { width: 18, height: 18, minWidth: 18, borderRadius: 5, flexShrink: 0, background: isAI ? 'linear-gradient(135deg,#6366f1,#7c3aed)' : 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8, fontWeight: 700, color: '#fff' } }, isAI ? 'G' : client ? client.initials[0] : 'C'),
         /*#__PURE__*/React.createElement("div", { style: { maxWidth: '80%', padding: '5px 7px', borderRadius: 7, background: isAI ? 'rgba(99,102,241,0.12)' : 'rgba(255,255,255,0.06)', border: '1px solid ' + (isAI ? 'rgba(99,102,241,0.2)' : 'rgba(255,255,255,0.07)') } },
-          /*#__PURE__*/React.createElement("div", { style: { fontSize: 8, color: isAI ? '#818cf8' : '#94a3b8', fontWeight: 600, marginBottom: 1 } }, isAI ? 'Gemini AI' : client ? client.name : 'Client'),
-          /*#__PURE__*/React.createElement("div", { style: { fontSize: 9, color: '#e2e8f0', lineHeight: 1.45 } }, m.text)
+          /*#__PURE__*/React.createElement("div", { style: { fontSize: 9, color: isAI ? '#818cf8' : '#94a3b8', fontWeight: 600, marginBottom: 1 } }, isAI ? 'Gemini AI' : client ? client.name : 'Client'),
+          /*#__PURE__*/React.createElement("div", { style: { fontSize: 10, color: '#e2e8f0', lineHeight: 1.45 } }, m.text)
         ));
     })
     ),
@@ -1980,104 +2420,256 @@ function GeminiHub({
       [{ icon: 'mic', label: 'Mute', c: '#94a3b8' }, { icon: 'share2', label: 'Share', c: '#3b82f6' }, { icon: 'zap', label: 'Intervene', c: '#f59e0b' }].map(function (ctrl) {
         return /*#__PURE__*/React.createElement("button", { key: ctrl.label, style: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, padding: '7px 0', borderRadius: 7, border: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.03)', color: ctrl.c, cursor: 'pointer', fontFamily: 'Inter,sans-serif' } },
           /*#__PURE__*/React.createElement(Ico, { n: ctrl.icon, size: 12 }),
-          /*#__PURE__*/React.createElement("span", { style: { fontSize: 7, fontWeight: 600, color: '#64748b' } }, ctrl.label));
+          /*#__PURE__*/React.createElement("span", { style: { fontSize: 8, fontWeight: 600, color: '#64748b' } }, ctrl.label));
       })
     ),
     gcsPath && /*#__PURE__*/React.createElement("div", { style: { marginTop: 2, padding: '6px 9px', borderRadius: 7, background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.2)', display: 'flex', alignItems: 'center', gap: 6 } },
       /*#__PURE__*/React.createElement(Ico, { n: 'fileSearch', size: 10, cls: 'text-emerald-400' }),
-      /*#__PURE__*/React.createElement("span", { style: { fontSize: 8, color: '#34d399', fontFamily: 'monospace', wordBreak: 'break-all' } }, gcsPath)
+      /*#__PURE__*/React.createElement("span", { style: { fontSize: 9, color: '#34d399', fontFamily: 'monospace', wordBreak: 'break-all' } }, gcsPath)
     )
     );
   }
+  var MOCK_ACTIONS = {
+    'amit_patel': [
+      { title: 'Schedule Rebalancing Meeting', description: 'Book 30-min call to walk through Tech → Financials rotation. Share model portfolio comparison before meeting.', priority: 'HIGH', due: 'Jun 26, 2026', assignee: 'Rohan Sharma', category: 'Meeting', crm_id: 'SF-20241' },
+      { title: 'Send Sector Drift Report', description: 'Email annotated portfolio vs model PDF — highlight ₹2.5 Cr YTD gap and the 14pp Tech overweight.', priority: 'MEDIUM', due: 'Jun 25, 2026', assignee: 'Rohan Sharma', category: 'Document', crm_id: 'SF-20242' },
+      { title: 'Log Rebalance Recommendation', description: 'Record rebalancing advice in CRM with SEBI IA disclosure. Client verbally acknowledged gap.', priority: 'HIGH', due: 'Jun 24, 2026', assignee: 'Compliance', category: 'Compliance', crm_id: 'SF-20243' }
+    ],
+    'priya_kapoor': [
+      { title: 'Submit SIP Switch Instructions', description: 'Process switch from HDFC Large Cap to Parag Parikh Flexi Cap. Pre-fill form and send DocuSign link.', priority: 'HIGH', due: 'Jul 1, 2026', assignee: 'Operations', category: 'Investment', crm_id: 'SF-20318' },
+      { title: 'Mirae ELSS 80C Documentation', description: 'Collect PAN and investment proof for ₹96,000 ELSS SIP. ELSS deadline July 31.', priority: 'HIGH', due: 'Jun 28, 2026', assignee: 'Rohan Sharma', category: 'Document', crm_id: 'SF-20319' },
+      { title: 'Follow-up on Fund Switch', description: 'Confirm all 3 SIP switches processed. Share new unit allotment statements to Priya.', priority: 'MEDIUM', due: 'Jul 5, 2026', assignee: 'Rohan Sharma', category: 'Follow-up', crm_id: 'SF-20320' }
+    ],
+    'vikram_nair': [
+      { title: 'Mid-Cap SIP Mandate Renewal', description: 'Generate and send renewal link for 3 expiring SIP mandates. Total ₹35,000/month.', priority: 'HIGH', due: 'Jun 25, 2026', assignee: 'Operations', category: 'Investment', crm_id: 'SF-20401' },
+      { title: 'Send SIP Performance Review', description: 'Share 3-year NAV comparison showing mid-cap outperformance vs large cap benchmarks.', priority: 'MEDIUM', due: 'Jun 26, 2026', assignee: 'Rohan Sharma', category: 'Document', crm_id: 'SF-20402' }
+    ],
+    'rajiv_singhania': [
+      { title: 'File Form 67 — DTAA Claim', description: 'Submit Form 67 for UAE-India DTAA credit. Apply 10% treaty rate on ₹1.8 Cr LTCG. Deadline this quarter.', priority: 'HIGH', due: 'Jun 30, 2026', assignee: 'Tax Team', category: 'Compliance', crm_id: 'SF-20501' },
+      { title: 'FEMA Repatriation Plan', description: 'Draft 5-year plan for ₹9 Cr repatriation from Dubai account. Include LRS limits and RBI reporting.', priority: 'MEDIUM', due: 'Jul 10, 2026', assignee: 'Rohan Sharma', category: 'Document', crm_id: 'SF-20502' },
+      { title: 'AIF LTCG Harvest Execution', description: 'Execute tax-loss harvesting in AIF units. Estimated saving: ₹68 Lakh this quarter.', priority: 'HIGH', due: 'Jun 28, 2026', assignee: 'Operations', category: 'Investment', crm_id: 'SF-20503' }
+    ],
+    'sunita_mehrotra': [
+      { title: 'FD Maturity Reinvestment', description: 'Process ₹2.4 Cr FD maturity into HDFC Floating Rate Fund. Generate switch form with post-tax yield comparison.', priority: 'HIGH', due: 'Jun 27, 2026', assignee: 'Operations', category: 'Investment', crm_id: 'SF-20601' },
+      { title: 'Send Debt MF Comparison PDF', description: 'Share personalised FD vs Debt MF yield analysis — show indexation benefit for 3-year holding.', priority: 'MEDIUM', due: 'Jun 25, 2026', assignee: 'Rohan Sharma', category: 'Document', crm_id: 'SF-20602' }
+    ]
+  };
   function renderActionsTab() {
     if (actionsLoading) {
       return /*#__PURE__*/React.createElement("div", { style: { padding: '30px 14px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 } },
         /*#__PURE__*/React.createElement("span", { style: { fontSize: 20, animation: 'ai-shimmer 1.5s ease-in-out infinite' } }, sp),
-        /*#__PURE__*/React.createElement("div", { style: { fontSize: 10, color: '#64748b', textAlign: 'center' } }, "Gemini is extracting action items…")
-      );
-    }
-    if (actions.length === 0) {
-      return /*#__PURE__*/React.createElement("div", { style: { padding: '30px 14px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 } },
-        /*#__PURE__*/React.createElement(Ico, { n: 'zap', size: 24, cls: 'text-slate-600' }),
-        /*#__PURE__*/React.createElement("div", { style: { fontSize: 10, color: '#64748b', textAlign: 'center' } }, "Action items appear here after the call ends")
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 11, color: '#64748b', textAlign: 'center' } }, "Gemini is extracting action items…")
       );
     }
     var priColor = { HIGH: '#ef4444', MEDIUM: '#f59e0b', LOW: '#3b82f6' };
     var catIcon = { Meeting: 'clock', Document: 'fileSearch', 'Follow-up': 'phone', Compliance: 'shield', Investment: 'trendUp' };
+    var displayActions = actions.length > 0 ? actions : (client ? (MOCK_ACTIONS[client.clientKey] || []) : []);
+    var isLive = actions.length > 0;
+    function ActionCard(act, i) {
+      var pc = priColor[act.priority] || '#64748b';
+      var ci = catIcon[act.category] || 'check';
+      return /*#__PURE__*/React.createElement("div", { key: i, style: { padding: '8px 10px', borderRadius: 9, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' } },
+        /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: 5, marginBottom: 3 } },
+          /*#__PURE__*/React.createElement(Ico, { n: ci, size: 10, sw: 2 }),
+          /*#__PURE__*/React.createElement("span", { style: { fontSize: 11, fontWeight: 700, color: '#f1f5f9', flex: 1 } }, act.title),
+          /*#__PURE__*/React.createElement("span", { style: { fontSize: 8, fontWeight: 800, padding: '1px 5px', borderRadius: 4, background: pc + '18', color: pc, border: '1px solid ' + pc + '44' } }, act.priority)
+        ),
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 9, color: '#94a3b8', lineHeight: 1.4, marginBottom: 5 } }, act.description),
+        /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' } },
+          /*#__PURE__*/React.createElement("span", { style: { fontSize: 8, color: '#64748b', display: 'flex', alignItems: 'center', gap: 3 } }, /*#__PURE__*/React.createElement(Ico, { n: 'clock', size: 8, sw: 1.5 }), act.due),
+          /*#__PURE__*/React.createElement("span", { style: { fontSize: 8, color: '#64748b', display: 'flex', alignItems: 'center', gap: 3 } }, /*#__PURE__*/React.createElement(Ico, { n: 'user', size: 8, sw: 1.5 }), act.assignee),
+          act.crm_id && /*#__PURE__*/React.createElement("span", { style: { fontSize: 8, color: '#34d399', fontWeight: 700, background: 'rgba(16,185,129,0.08)', padding: '1px 5px', borderRadius: 4, border: '1px solid rgba(16,185,129,0.2)' } }, '✓ ' + act.crm_id)
+        )
+      );
+    }
     return /*#__PURE__*/React.createElement("div", { style: { padding: '10px', display: 'flex', flexDirection: 'column', gap: 6 } },
-      crmSync && crmSync !== 'cached' && /*#__PURE__*/React.createElement("div", { style: { padding: '5px 8px', borderRadius: 7, background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.15)', display: 'flex', alignItems: 'center', gap: 5 } },
+      isLive && crmSync && crmSync !== 'cached' && /*#__PURE__*/React.createElement("div", { style: { padding: '5px 8px', borderRadius: 7, background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.15)', display: 'flex', alignItems: 'center', gap: 5 } },
         /*#__PURE__*/React.createElement(Ico, { n: 'check', size: 9, cls: 'text-emerald-400', sw: 2.5 }),
-        /*#__PURE__*/React.createElement("span", { style: { fontSize: 8, color: '#34d399', fontWeight: 600 } }, "Synced to Salesforce CRM")
+        /*#__PURE__*/React.createElement("span", { style: { fontSize: 9, color: '#34d399', fontWeight: 600 } }, "Synced to Salesforce CRM · " + displayActions.length + " actions")
       ),
-      actions.map(function (act, i) {
-        var pc = priColor[act.priority] || '#64748b';
-        var ci = catIcon[act.category] || 'check';
-        return /*#__PURE__*/React.createElement("div", { key: i, style: { padding: '8px 10px', borderRadius: 9, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' } },
-          /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: 5, marginBottom: 3 } },
-            /*#__PURE__*/React.createElement(Ico, { n: ci, size: 10, sw: 2 }),
-            /*#__PURE__*/React.createElement("span", { style: { fontSize: 10, fontWeight: 700, color: '#f1f5f9', flex: 1 } }, act.title),
-            /*#__PURE__*/React.createElement("span", { style: { fontSize: 7, fontWeight: 800, padding: '1px 5px', borderRadius: 4, background: pc + '18', color: pc, border: '1px solid ' + pc + '44' } }, act.priority)
-          ),
-          /*#__PURE__*/React.createElement("div", { style: { fontSize: 8, color: '#94a3b8', lineHeight: 1.4, marginBottom: 5 } }, act.description),
-          /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' } },
-            /*#__PURE__*/React.createElement("span", { style: { fontSize: 7, color: '#64748b', display: 'flex', alignItems: 'center', gap: 3 } }, /*#__PURE__*/React.createElement(Ico, { n: 'clock', size: 8, sw: 1.5 }), act.due),
-            /*#__PURE__*/React.createElement("span", { style: { fontSize: 7, color: '#64748b', display: 'flex', alignItems: 'center', gap: 3 } }, /*#__PURE__*/React.createElement(Ico, { n: 'user', size: 8, sw: 1.5 }), act.assignee),
-            act.crm_id && /*#__PURE__*/React.createElement("span", { style: { fontSize: 7, color: '#34d399', fontWeight: 700, background: 'rgba(16,185,129,0.08)', padding: '1px 5px', borderRadius: 4, border: '1px solid rgba(16,185,129,0.2)' } }, '✓ ' + act.crm_id)
-          )
-        );
-      })
+      !isLive && /*#__PURE__*/React.createElement("div", { style: { padding: '5px 8px', borderRadius: 7, background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.15)', display: 'flex', alignItems: 'center', gap: 5 } },
+        /*#__PURE__*/React.createElement(Ico, { n: 'clock', size: 9, cls: 'text-indigo-400', sw: 2 }),
+        /*#__PURE__*/React.createElement("span", { style: { fontSize: 9, color: '#818cf8', fontWeight: 600 } }, "AI action insights from last interaction")
+      ),
+      displayActions.map(function(act, i) { return ActionCard(act, i); })
     );
   }
+  var MOCK_VAULT = {
+    'amit_patel': [
+      { call_id: 'WM-260618-0412', date: 'Jun 18, 2026', duration: '3m 42s', gcs: 'gs://cymbal-wealth-vault/amit_patel/WM-260618-0412.json', note: 'Rebalancing call — Tech to Financials & Healthcare' },
+      { call_id: 'WM-260605-0930', date: 'Jun 5, 2026', duration: '18m 12s', gcs: 'gs://cymbal-wealth-vault/amit_patel/WM-260605-0930.json', note: 'Annual portfolio review video call' }
+    ],
+    'priya_kapoor': [
+      { call_id: 'WM-260614-1010', date: 'Jun 14, 2026', duration: '5m 10s', gcs: 'gs://cymbal-wealth-vault/priya_kapoor/WM-260614-1010.json', note: 'SIP fund quality gap — switch recommendation' },
+      { call_id: 'WM-260603-0930', date: 'Jun 3, 2026', duration: '18m 00s', gcs: 'gs://cymbal-wealth-vault/priya_kapoor/WM-260603-0930.json', note: 'Education corpus goal planning — 2027 target' }
+    ],
+    'vikram_nair': [
+      { call_id: 'WM-260619-0730', date: 'Jun 19, 2026', duration: '4m 18s', gcs: 'gs://cymbal-wealth-vault/vikram_nair/WM-260619-0730.json', note: 'SIP mandate renewal call — mid-cap momentum' },
+      { call_id: 'WM-260528-0645', date: 'May 28, 2026', duration: '3m 05s', gcs: 'gs://cymbal-wealth-vault/vikram_nair/WM-260528-0645.json', note: 'Quarterly portfolio check-in' }
+    ],
+    'rajiv_singhania': [
+      { call_id: 'WM-260621-1100', date: 'Jun 21, 2026', duration: '18m 00s', gcs: 'gs://cymbal-wealth-vault/rajiv_singhania/WM-260621-1100.json', note: 'Form 67 video call — DTAA annotation' },
+      { call_id: 'WM-260608-0700', date: 'Jun 8, 2026', duration: '6m 36s', gcs: 'gs://cymbal-wealth-vault/rajiv_singhania/WM-260608-0700.json', note: 'AIF LTCG harvest strategy walkthrough' }
+    ],
+    'sunita_mehrotra': [
+      { call_id: 'WM-260617-0715', date: 'Jun 17, 2026', duration: '3m 14s', gcs: 'gs://cymbal-wealth-vault/sunita_mehrotra/WM-260617-0715.json', note: 'FD maturity — Debt MF switch recommendation' },
+      { call_id: 'WM-260530-0900', date: 'May 30, 2026', duration: '11m 22s', gcs: 'gs://cymbal-wealth-vault/sunita_mehrotra/WM-260530-0900.json', note: 'Conservative portfolio review — debt allocation' }
+    ]
+  };
   function renderComplianceTab() {
-    if (!callEnded || !callId) {
-      return /*#__PURE__*/React.createElement("div", { style: { padding: '30px 14px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 } },
-        /*#__PURE__*/React.createElement(Ico, { n: 'shield', size: 28, cls: 'text-slate-600' }),
-        /*#__PURE__*/React.createElement("div", { style: { fontSize: 10, color: '#64748b', textAlign: 'center' } }, "Compliance vault is generated after the call ends")
+    var mockEntries = client ? (MOCK_VAULT[client.clientKey] || []) : [];
+    var regs = [{ code: 'SEBI Reg 24', desc: 'Recorded & logged per SEBI IA Regs 2013' }, { code: 'TRAI TCCCPR', desc: 'DND list pre-verified · 18-month register' }, { code: 'DPDP Act 2023', desc: 'Consent on file · purpose-limited call' }];
+    function VaultEntry(v) {
+      return /*#__PURE__*/React.createElement("div", { style: { padding: '8px 10px', borderRadius: 8, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', marginBottom: 5 } },
+        /*#__PURE__*/React.createElement("div", { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 } },
+          /*#__PURE__*/React.createElement("span", { style: { fontSize: 10, fontWeight: 700, color: '#e2e8f0', fontFamily: 'monospace' } }, v.call_id),
+          /*#__PURE__*/React.createElement("span", { style: { fontSize: 8, color: '#34d399', background: 'rgba(52,211,153,0.08)', padding: '1px 6px', borderRadius: 10, border: '1px solid rgba(52,211,153,0.2)', fontWeight: 700 } }, '✓ Vaulted')
+        ),
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 8, color: '#64748b', marginBottom: 3 } }, v.date + ' · ' + v.duration),
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 9, color: '#94a3b8', fontStyle: 'italic', marginBottom: 4 } }, '"' + v.note + '"'),
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 8, color: '#475569', fontFamily: 'monospace', wordBreak: 'break-all', lineHeight: 1.4 } }, v.gcs)
       );
     }
     return /*#__PURE__*/React.createElement("div", { style: { padding: '10px', display: 'flex', flexDirection: 'column', gap: 8 } },
-      /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: 7, padding: '8px 10px', borderRadius: 9, background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.15)' } },
-        /*#__PURE__*/React.createElement(Ico, { n: 'shield', size: 14, cls: 'text-emerald-400', sw: 2 }),
+      /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: 7, padding: '7px 10px', borderRadius: 9, background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.15)' } },
+        /*#__PURE__*/React.createElement(Ico, { n: 'shield', size: 13, cls: 'text-emerald-400', sw: 2 }),
         /*#__PURE__*/React.createElement("div", null,
-          /*#__PURE__*/React.createElement("div", { style: { fontSize: 10, fontWeight: 800, color: '#34d399' } }, "Compliance Vault"),
-          /*#__PURE__*/React.createElement("div", { style: { fontSize: 7, color: '#64748b' } }, "Audit-grade recording secured")
+          /*#__PURE__*/React.createElement("div", { style: { fontSize: 11, fontWeight: 800, color: '#34d399' } }, "Compliance Vault"),
+          /*#__PURE__*/React.createElement("div", { style: { fontSize: 8, color: '#64748b' } }, "All calls logged · SEBI audit-grade · GCS secured")
         )
       ),
-      /*#__PURE__*/React.createElement("div", { style: { padding: '8px 10px', borderRadius: 8, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' } },
-        [{ label: 'Call ID', value: callId }, { label: 'Client', value: client ? client.name : '—' }, { label: 'RM', value: 'Rohan Sharma' }, { label: 'Duration', value: fmt(secs) }].map(function (row) {
-          return /*#__PURE__*/React.createElement("div", { key: row.label, style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '3px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' } },
-            /*#__PURE__*/React.createElement("span", { style: { fontSize: 8, color: '#64748b', fontWeight: 600 } }, row.label),
-            /*#__PURE__*/React.createElement("span", { style: { fontSize: 8, color: '#e2e8f0', fontFamily: 'monospace' } }, row.value)
-          );
-        })
+      callEnded && callId && /*#__PURE__*/React.createElement("div", null,
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 8, fontWeight: 800, color: '#818cf8', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 5 } }, "Current Session"),
+        /*#__PURE__*/React.createElement("div", { style: { padding: '8px 10px', borderRadius: 8, background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.18)', marginBottom: 4 } },
+          [{ label: 'Call ID', value: callId }, { label: 'Client', value: client ? client.name : '—' }, { label: 'RM', value: 'Rohan Sharma' }, { label: 'Duration', value: fmt(secs) }].map(function (row) {
+            return /*#__PURE__*/React.createElement("div", { key: row.label, style: { display: 'flex', justifyContent: 'space-between', padding: '2px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' } },
+              /*#__PURE__*/React.createElement("span", { style: { fontSize: 9, color: '#64748b', fontWeight: 600 } }, row.label),
+              /*#__PURE__*/React.createElement("span", { style: { fontSize: 9, color: '#e2e8f0', fontFamily: 'monospace' } }, row.value)
+            );
+          })
+        ),
+        gcsPath && /*#__PURE__*/React.createElement("div", { style: { padding: '6px 10px', borderRadius: 7, background: 'rgba(99,102,241,0.05)', border: '1px solid rgba(99,102,241,0.12)', fontSize: 8, color: '#a5b4fc', fontFamily: 'monospace', wordBreak: 'break-all', lineHeight: 1.4 } }, gcsPath)
       ),
-      gcsPath && /*#__PURE__*/React.createElement("div", { style: { padding: '7px 10px', borderRadius: 8, background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.15)' } },
-        /*#__PURE__*/React.createElement("div", { style: { fontSize: 7, fontWeight: 800, color: '#818cf8', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 4 } }, "Vault Storage"),
-        /*#__PURE__*/React.createElement("div", { style: { fontSize: 8, color: '#a5b4fc', fontFamily: 'monospace', wordBreak: 'break-all', lineHeight: 1.4 } }, gcsPath)
+      mockEntries.length > 0 && /*#__PURE__*/React.createElement("div", null,
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 8, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 5 } }, "Previous Sessions"),
+        mockEntries.map(function(v, i) { return React.createElement(React.Fragment, { key: i }, VaultEntry(v)); })
       ),
       /*#__PURE__*/React.createElement("div", null,
-        /*#__PURE__*/React.createElement("div", { style: { fontSize: 7, fontWeight: 800, color: '#fff', textTransform: 'uppercase', letterSpacing: '.12em', marginBottom: 6 } }, "Regulatory Record"),
-        [{ code: 'SEBI Reg 24', desc: 'Recorded & logged per SEBI IA Regs 2013' }, { code: 'TRAI TCCCPR', desc: 'DND list pre-verified · 18-month register' }, { code: 'DPDP Act 2023', desc: 'Consent on file · purpose-limited call' }].map(function (reg) {
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 8, fontWeight: 800, color: '#fff', textTransform: 'uppercase', letterSpacing: '.12em', marginBottom: 6 } }, "Regulatory Compliance"),
+        regs.map(function (reg) {
           return /*#__PURE__*/React.createElement("div", { key: reg.code, style: { display: 'flex', alignItems: 'flex-start', gap: 7, padding: '5px 8px', borderRadius: 7, marginBottom: 4, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' } },
             /*#__PURE__*/React.createElement(Ico, { n: 'check', size: 10, cls: 'text-emerald-400', sw: 2.5 }),
             /*#__PURE__*/React.createElement("div", null,
-              /*#__PURE__*/React.createElement("div", { style: { fontSize: 9, fontWeight: 700, color: '#e2e8f0' } }, reg.code),
-              /*#__PURE__*/React.createElement("div", { style: { fontSize: 7, color: '#64748b' } }, reg.desc)
+              /*#__PURE__*/React.createElement("div", { style: { fontSize: 10, fontWeight: 700, color: '#e2e8f0' } }, reg.code),
+              /*#__PURE__*/React.createElement("div", { style: { fontSize: 8, color: '#64748b' } }, reg.desc)
             )
           );
         })
       )
     );
   }
+
+  // ─── HISTORY TAB ─────────────────────────────────────────────────────────────
+  var MOCK_HISTORY = {
+    'amit_patel': [
+      { type:'voice', ts:'2026-06-18T07:02:00Z', label:'Voice Call', status:'Completed', secs:222, preview:'Discussed portfolio rebalancing — rotate Tech into Financials & Healthcare' },
+      { type:'note',  ts:'2026-06-12T09:45:00Z', label:'Voice Note', status:'Sent', preview:'Tech over-concentration update — ₹2.5 Cr gap flagged for review' },
+      { type:'video', ts:'2026-06-05T05:30:00Z', label:'Video Call', status:'Completed', preview:'Annual portfolio review — sector allocation walkthrough with screen share' }
+    ],
+    'priya_kapoor': [
+      { type:'note',  ts:'2026-06-20T07:15:00Z', label:'Voice Note', status:'Sent', preview:'3 SIPs maturing Jul 31 — renewal options for ₹48,000/month portfolio' },
+      { type:'voice', ts:'2026-06-14T06:10:00Z', label:'Voice Call', status:'Completed', secs:310, preview:'HDFC Large Cap fund quality gap — switch to Parag Parikh Flexi Cap' },
+      { type:'video', ts:'2026-06-03T10:30:00Z', label:'Video Call', status:'Completed', preview:'Education corpus goal planning — 2027 target review with Priya' }
+    ],
+    'vikram_nair': [
+      { type:'voice', ts:'2026-06-19T07:30:00Z', label:'Voice Call', status:'Completed', secs:258, preview:'SIP mandate renewal — mid-cap momentum continued, ₹35,000/month' },
+      { type:'note',  ts:'2026-06-10T08:00:00Z', label:'Voice Note', status:'Sent', preview:'SIP expiry notice — renewal link and pre-filled form sent to WhatsApp' },
+      { type:'voice', ts:'2026-05-28T06:45:00Z', label:'Voice Call', status:'Completed', secs:185, preview:'Quarterly check-in — mid-cap rally and portfolio health at 84/100' }
+    ],
+    'rajiv_singhania': [
+      { type:'video', ts:'2026-06-21T11:00:00Z', label:'Video Call', status:'Completed', preview:'Form 67 live annotation — DTAA treaty rates applied, FEMA repatriation plan' },
+      { type:'note',  ts:'2026-06-15T06:30:00Z', label:'Voice Note', status:'Sent', preview:'DTAA filing reminder — ₹68L tax saving window closing this quarter' },
+      { type:'voice', ts:'2026-06-08T07:00:00Z', label:'Voice Call', status:'Completed', secs:396, preview:'AIF LTCG harvest strategy — treaty rate 10% vs standard 20% walkthrough' }
+    ],
+    'sunita_mehrotra': [
+      { type:'voice', ts:'2026-06-17T07:15:00Z', label:'Voice Call', status:'Completed', secs:194, preview:'FD maturity planning — switch to HDFC Floating Rate Fund, 8.2% vs 6.5%' },
+      { type:'note',  ts:'2026-06-09T08:30:00Z', label:'Voice Note', status:'Sent', preview:'FD renewal alert — post-tax yield comparison prepared for Sunita' },
+      { type:'video', ts:'2026-05-30T09:00:00Z', label:'Video Call', status:'Completed', preview:'Conservative portfolio review — debt vs liquid allocation with indexation benefit' }
+    ]
+  };
+  function renderHistoryTab() {
+    if (!client) return null;
+    var mockEntries = (MOCK_HISTORY[client.clientKey] || []);
+    var combined = callHistory.concat(mockEntries);
+    var typeColor = { voice: '#6366f1', note: '#25D366', video: '#a855f7' };
+    var typeIcon  = { voice: 'phone', note: 'mic', video: 'video' };
+    function fmtTs(ts) {
+      var d = new Date(ts);
+      var now = new Date();
+      var today = now.toDateString() === d.toDateString();
+      var yesterday = new Date(now - 86400000).toDateString() === d.toDateString();
+      var dateLabel = today ? 'Today' : yesterday ? 'Yesterday' : d.toLocaleDateString('en-IN', { day:'numeric', month:'short' });
+      var timeLabel = d.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', hour12: true });
+      return { dateLabel: dateLabel, timeLabel: timeLabel };
+    }
+    function fmtDur(s) { if (!s) return null; return Math.floor(s/60) + 'm ' + (s%60) + 's'; }
+    var grouped = [];
+    var seen = {};
+    combined.forEach(function(e) {
+      var t = fmtTs(e.ts);
+      if (!seen[t.dateLabel]) { seen[t.dateLabel] = true; grouped.push({ header: t.dateLabel, entries: [] }); }
+      grouped[grouped.length-1].entries.push({ entry: e, timeLabel: t.timeLabel });
+    });
+    return React.createElement('div', { style: { padding: '10px', display: 'flex', flexDirection: 'column', gap: 10, overflowY: 'auto' } },
+      React.createElement('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 } },
+        React.createElement('div', { style: { fontSize: 11, fontWeight: 800, color: '#f1f5f9' } }, 'Outreach History'),
+        React.createElement('div', { style: { fontSize: 9, fontWeight: 700, color: '#475569', background: 'rgba(255,255,255,0.04)', padding: '2px 8px', borderRadius: 20, border: '1px solid rgba(255,255,255,0.07)' } }, combined.length + ' interactions')
+      ),
+      combined.length === 0 && React.createElement('div', { style: { padding: '30px 0', textAlign: 'center', color: '#475569', fontSize: 10 } },
+        React.createElement(Ico, { n: 'clock', size: 22, cls: 'text-slate-700' }),
+        React.createElement('div', { style: { marginTop: 8 } }, 'No outreach history yet')
+      ),
+      grouped.map(function(group, gi) {
+        return React.createElement('div', { key: gi },
+          React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 } },
+            React.createElement('div', { style: { fontSize: 9, fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '.08em', whiteSpace: 'nowrap' } }, group.header),
+            React.createElement('div', { style: { flex: 1, height: 1, background: 'rgba(255,255,255,0.05)' } })
+          ),
+          group.entries.map(function(item, ii) {
+            var e = item.entry;
+            var col = typeColor[e.type] || '#6366f1';
+            var ic  = typeIcon[e.type]  || 'activity';
+            var dur = fmtDur(e.secs);
+            return React.createElement('div', { key: ii, style: { display: 'flex', gap: 8, padding: '8px 10px', borderRadius: 9, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', marginBottom: 5 } },
+              React.createElement('div', { style: { width: 28, height: 28, borderRadius: 8, background: col + '18', border: '1px solid ' + col + '33', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 } },
+                React.createElement(Ico, { n: ic, size: 11, sw: 2, style: { color: col } })
+              ),
+              React.createElement('div', { style: { flex: 1, minWidth: 0 } },
+                React.createElement('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 } },
+                  React.createElement('span', { style: { fontSize: 10, fontWeight: 800, color: '#e2e8f0' } }, e.label),
+                  React.createElement('span', { style: { fontSize: 8, fontWeight: 700, padding: '1px 6px', borderRadius: 10, background: e.status === 'Completed' || e.status === 'Sent' || e.status === 'Launched' ? 'rgba(52,211,153,0.1)' : 'rgba(99,102,241,0.1)', color: e.status === 'Completed' || e.status === 'Sent' || e.status === 'Launched' ? '#34d399' : '#a5b4fc' } }, e.status)
+                ),
+                React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: 5, marginBottom: e.preview ? 4 : 0 } },
+                  React.createElement('span', { style: { fontSize: 8, color: '#64748b' } }, item.timeLabel),
+                  dur && React.createElement('span', { style: { fontSize: 8, color: '#475569' } }, '· ' + dur)
+                ),
+                e.preview && React.createElement('div', { style: { fontSize: 8, color: '#64748b', lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, '"' + e.preview + '"')
+              )
+            );
+          })
+        );
+      })
+    );
+  }
+
   return /*#__PURE__*/React.createElement("aside", {
     style: {
-      width: 290,
-      minWidth: 290,
+      width: 380,
+      minWidth: 380,
       flexShrink: 0,
       display: 'flex',
       flexDirection: 'column',
-      borderLeft: '1px solid rgba(99,102,241,0.1)',
-      background: 'linear-gradient(180deg,#060920 0%,#030614 100%)',
+      background: 'linear-gradient(180deg,#07092a 0%,#030614 100%)',
       overflow: 'hidden'
     }
   }, /*#__PURE__*/React.createElement("div", {
@@ -2111,14 +2703,15 @@ function GeminiHub({
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      fontSize: 12,
+      fontSize: 16,
       fontWeight: 800,
-      color: '#f1f5f9',
-      letterSpacing: '-.01em'
+      color: '#e0e7ff',
+      letterSpacing: '-.02em',
+      textShadow: '0 0 18px rgba(99,102,241,0.28)'
     }
   }, "Gemini Intelligence Hub"), /*#__PURE__*/React.createElement("div", {
     style: {
-      fontSize: 8,
+      fontSize: 9,
       color: '#818cf8',
       fontWeight: 600
     }
@@ -2142,7 +2735,7 @@ function GeminiHub({
     }
   }), /*#__PURE__*/React.createElement("span", {
     style: {
-      fontSize: 7,
+      fontSize: 8,
       fontWeight: 700,
       color: '#34d399'
     }
@@ -2169,7 +2762,7 @@ function GeminiHub({
       justifyContent: 'center',
       fontWeight: 700,
       color: '#fff',
-      fontSize: 8
+      fontSize: 9
     }
   }, client.initials), /*#__PURE__*/React.createElement("div", {
     style: {
@@ -2178,7 +2771,7 @@ function GeminiHub({
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      fontSize: 10,
+      fontSize: 11,
       fontWeight: 700,
       color: '#f1f5f9',
       overflow: 'hidden',
@@ -2187,7 +2780,7 @@ function GeminiHub({
     }
   }, client.name), /*#__PURE__*/React.createElement("div", {
     style: {
-      fontSize: 8,
+      fontSize: 9,
       color: '#6366f1',
       fontWeight: 500
     }
@@ -2210,7 +2803,7 @@ function GeminiHub({
     cls: "text-slate-600"
   }), /*#__PURE__*/React.createElement("span", {
     style: {
-      fontSize: 9,
+      fontSize: 10,
       color: '#475569'
     }
   }, "Select a client from the table to activate")
@@ -2219,11 +2812,12 @@ function GeminiHub({
   /*#__PURE__*/React.createElement("div", {
     style: { overflowY: 'visible' }
   }, !client ? /*#__PURE__*/React.createElement("div", {
-    style: { padding: '24px 14px', textAlign: 'center', color: '#475569', fontSize: 10 }
+    style: { padding: '24px 14px', textAlign: 'center', color: '#475569', fontSize: 11 }
   }, "Select a client to begin") :
   hubTab === 'live' ? renderLiveTab() :
   hubTab === 'actions' ? renderActionsTab() :
   hubTab === 'compliance' ? renderComplianceTab() :
+  hubTab === 'history' ? renderHistoryTab() :
   renderBriefTab()
   )
   );
@@ -2269,7 +2863,7 @@ class ErrorBoundary extends React.Component {
         }
       }, 'Dashboard Error'), React.createElement('pre', {
         style: {
-          fontSize: 10,
+          fontSize: 11,
           color: '#64748b',
           maxWidth: 500,
           textAlign: 'left',
@@ -2290,43 +2884,111 @@ class ErrorBoundary extends React.Component {
 var AGENTSPACE_URL = 'https://vertexaisearch.cloud.google.com/home/cid/8fcae23b-c0aa-4178-8c8a-3a4ff97140ab?hl=en_US';
 
 function EnterpriseHub() {
+  var [hov, setHov] = useState(null);
+
   function launch() {
-    window.open(AGENTSPACE_URL, 'agentspace', 'width=1100,height=900,left=200,top=60,noopener');
+    window.open(AGENTSPACE_URL, '_blank', 'noopener');
   }
 
-  return /*#__PURE__*/React.createElement("div", {
-    style: { width: 290, minWidth: 290, flexShrink: 0, display: 'flex', flexDirection: 'column', borderTop: '1px solid rgba(16,185,129,0.12)', background: 'linear-gradient(180deg,#020c09 0%,#010608 100%)', overflow: 'hidden' }
+  var CAPS = [
+    {
+      icon: 'activity', label: 'Market Research',
+      desc: 'Live equity analysis, sector rotation, earnings comparisons, macro trends',
+      example: '"Compare HDFC Bank vs Kotak Q1 FY26 earnings"',
+      color: '#10b981', bg: 'rgba(16,185,129,0.07)', border: 'rgba(16,185,129,0.18)', hborder: 'rgba(16,185,129,0.4)'
+    },
+    {
+      icon: 'sparkles', label: 'Learning & Dev',
+      desc: 'SEBI / AMFI circulars, product certifications, regulatory change summaries',
+      example: '"Summarise latest SEBI NPS Tier-II circular"',
+      color: '#3b82f6', bg: 'rgba(59,130,246,0.07)', border: 'rgba(59,130,246,0.18)', hborder: 'rgba(59,130,246,0.4)'
+    },
+    {
+      icon: 'zap', label: 'Productivity',
+      desc: 'Draft client proposals, meeting notes, rebalancing letters, emails in seconds',
+      example: '"Draft rebalancing proposal for Amit Patel"',
+      color: '#8b5cf6', bg: 'rgba(139,92,246,0.07)', border: 'rgba(139,92,246,0.18)', hborder: 'rgba(139,92,246,0.4)'
+    },
+    {
+      icon: 'user', label: 'Chat with CRM',
+      desc: 'Query client history, call logs, pipeline stage, and action items by chat',
+      example: '"When did I last call Rajiv about DTAA?"',
+      color: '#f59e0b', bg: 'rgba(245,158,11,0.07)', border: 'rgba(245,158,11,0.18)', hborder: 'rgba(245,158,11,0.4)'
+    }
+  ];
+
+  return React.createElement("div", {
+    style: { width: 380, minWidth: 380, flexShrink: 0, display: 'flex', flexDirection: 'column', borderTop: '2px solid rgba(16,185,129,0.32)', background: 'linear-gradient(180deg,#020c09 0%,#010608 100%)', overflow: 'hidden' }
   },
-    /*#__PURE__*/React.createElement("div", {
+    /* ── Header ── */
+    React.createElement("div", {
       style: { padding: '10px 12px 8px', borderBottom: '1px solid rgba(16,185,129,0.08)', background: 'linear-gradient(180deg,rgba(16,185,129,0.06) 0%,transparent 100%)' }
     },
-      /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: 7 } },
-        /*#__PURE__*/React.createElement("div", { style: { padding: 6, borderRadius: 8, background: 'linear-gradient(135deg,rgba(16,185,129,.2),rgba(5,150,105,.2))', border: '1px solid rgba(16,185,129,0.22)' } },
-          /*#__PURE__*/React.createElement(Ico, { n: 'cpu', size: 11, sw: 2 })
+      React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: 7 } },
+        React.createElement("div", { style: { padding: 6, borderRadius: 8, background: 'linear-gradient(135deg,rgba(16,185,129,.2),rgba(5,150,105,.2))', border: '1px solid rgba(16,185,129,0.22)' } },
+          React.createElement(Ico, { n: 'cpu', size: 11, sw: 2 })
         ),
-        /*#__PURE__*/React.createElement("div", null,
-          /*#__PURE__*/React.createElement("div", { style: { fontSize: 11, fontWeight: 800, color: '#f1f5f9', letterSpacing: '-.01em' } }, "Gemini Enterprise Hub"),
-          /*#__PURE__*/React.createElement("div", { style: { fontSize: 7.5, color: '#34d399', fontWeight: 600 } }, "Activate your powers")
+        React.createElement("div", null,
+          React.createElement("div", { style: { fontSize: 16, fontWeight: 800, color: '#d1fae5', letterSpacing: '-.02em', textShadow: '0 0 18px rgba(16,185,129,0.28)' } }, "Gemini Enterprise Hub"),
+          React.createElement("div", { style: { fontSize: 8, color: '#34d399', fontWeight: 600 } }, "Rohan's AI-powered edge")
         )
       )
     ),
-    /*#__PURE__*/React.createElement("div", { style: { flex: 1, padding: '18px 14px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14 } },
-      /*#__PURE__*/React.createElement("div", { style: { width: 48, height: 48, borderRadius: 14, background: 'linear-gradient(135deg,#059669,#10b981)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 28px rgba(16,185,129,0.35)' } },
-        /*#__PURE__*/React.createElement(Ico, { n: 'cpu', size: 22, sw: 1.5 })
+
+    /* ── Body ── */
+    React.createElement("div", { style: { flex: 1, padding: '12px', display: 'flex', flexDirection: 'column', gap: 10, overflowY: 'auto' } },
+
+      /* Tagline */
+      React.createElement("div", { style: { fontSize: 9, color: '#475569', lineHeight: 1.6, paddingBottom: 2 } },
+        "Four ways Gemini makes Rohan 10× more effective — click any to launch."
       ),
-      /*#__PURE__*/React.createElement("div", { style: { textAlign: 'center' } },
-        /*#__PURE__*/React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: '#f1f5f9', marginBottom: 5 } }, "Your Agents are ready"),
-        /*#__PURE__*/React.createElement("div", { style: { fontSize: 8.5, color: '#64748b', lineHeight: 1.6 } }, "Access your organisation's AI agents, enterprise search, and intelligent workflows — all in one place.")
+
+      /* 2×2 capability grid */
+      React.createElement("div", { style: { flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr', gap: 8 } },
+        CAPS.map(function(cap, i) {
+          var isHov = hov === i;
+          return React.createElement("div", {
+            key: i,
+            onClick: launch,
+            onMouseEnter: function() { setHov(i); },
+            onMouseLeave: function() { setHov(null); },
+            style: {
+              padding: '10px', borderRadius: 10, cursor: 'pointer',
+              background: isHov ? cap.bg : 'rgba(255,255,255,0.02)',
+              border: '1px solid ' + (isHov ? cap.hborder : cap.border),
+              transition: 'all .15s', display: 'flex', flexDirection: 'column', gap: 6
+            }
+          },
+            /* Icon + label */
+            React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: 6 } },
+              React.createElement("div", {
+                style: { width: 22, height: 22, borderRadius: 6, background: cap.bg, border: '1px solid ' + cap.border, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: cap.color }
+              },
+                React.createElement(Ico, { n: cap.icon, size: 10, sw: 2, cls: '' })
+              ),
+              React.createElement("div", { style: { fontSize: 9, fontWeight: 700, color: '#f1f5f9', lineHeight: 1.2 } }, cap.label)
+            ),
+            /* Description */
+            React.createElement("div", { style: { fontSize: 8, color: '#64748b', lineHeight: 1.5 } }, cap.desc),
+            /* Example prompt chip */
+            React.createElement("div", {
+              style: { fontSize: 8, color: cap.color, background: cap.bg, border: '1px solid ' + cap.border, borderRadius: 5, padding: '3px 6px', lineHeight: 1.4, fontStyle: 'italic' }
+            }, cap.example)
+          );
+        })
       ),
-      /*#__PURE__*/React.createElement("button", {
+
+      /* Launch button */
+      React.createElement("button", {
         onClick: launch,
-        style: { display: 'flex', alignItems: 'center', gap: 7, padding: '9px 18px', borderRadius: 10, border: 'none', background: 'linear-gradient(135deg,#059669,#10b981)', color: '#fff', fontFamily: 'Inter,sans-serif', fontSize: 10, fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 16px rgba(16,185,129,0.3)', letterSpacing: '-.01em' }
+        style: { width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, padding: '9px', borderRadius: 10, border: 'none', background: 'linear-gradient(135deg,#059669,#10b981)', color: '#fff', fontFamily: 'Inter,sans-serif', fontSize: 11, fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 16px rgba(16,185,129,0.25)', letterSpacing: '-.01em', marginTop: 2 }
       },
-        /*#__PURE__*/React.createElement(Ico, { n: 'cpu', size: 11, sw: 2 }),
-        "Launch",
-        /*#__PURE__*/React.createElement(Ico, { n: 'chevRight', size: 10, sw: 2.5 })
+        React.createElement(Ico, { n: 'cpu', size: 10, sw: 2 }),
+        "Launch your Agents",
+        React.createElement(Ico, { n: 'chevRight', size: 9, sw: 2.5 })
       ),
-      /*#__PURE__*/React.createElement("div", { style: { fontSize: 7, color: '#334155', textAlign: 'center', lineHeight: 1.5 } }, "Opens in a new window", /*#__PURE__*/React.createElement("br", null), "Authenticated via your Google credentials")
+
+      React.createElement("div", { style: { fontSize: 8, color: '#1e293b', textAlign: 'center' } }, "Opens in a new window · Authenticated via Google")
     )
   );
 }
@@ -2372,7 +3034,9 @@ function App() {
   }, /*#__PURE__*/React.createElement("main", {
     style: {
       flex: 1,
+      height: '100%',
       display: 'flex',
+      minWidth: 0,
       overflow: 'hidden'
     }
   }, /*#__PURE__*/React.createElement(ClientList, {
@@ -2382,7 +3046,7 @@ function App() {
   }), /*#__PURE__*/React.createElement(PortfolioDetail, {
     client: client
   })), /*#__PURE__*/React.createElement("div", {
-    style: { display: 'flex', flexDirection: 'column', height: '100%', overflowY: 'auto', borderLeft: '1px solid rgba(255,255,255,0.04)', gap: 72 }
+    style: { display: 'flex', flexDirection: 'column', height: '100%', overflowY: 'auto', borderLeft: '2px solid rgba(99,102,241,0.28)', boxShadow: '-6px 0 32px rgba(99,102,241,0.06)', gap: 0 }
   }, /*#__PURE__*/React.createElement(EnterpriseHub, null), /*#__PURE__*/React.createElement(GeminiHub, {
     client: client,
     activeCh: activeCh

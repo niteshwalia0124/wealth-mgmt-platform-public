@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Priya — Cymbal Wealth Management Video Call</title>
+<title>Rohan — Cymbal Wealth Video Advisory</title>
+<!-- Proxy interceptor must load FIRST — patches window.WebSocket before SDK loads -->
+<script src="/static/vendor/vertex-ai-proxy-interceptor.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; background: #04060f; font-family: 'Inter', system-ui, sans-serif; color: #e2e8f0; overflow: hidden; }
 
-.call-wrap {
-  display: flex; height: 100vh;
-}
+.call-wrap { display: flex; height: 100vh; }
 
 /* ── Avatar panel ── */
 .avatar-panel {
@@ -20,44 +20,57 @@ html, body { height: 100%; background: #04060f; font-family: 'Inter', system-ui,
 }
 
 #avatarVideo {
-  width: 100%; height: 100%; object-fit: cover;
-  border-radius: 0;
+  max-height: 100%; width: auto;
+  object-fit: contain;
+  display: none;
 }
 
-/* Fallback when video hasn't started yet */
+/* Placeholder */
 .avatar-placeholder {
   position: absolute; inset: 0;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 16px;
   background: radial-gradient(ellipse at 50% 40%, #0d1b3a 0%, #04060f 70%);
+  transition: opacity .5s;
 }
 .avatar-initial {
   width: 120px; height: 120px; border-radius: 50%;
   background: linear-gradient(135deg, #1a56db, #6366f1);
   display: flex; align-items: center; justify-content: center;
   font-size: 48px; font-weight: 800; color: white;
-  box-shadow: 0 0 60px rgba(99,102,241,0.3);
+  box-shadow: 0 0 60px rgba(99,102,241,0.35);
+  position: relative; z-index: 1;
 }
-.avatar-placeholder-name { font-size: 22px; font-weight: 600; color: white; }
-.avatar-placeholder-sub  { font-size: 13px; color: #64748b; }
-
-/* Connecting spinner */
 .connecting-ring {
+  position: absolute;
   width: 140px; height: 140px; border-radius: 50%;
   border: 3px solid rgba(99,102,241,0.15);
   border-top-color: #6366f1;
   animation: spin 1.1s linear infinite;
-  position: absolute;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+.avatar-placeholder-name { font-size: 22px; font-weight: 700; color: white; }
+.avatar-placeholder-sub  { font-size: 13px; color: #64748b; }
 
-/* Name tag overlay */
+/* Status pill */
+.status-pill {
+  position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+  background: rgba(0,0,0,0.6); backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.1); border-radius: 20px;
+  padding: 6px 16px; font-size: 12px; font-weight: 500; color: #94a3b8;
+  display: flex; align-items: center; gap: 8px;
+  transition: all .3s; white-space: nowrap;
+}
+.status-pill.live  { border-color: rgba(16,185,129,0.3); color: #34d399; }
+.status-pill.ended { border-color: rgba(239,68,68,0.3);  color: #fca5a5; }
+
+/* Name tag */
 .name-tag {
   position: absolute; bottom: 90px; left: 24px;
   background: rgba(0,0,0,0.55); backdrop-filter: blur(12px);
   border: 1px solid rgba(255,255,255,0.08);
   border-radius: 10px; padding: 8px 14px;
-  display: flex; align-items: center; gap: 10px;
+  display: none; align-items: center; gap: 10px;
 }
 .name-tag-dot {
   width: 8px; height: 8px; border-radius: 50%; background: #10b981;
@@ -67,19 +80,7 @@ html, body { height: 100%; background: #04060f; font-family: 'Inter', system-ui,
 .name-tag-text { font-size: 13px; font-weight: 600; color: white; }
 .name-tag-sub  { font-size: 11px; color: #94a3b8; margin-top: 1px; }
 
-/* Status pill */
-.status-pill {
-  position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
-  background: rgba(0,0,0,0.6); backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.1); border-radius: 20px;
-  padding: 6px 16px; font-size: 12px; font-weight: 500; color: #94a3b8;
-  display: flex; align-items: center; gap: 8px;
-  transition: all .3s;
-}
-.status-pill.live { border-color: rgba(16,185,129,0.3); color: #34d399; }
-.status-pill.ended { border-color: rgba(239,68,68,0.3); color: #fca5a5; }
-
-/* ── Controls bar ── */
+/* Controls */
 .controls {
   position: absolute; bottom: 0; left: 0; right: 0;
   height: 72px;
@@ -100,13 +101,23 @@ html, body { height: 100%; background: #04060f; font-family: 'Inter', system-ui,
 .btn-mic.muted { background: rgba(239,68,68,0.18); color: #fca5a5; border-color: rgba(239,68,68,.4); }
 .btn-end {
   background: #ef4444; color: white; width: 56px; height: 56px;
-  box-shadow: 0 4px 20px rgba(239,68,68,0.4);
+  box-shadow: 0 4px 20px rgba(239,68,68,0.4); border: none; cursor: pointer;
+  border-radius: 50%; font-size: 20px; display: flex; align-items: center; justify-content: center;
 }
-.btn-end:hover { background: #dc2626; }
+.btn-end:hover { background: #dc2626; transform: scale(1.05); }
+.btn-share { background: rgba(255,255,255,0.12); color: white; border: 1px solid rgba(255,255,255,0.2); }
+.btn-share.active { background: rgba(59,130,246,0.25); border-color: rgba(59,130,246,0.5); color: #93c5fd; }
+.btn-share:disabled { opacity: 0.35; cursor: default; }
+.btn-camera { background: rgba(255,255,255,0.12); color: white; border: 1px solid rgba(255,255,255,0.2); }
+.btn-camera:disabled { opacity: 0.35; cursor: default; }
+
+/* Button label strip */
+.ctrl-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.ctrl-lbl { font-size: 9px; color: rgba(255,255,255,0.4); font-weight: 500; letter-spacing: .03em; white-space: nowrap; }
 
 /* ── Transcript panel ── */
 .transcript-panel {
-  width: 320px; min-width: 320px;
+  width: 340px; min-width: 340px;
   background: #080c1a; border-left: 1px solid rgba(255,255,255,0.06);
   display: flex; flex-direction: column;
 }
@@ -115,40 +126,83 @@ html, body { height: 100%; background: #04060f; font-family: 'Inter', system-ui,
   border-bottom: 1px solid rgba(255,255,255,0.06);
   display: flex; align-items: center; justify-content: space-between;
 }
-.tx-title { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #475569; }
-.tx-investor { font-size: 13px; font-weight: 600; color: white; margin-top: 2px; }
-.tx-fund { font-size: 11px; color: #475569; margin-top: 2px; }
+.tx-title { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #475569; }
+.tx-name  { font-size: 14px; font-weight: 700; color: white; margin-top: 3px; }
+.tx-role  { font-size: 11px; color: #475569; margin-top: 2px; }
+.tx-badge {
+  padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700;
+  background: rgba(99,102,241,0.12); color: #818cf8; border: 1px solid rgba(99,102,241,0.2);
+  white-space: nowrap; align-self: flex-start; margin-top: 2px;
+}
 
-.tx-body { flex: 1; overflow-y: auto; padding: 14px 14px; display: flex; flex-direction: column; gap: 10px; }
+.tx-body { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
 .tx-body::-webkit-scrollbar { width: 3px; }
 .tx-body::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.25); border-radius: 3px; }
 
-.bubble { max-width: 88%; padding: 9px 12px; border-radius: 12px; font-size: 12px; line-height: 1.55; }
+.bubble { max-width: 90%; padding: 9px 12px; border-radius: 12px; font-size: 12px; line-height: 1.6; }
 .bubble-lbl { font-size: 10px; font-weight: 600; opacity: .55; margin-bottom: 4px; letter-spacing: .04em; }
-.bubble-priya {
+.bubble-rohan {
   align-self: flex-start;
   background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,.2);
   border-radius: 3px 12px 12px 12px; color: #c7d2fe;
 }
-.bubble-investor {
+.bubble-user {
   align-self: flex-end;
   background: rgba(20,32,65,0.8); border: 1px solid rgba(255,255,255,0.07);
   border-radius: 12px 3px 12px 12px; color: #e2e8f0;
+}
+.bubble-live {
+  align-self: flex-start;
+  background: rgba(16,185,129,0.07); border: 1px solid rgba(16,185,129,0.15);
+  border-radius: 3px 12px 12px 12px; color: #6ee7b7;
+  font-style: italic;
 }
 .tx-empty {
   text-align: center; color: #334155; font-size: 12px;
   padding: 32px 16px; line-height: 1.7;
 }
 
+/* Live typing indicator */
+.live-typing { display: flex; align-items: center; gap: 6px; padding: 6px 10px; }
+.typing-dot {
+  width: 5px; height: 5px; border-radius: 50%; background: #6366f1;
+  animation: blink 1.2s infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: .2s; }
+.typing-dot:nth-child(3) { animation-delay: .4s; }
+@keyframes blink { 0%,80%,100%{opacity:.2} 40%{opacity:1} }
+
+/* Text input */
+.tx-input-row {
+  padding: 10px 14px; border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex; gap: 8px; align-items: center;
+}
+.tx-input {
+  flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px; padding: 8px 10px; font-size: 12px; color: #e2e8f0;
+  font-family: inherit; outline: none; resize: none;
+}
+.tx-input:focus { border-color: rgba(99,102,241,0.4); }
+.tx-input::placeholder { color: #334155; }
+.tx-send {
+  width: 36px; height: 36px; border-radius: 8px; border: none; cursor: pointer;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: white; font-size: 14px; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: opacity .18s;
+}
+.tx-send:disabled { opacity: 0.4; cursor: default; }
+
 .tx-footer {
-  padding: 12px 14px; border-top: 1px solid rgba(255,255,255,0.06);
-  font-size: 10px; color: #334155; text-align: center;
+  padding: 8px 14px; font-size: 10px; color: #334155; text-align: center;
+  border-top: 1px solid rgba(255,255,255,0.04);
 }
 
-/* MJPEG canvas */
-#avatarCanvas {
-  position: absolute; inset: 0; width: 100%; height: 100%;
-  object-fit: cover; display: none;
+/* Error banner */
+.error-banner {
+  position: absolute; top: 60px; left: 50%; transform: translateX(-50%);
+  background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3);
+  border-radius: 8px; padding: 8px 16px; font-size: 12px; color: #fca5a5;
+  display: none; white-space: nowrap; z-index: 10;
 }
 </style>
 </head>
@@ -157,280 +211,674 @@ html, body { height: 100%; background: #04060f; font-family: 'Inter', system-ui,
 
   <!-- ── Avatar panel ── -->
   <div class="avatar-panel" id="avatarPanel">
+    <video id="avatarVideo" autoplay playsinline></video>
 
-    <!-- Video element (for H.264 / MSE stream) -->
-    <video id="avatarVideo" autoplay playsinline muted style="display:none"></video>
-
-    <!-- Canvas element (for JPEG frame-by-frame rendering) -->
-    <canvas id="avatarCanvas"></canvas>
-
-    <!-- Placeholder shown while connecting -->
     <div class="avatar-placeholder" id="placeholder">
-      <div style="position:relative;width:120px;height:120px;display:flex;align-items:center;justify-content:center">
+      <div style="position:relative;width:140px;height:140px;display:flex;align-items:center;justify-content:center">
         <div class="connecting-ring" id="connectRing"></div>
-        <div class="avatar-initial">P</div>
+        <div class="avatar-initial">R</div>
       </div>
-      <div class="avatar-placeholder-name">Priya</div>
-      <div class="avatar-placeholder-sub" id="statusText">Connecting…</div>
+      <div class="avatar-placeholder-name">Rohan Sharma</div>
+      <div class="avatar-placeholder-sub" id="statusText">Tap to start session</div>
     </div>
 
-    <!-- Status pill -->
     <div class="status-pill" id="statusPill">
       <span id="pillDot">⏳</span>
-      <span id="pillText">Connecting to Priya</span>
+      <span id="pillText">Ready to connect</span>
     </div>
 
-    <!-- Name tag (shown once live) -->
-    <div class="name-tag" id="nameTag" style="display:none">
+    <div class="name-tag" id="nameTag">
+      <div class="name-tag-dot"></div>
       <div>
-        <div class="name-tag-dot"></div>
-      </div>
-      <div>
-        <div class="name-tag-text">Priya · Cymbal Wealth Management</div>
+        <div class="name-tag-text">Rohan Sharma · Cymbal Wealth</div>
         <div class="name-tag-sub" id="callTimer">00:00</div>
       </div>
     </div>
 
-    <!-- Controls -->
-    <div class="controls">
-      <button class="ctrl-btn btn-mic" id="micBtn" onclick="toggleMic()" title="Mute/Unmute">🎙️</button>
-      <button class="ctrl-btn btn-end" onclick="endCall()" title="End Call">📵</button>
-    </div>
+    <div class="error-banner" id="errorBanner"></div>
 
+    <div class="controls">
+      <div class="ctrl-wrap">
+        <button class="ctrl-btn btn-share" id="shareBtn" onclick="toggleScreenShare()" title="Share Screen" disabled>🖥️</button>
+        <span class="ctrl-lbl">Share</span>
+      </div>
+      <div class="ctrl-wrap" id="cameraWrap">
+        <button class="ctrl-btn btn-camera" id="cameraBtn" onclick="toggleCamera()" title="Switch Camera" disabled>📷</button>
+        <span class="ctrl-lbl">Camera</span>
+      </div>
+      <div class="ctrl-wrap">
+        <button class="ctrl-btn btn-mic" id="micBtn" onclick="toggleMic()" title="Mute/Unmute">🎙️</button>
+        <span class="ctrl-lbl">Mute</span>
+      </div>
+      <div class="ctrl-wrap">
+        <button class="ctrl-btn btn-end" id="connectBtn" onclick="handleConnectBtn()" title="Connect">▶️</button>
+        <span class="ctrl-lbl" id="connectLbl">Connect</span>
+      </div>
+    </div>
   </div>
 
   <!-- ── Transcript panel ── -->
   <div class="transcript-panel">
     <div class="tx-header">
-      <div>
-        <div class="tx-title">Live Transcript</div>
-        <div class="tx-investor" id="txInvestor">—</div>
-        <div class="tx-fund" id="txFund">—</div>
+      <div style="flex:1">
+        <div class="tx-title">Annual Portfolio Review</div>
+        <div class="tx-name">Rohan Sharma</div>
+        <div class="tx-role">Senior Wealth Advisor · Cymbal Wealth Management</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+        <div class="tx-badge">AI Avatar</div>
+        <div id="clientBadge" style="display:none;font-size:10px;color:#94a3b8;font-weight:600"></div>
       </div>
     </div>
     <div class="tx-body" id="txBody">
-      <div class="tx-empty">Transcript will appear here as the conversation progresses.</div>
+      <div class="tx-empty" id="txEmpty">
+        Connect to begin your<br>wealth advisory session with Rohan.
+      </div>
     </div>
-    <div class="tx-footer">Cymbal Wealth Management · AI-assisted advisory call</div>
+    <div class="tx-input-row">
+      <input class="tx-input" id="txInput" type="text" placeholder="Type a message…" onkeydown="onInputKey(event)" disabled />
+      <button class="tx-send" id="txSend" onclick="sendText()" disabled>↑</button>
+    </div>
+    <div class="tx-footer">Cymbal Wealth Management · Gemini Avatar Session</div>
   </div>
 
 </div>
 
-<script>
-// ── Config from URL params ─────────────────────────────────────────────────
-const params   = new URLSearchParams(location.search);
-const CALL_ID  = params.get("call_id") || "";
-const BROKER   = params.get("broker")  || location.origin.replace(/^http/, "ws");
-const INVESTOR = params.get("investor") || "Investor";
-const FUND     = params.get("fund")     || "";
+<script type="module">
+import { GoogleGenAI } from 'https://esm.sh/@google/genai@2.7.0';
 
-document.getElementById("txInvestor").textContent = INVESTOR;
-document.getElementById("txFund").textContent = FUND;
+// ── Config ─────────────────────────────────────────────────────────────────
+const MODEL = 'publishers/google/models/gemini-3.1-flash-live-preview-04-2026';
+
+function buildSystemInstruction(client) {
+  const clientName    = client ? client.name        : 'the client';
+  const clientSalut   = client ? client.salutation  : 'Sir/Ma\'am';
+
+  const BASE_PERSONA = `You are Rohan's AI Avatar — the digital assistant of Rohan Sharma, Senior Wealth Advisor at Cymbal Wealth Management India.
+
+⚠️ CLIENT NAME — ABSOLUTE RULE
+The client you are speaking to RIGHT NOW is: ${clientName}.
+You MUST address them ONLY as "${clientSalut}".
+NEVER use any other name, surname, or salutation. Not "Mr. Kumar", not "Sir", not "Ma'am" — ONLY "${clientSalut}".
+If you are unsure, say "${clientSalut}" and nothing else. This rule overrides everything.
+
+IDENTITY & TONE
+- Introduce yourself as: "Hi, I'm Rohan's AI Avatar from Cymbal Wealth Management"
+- Warm, professional, respectful — carry Rohan's expertise with confidence
+- Use "ji" naturally: "${clientSalut} ji"
+- Indian number formatting: ₹38.4 Crore, ₹2.5 Lakh — never "38.4M" or "2.5L"
+- Deep knowledge of Indian markets, SEBI regulations, 80C, LTCG, STCG
+
+LANGUAGE
+- Always start in English and stay in English unless the client explicitly speaks in another language
+- If client switches to Hindi, Tamil, Gujarati, Marathi, Bengali, Telugu, Kannada, Malayalam or Punjabi → switch immediately and continue in that language
+
+SCOPE — CRITICAL
+- Only discuss information from the portfolio brief below
+- If asked something outside the brief: "That's a good point — I'll make a note for Rohan to address that personally"
+
+CONVERSATION DISCIPLINE
+- Present ONE talking point at a time — say it, listen, then proceed
+- 2–4 sentences per turn unless walking through a calculation
+- Answer questions fully before moving to the next point
+
+WHEN THE CLIENT WANTS TO END THE CALL
+If the client says "I'll talk later", "I need to go", "let's continue another time", "speak to you later", or any similar farewell:
+Say: "Of course, ${clientSalut} ji! It was a pleasure speaking with you today. I'll share a summary of our discussion with Rohan, and he will follow up with you shortly. Please feel free to reach out anytime. Have a wonderful day!"
+Do NOT say "I'll let Rohan know" in this situation — that sounds like a complaint escalation, not a warm goodbye.
+
+WHEN THE CLIENT ASKS TO SPEAK TO ROHAN DIRECTLY
+Say: "Absolutely, ${clientSalut} ji — I completely understand. I'll inform Rohan that you'd like to connect with him personally. He will reach out to schedule a call at a time that suits you. Is there anything specific you'd like me to pass on to him?"
+
+RULES
+- Never process, confirm, or promise any transaction
+- Never collect account numbers, OTPs, PAN, or Aadhaar
+- Never claim to be the human Rohan or imply a physical meeting
+- Always frame Rohan as a real person who will follow up personally
+
+CLOSING (when conversation wraps up naturally)
+Say: "Thank you so much for your time today, ${clientSalut} ji. I'll send Rohan a full summary along with a written proposal within 24 hours. Would you like me to also request a personal call with Rohan to finalise the plan?"`;
+
+  if (!client) {
+    return BASE_PERSONA + `\n\nOPENING: Greet the client warmly and introduce yourself.`;
+  }
+
+  const p = client.portfolio;
+  const rawGap = (p.ytdReturn - p.benchmarkReturn).toFixed(1);
+  const gapDir = rawGap >= 0 ? `ahead of benchmark by ${Math.abs(rawGap)}pp` : `trailing benchmark by ${Math.abs(rawGap)}pp`;
+  const topDrifts = p.sectors
+    .map(s => ({ ...s, drift: s.pct - s.model }))
+    .sort((a, b) => Math.abs(b.drift) - Math.abs(a.drift))
+    .slice(0, 3)
+    .map(s => `${s.name} ${s.pct}% vs model ${s.model}% (${s.drift > 0 ? '+' : ''}${s.drift}pp)`)
+    .join('; ');
+  const holdingsList = p.holdings.map(h => `${h.name} (${h.pct}%)`).join(', ');
+  const talkingPts = p.talkingPoints.map((t, i) => `${i + 1}. ${t}`).join('\n');
+
+  return `${BASE_PERSONA}
+
+---
+
+CLIENT BRIEF FOR THIS CALL
+Client: ${client.name} — address as "${client.salutation}" or "${client.salutation} ji" — NO OTHER NAME
+Age: ${client.age} | Location: ${client.loc} | Risk Profile: ${client.risk}
+AUM: ${client.aum} | Net Worth: ${client.nw}
+
+PORTFOLIO SNAPSHOT
+- YTD Return: ${p.ytdReturn}% vs Model ${p.benchmarkReturn}% → ${gapDir}
+- Portfolio Health Score: ${p.healthScore}/100
+- Risk Score: ${p.riskScore}/10
+- Top Sector Drifts: ${topDrifts}
+- Top Holdings: ${holdingsList}
+
+PORTFOLIO INTELLIGENCE
+${p.aiInsight}
+
+TALKING POINTS — present ONE AT A TIME in this order:
+${talkingPts}
+
+YOUR OPENING (say exactly this):
+"Good day, ${client.salutation} ji! I'm Rohan's AI Avatar from Cymbal Wealth Management. I've been reviewing your portfolio ahead of today's annual review — your corpus stands at ${client.aum} and I have some important observations I'd like to walk you through. Shall we get started?"`;
+}
+
+let CLIENT_DATA = null;
+let SYSTEM_INSTRUCTION = buildSystemInstruction(null);
 
 // ── State ──────────────────────────────────────────────────────────────────
-let ws = null;
+let session = null;
 let micStream = null;
-let audioProcessor = null;
-let audioCtx = null;
+let inputAudioCtx = null;
+let scriptProcessor = null;
+let mediaSourceNode = null;
 let muted = false;
+let connected = false;
+let connecting = false;
+let setupComplete = false;
+let agentTalking = false;
+let hasVideo = false;
 let callStartMs = null;
 let timerInterval = null;
 let transcriptEmpty = true;
+let currentRohanText = '';
+let currentUserText = '';
 
-// ── Boot ───────────────────────────────────────────────────────────────────
-(async () => {
-  await startMic();
-  connectWs();
+// Screen share state
+let screenStream = null;
+let screenInterval = null;
+// Camera state
+let cameraFacing = 'user';
+// Desktop-only: hide camera toggle on mobile
+if (window.innerWidth < 768) {
+  const cw = document.getElementById('cameraWrap');
+  if (cw) cw.style.display = 'none';
+}
+
+// MSE video state
+let mseObj = null;
+let sourceBuffer = null;
+const videoQueue = [];
+let cachedInitSegment = null;
+let animFrame = null;
+
+const videoEl = document.getElementById('avatarVideo');
+
+// ── Client context init ────────────────────────────────────────────────────
+(async function initClientContext() {
+  const params = new URLSearchParams(window.location.search);
+  const clientId = params.get('client');
+  if (!clientId) return;
+  try {
+    const res = await fetch(`/api/wealth/client/${clientId}/portfolio`);
+    if (!res.ok) return;
+    CLIENT_DATA = await res.json();
+    SYSTEM_INSTRUCTION = buildSystemInstruction(CLIENT_DATA);
+    // Update header badge
+    const badge = document.getElementById('clientBadge');
+    if (badge) {
+      badge.textContent = `${CLIENT_DATA.name} · ${CLIENT_DATA.aum}`;
+      badge.style.display = 'block';
+    }
+  } catch (e) {
+    console.warn('Could not load client portfolio:', e);
+  }
 })();
 
-// ── Microphone ─────────────────────────────────────────────────────────────
-async function startMic() {
-  try {
-    micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-    audioCtx = new AudioContext({ sampleRate: 16000 });
-    const source = audioCtx.createMediaStreamSource(micStream);
-    await audioCtx.audioWorklet.addModule(URL.createObjectURL(new Blob([`
-      class PCMProcessor extends AudioWorkletProcessor {
-        process(inputs) {
-          const ch = inputs[0][0];
-          if (!ch) return true;
-          const pcm = new Int16Array(ch.length);
-          for (let i = 0; i < ch.length; i++)
-            pcm[i] = Math.max(-32768, Math.min(32767, ch[i] * 32768));
-          this.port.postMessage(pcm.buffer, [pcm.buffer]);
-          return true;
+// ── MediaSource setup ──────────────────────────────────────────────────────
+function initMediaSource() {
+  if (mseObj) return;
+  const ms = new MediaSource();
+  mseObj = ms;
+  videoEl.src = URL.createObjectURL(ms);
+
+  ms.addEventListener('sourceopen', () => {
+    try {
+      const type = 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"';
+      const sb = MediaSource.isTypeSupported(type)
+        ? ms.addSourceBuffer(type)
+        : ms.addSourceBuffer('video/mp4');
+      sb.mode = 'sequence';
+      sourceBuffer = sb;
+
+      if (cachedInitSegment && videoQueue[0] !== cachedInitSegment) {
+        videoQueue.unshift(cachedInitSegment);
+      }
+
+      flushVideoQueue();
+
+      sb.addEventListener('updateend', () => {
+        if (videoEl.paused) videoEl.play().catch(() => {});
+
+        if (ms.readyState === 'open' && videoEl.buffered.length > 0) {
+          try {
+            const end = videoEl.buffered.end(videoEl.buffered.length - 1);
+            ms.setLiveSeekableRange(0, end);
+          } catch (e) {}
         }
-      }
-      registerProcessor('pcm-proc', PCMProcessor);
-    `], { type: 'application/javascript' })));
-    audioProcessor = new AudioWorkletNode(audioCtx, 'pcm-proc');
-    audioProcessor.port.onmessage = (e) => {
-      if (ws && ws.readyState === WebSocket.OPEN && !muted) {
-        ws.send(e.data);
-      }
-    };
-    source.connect(audioProcessor);
+
+        // Trim old buffer
+        if (!sb.updating && videoEl.currentTime > 6 && videoEl.buffered.length > 0) {
+          try {
+            const start = videoEl.buffered.start(0);
+            const trimTo = videoEl.currentTime - 5;
+            if (trimTo > start) { sb.remove(start, trimTo); return; }
+          } catch (e) {}
+        }
+
+        flushVideoQueue();
+      });
+    } catch (e) {
+      showError('Video init failed: ' + e.message);
+    }
+  });
+}
+
+function flushVideoQueue() {
+  if (!sourceBuffer || sourceBuffer.updating || videoQueue.length === 0) return;
+  const chunk = videoQueue.shift();
+  if (chunk) { try { sourceBuffer.appendBuffer(chunk); } catch (e) {} }
+}
+
+function appendVideoChunk(arrayBuffer) {
+  if (!cachedInitSegment) cachedInitSegment = arrayBuffer;
+  initMediaSource();
+  if (sourceBuffer && !sourceBuffer.updating && videoQueue.length === 0) {
+    try { sourceBuffer.appendBuffer(arrayBuffer); }
+    catch (e) {
+      if (e.name === 'QuotaExceededError') {
+        try {
+          const trimTo = videoEl.currentTime - 3;
+          if (trimTo > 0 && !sourceBuffer.updating) sourceBuffer.remove(0, trimTo);
+          videoQueue.push(arrayBuffer);
+        } catch (_) {}
+      } else if (e.name === 'InvalidStateError') {
+        mseObj = null; sourceBuffer = null; videoQueue.length = 0;
+      } else { videoQueue.push(arrayBuffer); }
+    }
+  } else { videoQueue.push(arrayBuffer); }
+}
+
+// Playback rate control loop
+function monitorLoop() {
+  if (videoEl.readyState >= 2 && !videoEl.paused && videoEl.buffered.length > 0) {
+    const bufferedEnd = videoEl.buffered.end(videoEl.buffered.length - 1);
+    const ahead = bufferedEnd - videoEl.currentTime;
+    if (agentTalking) {
+      // Never seek or change rate mid-sentence — let it play naturally
+      videoEl.playbackRate = 1.0;
+    } else {
+      if (ahead > 2.0) { videoEl.currentTime = bufferedEnd - 0.05; videoEl.playbackRate = 1.0; }
+      else if (ahead > 0.4) { videoEl.playbackRate = Math.min(1.2, 1.0 + ahead * 2); }
+      else { videoEl.playbackRate = 1.0; }
+    }
+  }
+  animFrame = requestAnimationFrame(monitorLoop);
+}
+
+// ── Decode base64 → ArrayBuffer ────────────────────────────────────────────
+function b64ToBuffer(b64) {
+  const bin = atob(b64);
+  const buf = new ArrayBuffer(bin.length);
+  const view = new Uint8Array(buf);
+  for (let i = 0; i < bin.length; i++) view[i] = bin.charCodeAt(i);
+  return buf;
+}
+
+// ── Connect ────────────────────────────────────────────────────────────────
+async function connect() {
+  if (connected || connecting) return;
+  connecting = true;
+  setStatus('Connecting…', false);
+  hideError();
+
+  try {
+    // Request mic
+    micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+    if (muted) micStream.getAudioTracks().forEach(t => { t.enabled = false; });
+
+    inputAudioCtx = new AudioContext({ sampleRate: 16000 });
+
+    // Start monitoring loop
+    if (animFrame) cancelAnimationFrame(animFrame);
+    monitorLoop();
+
+    // GoogleGenAI with vertexai:true — WebSocket will be intercepted by the proxy shim
+    const ai = new GoogleGenAI({ apiKey: 'browser-auth-via-proxy', vertexai: true });
+
+    session = await ai.live.connect({
+      model: MODEL,
+      config: {
+        avatarConfig: { avatarName: 'Sam' },
+        responseModalities: ['VIDEO'],
+        speechConfig: {
+          languageCode: 'en-IN',
+          voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Puck' } },
+        },
+        systemInstruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
+        inputAudioTranscription: {},
+        outputAudioTranscription: {},
+      },
+      callbacks: {
+        onopen: () => {
+          connected = true;
+          connecting = false;
+          setStatus('Session open — waiting for Rohan…', false);
+          startAudioInput();
+          document.getElementById('shareBtn').disabled = false;
+          document.getElementById('cameraBtn').disabled = false;
+          document.getElementById('connectLbl').textContent = 'End';
+        },
+        onmessage: (msg) => handleMessage(msg),
+        onerror: () => { showError('Connection error'); disconnect(); },
+        onclose: () => { if (connected) disconnect(); },
+      },
+    });
   } catch (err) {
-    setStatus(`Mic error: ${err.message}`, false);
+    connecting = false;
+    showError('Failed to connect: ' + err.message);
+    setStatus('Connection failed', true);
+    document.getElementById('connectBtn').textContent = '▶️';
   }
 }
 
-function toggleMic() {
-  muted = !muted;
-  const btn = document.getElementById("micBtn");
-  btn.textContent = muted ? "🔇" : "🎙️";
-  btn.classList.toggle("muted", muted);
+// ── Audio input ────────────────────────────────────────────────────────────
+function startAudioInput() {
+  if (!inputAudioCtx || !micStream || scriptProcessor) return;
+
+  const source = inputAudioCtx.createMediaStreamSource(micStream);
+  const proc = inputAudioCtx.createScriptProcessor(4096, 1, 1);
+
+  proc.onaudioprocess = (e) => {
+    if (!setupComplete || !session) return;
+    const data = e.inputBuffer.getChannelData(0);
+    const pcm16 = new Int16Array(data.length);
+    for (let i = 0; i < data.length; i++)
+      pcm16[i] = Math.max(-32768, Math.min(32767, data[i] * 32768));
+    const bytes = new Uint8Array(pcm16.buffer);
+    let binary = '';
+    for (let j = 0; j < bytes.byteLength; j++) binary += String.fromCharCode(bytes[j]);
+    try { session.sendRealtimeInput({ audio: { data: btoa(binary), mimeType: 'audio/pcm;rate=16000' } }); } catch (_) {}
+  };
+
+  source.connect(proc);
+  proc.connect(inputAudioCtx.destination);
+  mediaSourceNode = source;
+  scriptProcessor = proc;
 }
 
-// ── WebSocket to broker ────────────────────────────────────────────────────
-function connectWs() {
-  const brokerWs = BROKER.startsWith("http")
-    ? BROKER.replace(/^http/, "ws")
-    : BROKER;
-  const url = `${brokerWs}/video/${CALL_ID}`;
-  setStatus("Connecting to Priya…", false);
+// ── Stall recovery ─────────────────────────────────────────────────────────
+videoEl.addEventListener('stalled', () => { if (connected) videoEl.play().catch(() => {}); });
+videoEl.addEventListener('waiting', () => { if (connected) videoEl.play().catch(() => {}); });
 
-  ws = new WebSocket(url);
-  ws.binaryType = "arraybuffer";
-
-  ws.onopen = () => {
-    setStatus("Connected — waiting for Priya…", false);
-  };
-
-  ws.onmessage = (evt) => {
-    if (typeof evt.data === "string") {
-      handleJsonMsg(JSON.parse(evt.data));
-    } else {
-      handleVideoChunk(evt.data);
-    }
-  };
-
-  ws.onclose = () => {
-    setStatus("Call ended", true);
-    document.getElementById("statusPill").className = "status-pill ended";
-    stopTimer();
-  };
-
-  ws.onerror = (e) => {
-    setStatus("Connection error", true);
-  };
-}
-
-// ── Video rendering ────────────────────────────────────────────────────────
-const canvas  = document.getElementById("avatarCanvas");
-const ctx2d   = canvas.getContext("2d");
-let   gotVideo = false;
-
-function handleVideoChunk(buffer) {
-  const bytes = new Uint8Array(buffer);
-
-  // JPEG magic bytes: 0xFF 0xD8
-  if (bytes[0] === 0xFF && bytes[1] === 0xD8) {
-    renderJpegFrame(buffer);
+// ── Screen share ───────────────────────────────────────────────────────────
+async function toggleScreenShare() {
+  const btn = document.getElementById('shareBtn');
+  if (screenStream) {
+    screenStream.getTracks().forEach(t => t.stop());
+    screenStream = null;
+    clearInterval(screenInterval);
+    screenInterval = null;
+    btn.classList.remove('active');
     return;
   }
-
-  // Try as generic video via <video> + MSE (H.264 / VP8)
-  renderVideoChunk(buffer);
-}
-
-// MJPEG path — each chunk is a complete JPEG frame
-function renderJpegFrame(buffer) {
-  showCanvas();
-  const blob = new Blob([buffer], { type: "image/jpeg" });
-  const url  = URL.createObjectURL(blob);
-  const img  = new Image();
-  img.onload = () => {
-    canvas.width  = img.naturalWidth;
-    canvas.height = img.naturalHeight;
-    ctx2d.drawImage(img, 0, 0);
-    URL.revokeObjectURL(url);
-    onFirstVideo();
-  };
-  img.src = url;
-}
-
-// MSE path — H.264 / VP8 segments
-let mediaSource = null;
-let sourceBuffer = null;
-const mseQueue = [];
-let mseReady = false;
-
-function renderVideoChunk(buffer) {
-  if (!mediaSource) {
-    const video = document.getElementById("avatarVideo");
-    video.style.display = "block";
-    canvas.style.display = "none";
-    mediaSource = new MediaSource();
-    video.src = URL.createObjectURL(mediaSource);
-    mediaSource.addEventListener("sourceopen", () => {
-      // Try common codec strings; adjust if needed for Gemini's output
-      const codecs = [
-        'video/mp4; codecs="avc1.42E01E"',
-        'video/webm; codecs="vp8"',
-        'video/webm; codecs="vp09.00.10.08"',
-      ];
-      const mime = codecs.find(c => MediaSource.isTypeSupported(c)) || codecs[0];
-      try {
-        sourceBuffer = mediaSource.addSourceBuffer(mime);
-        sourceBuffer.mode = "sequence";
-        sourceBuffer.addEventListener("updateend", flushMseQueue);
-        mseReady = true;
-        flushMseQueue();
-      } catch (e) {
-        console.warn("MSE codec error:", e);
-      }
+  try {
+    screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+    btn.classList.add('active');
+    screenStream.getVideoTracks()[0].addEventListener('ended', () => {
+      screenStream = null;
+      clearInterval(screenInterval);
+      screenInterval = null;
+      btn.classList.remove('active');
     });
-    onFirstVideo();
+    const canvas = document.createElement('canvas');
+    const ctx2d = canvas.getContext('2d');
+    screenInterval = setInterval(() => {
+      if (!session || !screenStream) return;
+      const track = screenStream.getVideoTracks()[0];
+      const settings = track.getSettings();
+      canvas.width = Math.min(settings.width || 1280, 1280);
+      canvas.height = Math.min(settings.height || 720, 720);
+      const imgCapture = new ImageCapture(track);
+      imgCapture.grabFrame().then(bitmap => {
+        ctx2d.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+        const b64 = canvas.toDataURL('image/jpeg', 0.7).split(',')[1];
+        try { session.sendRealtimeInput({ video: { data: b64, mimeType: 'image/jpeg' } }); } catch (_) {}
+      }).catch(() => {});
+    }, 2000);
+  } catch (e) {
+    if (e.name !== 'NotAllowedError') showError('Screen share failed: ' + e.message);
   }
-  mseQueue.push(buffer);
-  flushMseQueue();
 }
 
-function flushMseQueue() {
-  if (!mseReady || !sourceBuffer || sourceBuffer.updating || !mseQueue.length) return;
-  sourceBuffer.appendBuffer(mseQueue.shift());
+// ── Camera toggle ──────────────────────────────────────────────────────────
+async function toggleCamera() {
+  if (!connected || !inputAudioCtx) return;
+  cameraFacing = cameraFacing === 'user' ? 'environment' : 'user';
+  try {
+    if (micStream) micStream.getTracks().forEach(t => t.stop());
+    micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false, facingMode: cameraFacing });
+    if (scriptProcessor) {
+      scriptProcessor.disconnect();
+      mediaSourceNode && mediaSourceNode.disconnect();
+      scriptProcessor = null;
+      mediaSourceNode = null;
+    }
+    startAudioInput();
+  } catch (e) {
+    showError('Camera switch failed: ' + e.message);
+  }
 }
 
-function showCanvas() {
-  canvas.style.display = "block";
-  document.getElementById("avatarVideo").style.display = "none";
+// ── Message handler ────────────────────────────────────────────────────────
+function handleMessage(msg) {
+  if (msg.setupComplete) {
+    setupComplete = true;
+    setStatus('Rohan is ready…', false);
+    // Enable text input
+    document.getElementById('txInput').disabled = false;
+    document.getElementById('txSend').disabled = false;
+  }
+
+  // Transcription — output (Rohan speaking)
+  if (msg.serverContent?.outputTranscription?.text) {
+    if (currentRohanText === '') agentTalking = true;
+    currentRohanText += msg.serverContent.outputTranscription.text;
+    updateLiveBubble('rohan', currentRohanText);
+  }
+
+  // Transcription — input (user speaking)
+  if (msg.serverContent?.inputTranscription?.text) {
+    currentUserText += msg.serverContent.inputTranscription.text;
+    updateLiveBubble('user', currentUserText);
+  }
+
+  // Turn complete / interrupted — flush to history
+  if (msg.serverContent?.turnComplete || msg.serverContent?.interrupted) {
+    agentTalking = false;
+    if (currentRohanText.trim()) {
+      commitBubble('rohan', currentRohanText.trim());
+      currentRohanText = '';
+    }
+    if (currentUserText.trim()) {
+      commitBubble('user', currentUserText.trim());
+      currentUserText = '';
+    }
+    removeLiveBubbles();
+  }
+
+  // Video chunks
+  const parts = msg.serverContent?.modelTurn?.parts;
+  if (parts) {
+    for (const part of parts) {
+      if (part.inlineData?.mimeType?.startsWith('video/mp4') && part.inlineData?.data) {
+        if (!hasVideo) {
+          hasVideo = true;
+          onFirstVideo();
+        }
+        const buf = b64ToBuffer(part.inlineData.data);
+        appendVideoChunk(buf);
+      }
+    }
+  }
 }
 
+// ── Disconnect ─────────────────────────────────────────────────────────────
+function disconnect() {
+  connected = false;
+  connecting = false;
+  setupComplete = false;
+  hasVideo = false;
+
+  if (session) { try { session.close(); } catch (e) {} session = null; }
+  if (micStream) { micStream.getTracks().forEach(t => t.stop()); micStream = null; }
+  if (scriptProcessor) { scriptProcessor.disconnect(); scriptProcessor = null; }
+  if (mediaSourceNode) { mediaSourceNode.disconnect(); mediaSourceNode = null; }
+  if (inputAudioCtx) { inputAudioCtx.close(); inputAudioCtx = null; }
+  if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; }
+
+  agentTalking = false;
+  videoQueue.length = 0;
+  cachedInitSegment = null;
+  if (mseObj && mseObj.readyState === 'open') { try { mseObj.endOfStream(); } catch (e) {} }
+  if (videoEl.src?.startsWith('blob:')) URL.revokeObjectURL(videoEl.src);
+  videoEl.removeAttribute('src');
+  videoEl.load();
+  videoEl.style.display = 'none';
+  mseObj = null;
+  sourceBuffer = null;
+
+  stopTimer();
+  document.getElementById('placeholder').style.opacity = '1';
+  document.getElementById('placeholder').style.display = 'flex';
+  document.getElementById('nameTag').style.display = 'none';
+  document.getElementById('statusPill').className = 'status-pill ended';
+  document.getElementById('pillDot').textContent = '🔴';
+  document.getElementById('pillText').textContent = 'Session ended';
+  document.getElementById('connectBtn').textContent = '▶️';
+  document.getElementById('connectBtn').title = 'Reconnect';
+  document.getElementById('connectLbl').textContent = 'Connect';
+  document.getElementById('shareBtn').disabled = true;
+  document.getElementById('cameraBtn').disabled = true;
+  if (screenStream) { screenStream.getTracks().forEach(t => t.stop()); screenStream = null; }
+  if (screenInterval) { clearInterval(screenInterval); screenInterval = null; }
+  document.getElementById('shareBtn').classList.remove('active');
+  document.getElementById('txInput').disabled = true;
+  document.getElementById('txSend').disabled = true;
+}
+
+// ── UI helpers ─────────────────────────────────────────────────────────────
 function onFirstVideo() {
-  if (gotVideo) return;
-  gotVideo = true;
-  document.getElementById("placeholder").style.display = "none";
-  document.getElementById("nameTag").style.display = "flex";
-  document.getElementById("statusPill").className = "status-pill live";
-  document.getElementById("pillDot").textContent = "🟢";
-  document.getElementById("pillText").textContent = "Live";
+  videoEl.style.display = 'block';
+  document.getElementById('placeholder').style.display = 'none';
+  document.getElementById('nameTag').style.display = 'flex';
+  document.getElementById('statusPill').className = 'status-pill live';
+  document.getElementById('pillDot').textContent = '🟢';
+  document.getElementById('pillText').textContent = 'Live · Rohan Sharma';
+  document.getElementById('connectBtn').textContent = '📵';
+  document.getElementById('connectBtn').title = 'End call';
   startTimer();
 }
 
-// ── JSON control messages ──────────────────────────────────────────────────
-function handleJsonMsg(msg) {
-  if (msg.type === "transcript") {
-    addBubble(msg.speaker, msg.text);
-  } else if (msg.type === "interrupted") {
-    // Gemini stopped speaking — optional: dim video briefly
-  } else if (msg.type === "error") {
-    setStatus(`Error: ${msg.message}`, true);
+function setStatus(text, isEnded) {
+  document.getElementById('statusText').textContent = text;
+  document.getElementById('pillText').textContent = text;
+  if (isEnded) {
+    document.getElementById('statusPill').className = 'status-pill ended';
+    document.getElementById('connectRing').style.display = 'none';
   }
 }
 
-function addBubble(speaker, text) {
-  const body = document.getElementById("txBody");
+function showError(msg) {
+  const el = document.getElementById('errorBanner');
+  el.textContent = msg;
+  el.style.display = 'block';
+  setTimeout(() => { el.style.display = 'none'; }, 6000);
+}
+function hideError() {
+  document.getElementById('errorBanner').style.display = 'none';
+}
+
+// Live streaming bubbles (replaced each turn)
+let rohanLiveEl = null;
+let userLiveEl = null;
+
+function updateLiveBubble(role, text) {
+  clearEmptyState();
+  const body = document.getElementById('txBody');
+  if (role === 'rohan') {
+    if (!rohanLiveEl) {
+      rohanLiveEl = makeBubble('rohan', text, true);
+      body.appendChild(rohanLiveEl);
+    } else {
+      rohanLiveEl.querySelector('.bubble-text').textContent = text;
+    }
+  } else {
+    if (!userLiveEl) {
+      userLiveEl = makeBubble('user', text, true);
+      body.appendChild(userLiveEl);
+    } else {
+      userLiveEl.querySelector('.bubble-text').textContent = text;
+    }
+  }
+  body.scrollTop = body.scrollHeight;
+}
+
+function commitBubble(role, text) {
+  clearEmptyState();
+  const body = document.getElementById('txBody');
+  // Remove live element if exists
+  if (role === 'rohan' && rohanLiveEl) { rohanLiveEl.remove(); rohanLiveEl = null; }
+  if (role === 'user' && userLiveEl) { userLiveEl.remove(); userLiveEl = null; }
+  const el = makeBubble(role, text, false);
+  body.appendChild(el);
+  body.scrollTop = body.scrollHeight;
+}
+
+function removeLiveBubbles() {
+  if (rohanLiveEl) { rohanLiveEl.remove(); rohanLiveEl = null; }
+  if (userLiveEl) { userLiveEl.remove(); userLiveEl = null; }
+}
+
+function makeBubble(role, text, isLive) {
+  const div = document.createElement('div');
+  div.className = isLive
+    ? (role === 'rohan' ? 'bubble bubble-live' : 'bubble bubble-user')
+    : (role === 'rohan' ? 'bubble bubble-rohan' : 'bubble bubble-user');
+  const lbl = document.createElement('div');
+  lbl.className = 'bubble-lbl';
+  lbl.textContent = role === 'rohan' ? '🤖 Rohan' : '👤 You';
+  const txt = document.createElement('div');
+  txt.className = 'bubble-text';
+  txt.textContent = text;
+  div.appendChild(lbl);
+  div.appendChild(txt);
+  return div;
+}
+
+function clearEmptyState() {
   if (transcriptEmpty) {
-    body.innerHTML = "";
+    document.getElementById('txEmpty').style.display = 'none';
     transcriptEmpty = false;
   }
-  const isPriya = speaker === "priya";
-  const div = document.createElement("div");
-  div.className = `bubble ${isPriya ? "bubble-priya" : "bubble-investor"}`;
-  div.innerHTML = `<div class="bubble-lbl">${isPriya ? "🤖 Priya" : "👤 " + INVESTOR.split(" ")[0]}</div>${text}`;
-  body.appendChild(div);
-  body.scrollTop = body.scrollHeight;
 }
 
 // ── Timer ──────────────────────────────────────────────────────────────────
@@ -439,34 +887,46 @@ function startTimer() {
   timerInterval = setInterval(() => {
     const s = Math.floor((Date.now() - callStartMs) / 1000);
     const m = Math.floor(s / 60);
-    document.getElementById("callTimer").textContent =
-      String(m).padStart(2,"0") + ":" + String(s % 60).padStart(2,"0");
+    document.getElementById('callTimer').textContent =
+      String(m).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
   }, 1000);
 }
 function stopTimer() { clearInterval(timerInterval); }
 
-// ── End call ──────────────────────────────────────────────────────────────
-function endCall() {
-  if (ws && ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify({ type: "end_call" }));
-    ws.close();
-  }
-  if (micStream) micStream.getTracks().forEach(t => t.stop());
-  if (audioCtx)  audioCtx.close();
-  stopTimer();
-  document.getElementById("statusPill").className = "status-pill ended";
-  document.getElementById("pillDot").textContent = "🔴";
-  document.getElementById("pillText").textContent = "Call ended";
-  // Auto-close tab after 3s
-  setTimeout(() => window.close(), 3000);
-}
+// ── Controls ───────────────────────────────────────────────────────────────
+window.toggleMic = function() {
+  muted = !muted;
+  const btn = document.getElementById('micBtn');
+  btn.textContent = muted ? '🔇' : '🎙️';
+  btn.classList.toggle('muted', muted);
+  if (micStream) micStream.getAudioTracks().forEach(t => { t.enabled = !muted; });
+};
 
-// ── Status helper ─────────────────────────────────────────────────────────
-function setStatus(text, isError) {
-  document.getElementById("statusText").textContent = text;
-  document.getElementById("pillText").textContent = text;
-  if (isError) document.getElementById("connectRing").style.display = "none";
-}
+window.handleConnectBtn = function() {
+  if (!connected && !connecting) {
+    connect();
+  } else {
+    disconnect();
+  }
+};
+
+window.sendText = function() {
+  const input = document.getElementById('txInput');
+  const text = input.value.trim();
+  if (!text || !session || !setupComplete) return;
+  input.value = '';
+  try {
+    session.sendRealtimeInput({ text });
+    commitBubble('user', text);
+  } catch (e) {}
+};
+
+window.onInputKey = function(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    window.sendText();
+  }
+};
 </script>
 </body>
 </html>

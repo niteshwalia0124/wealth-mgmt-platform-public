@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Priya — AI Voice Persona · Cymbal Wealth</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, 'Inter', 'Segoe UI', sans-serif;
+      background: #060b18;
+      color: #f1f5f9;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Nav ── */
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 36px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      background: rgba(6,11,24,0.9);
+      backdrop-filter: blur(12px);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .nav-brand { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 700; color: #f1f5f9; }
+    .nav-gem { width: 8px; height: 8px; border-radius: 50%; background: linear-gradient(135deg,#6366f1,#8b5cf6); }
+    .nav-divider { width: 1px; height: 16px; background: rgba(255,255,255,0.1); }
+    .nav-page { font-size: 12px; color: #64748b; font-weight: 500; }
+    .nav-back { font-size: 12px; color: #64748b; text-decoration: none; display: flex; align-items: center; gap: 5px; transition: color .15s; }
+    .nav-back:hover { color: #94a3b8; }
+
+    /* ── Hero ── */
+    .hero {
+      text-align: center;
+      padding: 72px 32px 56px;
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; top: -80px; left: 50%; transform: translateX(-50%);
+      width: 700px; height: 700px;
+      background: radial-gradient(circle, rgba(99,102,241,0.10) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .avatar-wrap { position: relative; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 28px; }
+    .ring {
+      position: absolute; border-radius: 50%; border: 1px solid rgba(99,102,241,0.28);
+      animation: ring-pulse 2.8s ease-in-out infinite;
+    }
+    .ring-1 { inset: -14px; }
+    .ring-2 { inset: -28px; animation-delay: .7s; border-color: rgba(99,102,241,0.14); }
+    .ring-3 { inset: -44px; animation-delay: 1.4s; border-color: rgba(99,102,241,0.07); }
+    @keyframes ring-pulse {
+      0%,100% { opacity:1; transform:scale(1); }
+      50%      { opacity:.45; transform:scale(1.03); }
+    }
+
+    .avatar {
+      width: 100px; height: 100px; border-radius: 50%;
+      background: linear-gradient(135deg, #4338ca, #6d28d9, #a21caf);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 38px; font-weight: 900; color: #fff; position: relative;
+      box-shadow: 0 0 0 2px rgba(99,102,241,0.4), 0 0 50px rgba(99,102,241,0.35);
+    }
+
+    .live-badge {
+      position: absolute; bottom: 5px; right: 0px;
+      background: #10b981; border: 2.5px solid #060b18;
+      border-radius: 20px; padding: 2px 8px 2px 6px;
+      font-size: 7px; font-weight: 800; color: #fff; letter-spacing: .08em;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .blink { width: 5px; height: 5px; border-radius: 50%; background: #fff; animation: blink 1.2s ease-in-out infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
+
+    .hero h1 {
+      font-size: 52px; font-weight: 900; letter-spacing: -0.04em; margin-bottom: 8px;
+      background: linear-gradient(135deg, #f1f5f9 0%, #a5b4fc 60%, #c084fc 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero-sub { font-size: 14px; color: #64748b; font-weight: 500; margin-bottom: 28px; }
+
+    .lang-pills { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 40px; }
+    .lang-pill {
+      padding: 5px 14px; border-radius: 20px;
+      background: rgba(99,102,241,0.09); border: 1px solid rgba(99,102,241,0.22);
+      font-size: 12px; font-weight: 600; color: #a5b4fc;
+    }
+
+    .stats { display: flex; gap: 0; justify-content: center; flex-wrap: wrap; }
+    .stat { padding: 0 36px; border-right: 1px solid rgba(255,255,255,0.07); }
+    .stat:last-child { border-right: none; }
+    .stat-v { font-size: 26px; font-weight: 800; color: #f1f5f9; }
+    .stat-l { font-size: 9px; color: #475569; text-transform: uppercase; letter-spacing: .1em; margin-top: 3px; }
+
+    /* ── Traits ── */
+    .section { max-width: 1100px; margin: 0 auto; padding: 0 32px 64px; }
+
+    .traits-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+    .trait {
+      background: rgba(14,20,48,0.65);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px; padding: 20px 18px;
+      transition: border-color .2s;
+    }
+    .trait:hover { border-color: rgba(99,102,241,0.25); }
+    .trait-ico { font-size: 22px; margin-bottom: 13px; }
+    .trait-t { font-size: 13px; font-weight: 700; color: #f1f5f9; margin-bottom: 6px; }
+    .trait-d { font-size: 11px; color: #64748b; line-height: 1.55; }
+
+    /* ── Demo ── */
+    .demo { max-width: 880px; margin: 0 auto; padding: 0 32px 72px; }
+
+    .section-eye { font-size: 9px; font-weight: 800; color: #6366f1; text-transform: uppercase; letter-spacing: .14em; margin-bottom: 6px; }
+    .section-h { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; color: #f1f5f9; margin-bottom: 6px; }
+    .section-desc { font-size: 13px; color: #64748b; margin-bottom: 28px; line-height: 1.5; }
+
+    .lang-tabs {
+      display: flex; gap: 4px; margin-bottom: 16px;
+      background: rgba(14,20,48,0.8); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px; padding: 5px;
+    }
+    .ltab {
+      flex: 1; padding: 10px 8px; border-radius: 8px; border: none;
+      background: transparent; cursor: pointer; font-family: inherit;
+      color: #64748b; transition: all .2s; text-align: center;
+    }
+    .ltab-main { font-size: 12px; font-weight: 700; display: block; }
+    .ltab-code { font-size: 8px; opacity: .6; display: block; margin-top: 1px; font-weight: 400; }
+    .ltab.active { background: linear-gradient(135deg, #4f46e5, #7c3aed); color: #fff; box-shadow: 0 2px 14px rgba(99,102,241,0.38); }
+    .ltab:hover:not(.active) { background: rgba(255,255,255,0.04); color: #94a3b8; }
+
+    .conv-box {
+      background: rgba(14,20,48,0.75); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 16px; padding: 20px; min-height: 440px;
+    }
+    .conv-hdr {
+      display: flex; align-items: center; gap: 10px;
+      padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px;
+    }
+    .conv-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: linear-gradient(135deg,#4f46e5,#7c3aed);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 800; color: #fff; flex-shrink: 0;
+    }
+    .conv-info-t { font-size: 12px; font-weight: 700; color: #f1f5f9; }
+    .conv-info-s { font-size: 9px; color: #64748b; margin-top: 1px; }
+    .call-pill {
+      margin-left: auto; padding: 4px 10px; border-radius: 20px;
+      background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2);
+      font-size: 8px; font-weight: 700; color: #34d399;
+      display: flex; align-items: center; gap: 4px;
+    }
+
+    .brow { display: flex; gap: 10px; margin-bottom: 14px; opacity: 0; transform: translateY(6px); transition: opacity .32s ease, transform .32s ease; }
+    .brow.vis { opacity: 1; transform: translateY(0); }
+    .brow.right { flex-direction: row-reverse; }
+
+    .bav {
+      width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; font-weight: 800; margin-top: 2px;
+    }
+    .bav.p { background: linear-gradient(135deg,#4f46e5,#7c3aed); color:#fff; }
+    .bav.c { background: rgba(255,255,255,0.06); color:#64748b; }
+
+    .bwrap { max-width: 72%; }
+    .bubble {
+      padding: 11px 14px; border-radius: 14px;
+      font-size: 12px; line-height: 1.58;
+    }
+    .bubble.p-bub {
+      background: linear-gradient(135deg, rgba(79,70,229,0.22), rgba(124,58,237,0.17));
+      border: 1px solid rgba(99,102,241,0.25);
+      color: #dde4ff; border-top-right-radius: 4px;
+    }
+    .bubble.c-bub {
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.07);
+      color: #94a3b8; border-top-left-radius: 4px;
+    }
+    .bmeta { font-size: 8px; color: #334155; margin-top: 5px; }
+    .right .bmeta { text-align: right; }
+
+    /* typing indicator */
+    .typing-row { display: flex; gap: 10px; margin-bottom: 14px; }
+    .typing-bubble {
+      background: rgba(79,70,229,0.15); border: 1px solid rgba(99,102,241,0.2);
+      border-radius: 14px; border-top-right-radius: 4px; padding: 14px 18px;
+    }
+    .typing-dots { display: flex; gap: 5px; }
+    .typing-dots span {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #6366f1; animation: tdot 1.2s ease-in-out infinite;
+    }
+    .typing-dots span:nth-child(2) { animation-delay: .2s; }
+    .typing-dots span:nth-child(3) { animation-delay: .4s; }
+    @keyframes tdot { 0%,80%,100%{transform:scale(.7);opacity:.4} 40%{transform:scale(1);opacity:1} }
+
+    /* ── Flow ── */
+    .flow-grid { display: flex; align-items: stretch; gap: 0; margin-top: 24px; }
+    .flow-step {
+      flex: 1; background: rgba(14,20,48,0.65); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px; padding: 22px 18px; text-align: center;
+    }
+    .flow-ico { font-size: 26px; margin-bottom: 10px; }
+    .flow-num { font-size: 8px; font-weight: 800; color: #6366f1; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 5px; }
+    .flow-t { font-size: 12px; font-weight: 700; color: #f1f5f9; margin-bottom: 5px; }
+    .flow-d { font-size: 10px; color: #64748b; line-height: 1.5; }
+    .flow-arr { width: 32px; display: flex; align-items: center; justify-content: center; color: #1e293b; font-size: 20px; flex-shrink: 0; }
+
+    /* ── Guardrails ── */
+    .guard-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-top: 24px; }
+    .guard {
+      background: rgba(239,68,68,0.04); border: 1px solid rgba(239,68,68,0.13);
+      border-radius: 12px; padding: 16px 16px; display: flex; gap: 12px; align-items: flex-start;
+    }
+    .guard-ico { font-size: 17px; flex-shrink: 0; margin-top: 1px; }
+    .guard-t { font-size: 12px; font-weight: 700; color: #fca5a5; margin-bottom: 4px; }
+    .guard-d { font-size: 10px; color: #64748b; line-height: 1.5; }
+
+    /* ── Compliance strip ── */
+    .compliance-strip {
+      border-top: 1px solid rgba(255,255,255,0.05);
+      padding: 20px 32px;
+      display: flex; align-items: center; justify-content: center; gap: 24px; flex-wrap: wrap;
+    }
+    .comp-pill {
+      padding: 5px 14px; border-radius: 20px;
+      background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.15);
+      font-size: 10px; font-weight: 700; color: #6ee7b7;
+    }
+
+    @media (max-width: 900px) {
+      .traits-grid { grid-template-columns: repeat(2,1fr); }
+      .guard-grid   { grid-template-columns: repeat(2,1fr); }
+      .flow-grid    { flex-direction: column; }
+      .flow-arr     { transform: rotate(90deg); width: 100%; height: 28px; }
+      .hero h1      { font-size: 36px; }
+    }
+    @media (max-width: 600px) {
+      .guard-grid   { grid-template-columns: 1fr; }
+      .traits-grid  { grid-template-columns: 1fr; }
+      .stats        { gap: 20px; }
+      .stat         { padding: 0 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+  <div style="display:flex;align-items:center;gap:12px">
+    <div class="nav-brand">
+      <div class="nav-gem"></div>
+      Cymbal Wealth
+    </div>
+    <div class="nav-divider"></div>
+    <div class="nav-page">AI Voice Persona</div>
+  </div>
+  <a href="/advisor" class="nav-back">← Advisor Dashboard</a>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="avatar-wrap">
+    <div class="ring ring-3"></div>
+    <div class="ring ring-2"></div>
+    <div class="ring ring-1"></div>
+    <div class="avatar">
+      P
+      <div class="live-badge"><div class="blink"></div>LIVE</div>
+    </div>
+  </div>
+  <h1>Priya</h1>
+  <div class="hero-sub">AI Voice Relationship Manager &nbsp;·&nbsp; Cymbal Wealth Management</div>
+  <div class="lang-pills">
+    <div class="lang-pill">🇮🇳 English</div>
+    <div class="lang-pill">हिंदी</div>
+    <div class="lang-pill">தமிழ்</div>
+    <div class="lang-pill">मराठी</div>
+    <div class="lang-pill">বাংলা</div>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-v">5</div><div class="stat-l">Languages</div></div>
+    <div class="stat"><div class="stat-v">&lt; 500ms</div><div class="stat-l">Response Time</div></div>
+    <div class="stat"><div class="stat-v">24 × 7</div><div class="stat-l">Availability</div></div>
+    <div class="stat"><div class="stat-v">100%</div><div class="stat-l">Calls Logged</div></div>
+    <div class="stat"><div class="stat-v">0</div><div class="stat-l">Transactions Executed</div></div>
+  </div>
+</section>
+
+<!-- Traits -->
+<div class="section">
+  <div class="traits-grid">
+    <div class="trait">
+      <div class="trait-ico">🤝</div>
+      <div class="trait-t">Warm, Not Robotic</div>
+      <div class="trait-d">Uses natural Indian conversational patterns — "Ji", "Saheb" in Hindi-Marathi, "Amma/Appa" for Tamil, formal "Babu" in Bengali. Pauses, listens, mirrors the caller's energy.</div>
+    </div>
+    <div class="trait">
+      <div class="trait-ico">📊</div>
+      <div class="trait-t">Briefed from Gap Analysis</div>
+      <div class="trait-d">Receives a structured brief before every call — specific portfolio numbers, sector drifts, fund underperformance vs category. Never uses generic scripts.</div>
+    </div>
+    <div class="trait">
+      <div class="trait-ico">🗣️</div>
+      <div class="trait-t">Auto-Detects Language</div>
+      <div class="trait-d">Opens in English. Switches instantly if the client responds in Hindi, Tamil, Marathi, or Bengali — no menu, no friction. Follows the client, not the system.</div>
+    </div>
+    <div class="trait">
+      <div class="trait-ico">🛡️</div>
+      <div class="trait-t">SEBI · TRAI · DPDP Compliant</div>
+      <div class="trait-d">Discloses she is AI, discloses recording, ends on "no", never collects credentials, never advises. Every call is timestamped, transcribed, and stored in GCS.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Language Demo -->
+<div class="demo">
+  <div class="section-eye">Live Language Demo</div>
+  <div class="section-h">Hear Priya in your language</div>
+  <div class="section-desc">Same client. Same portfolio gap data. Five languages — same warmth, same precision.<br>Scenario: Amit Patel · Portfolio trailing model by 6.6pp · ₹2.5 Cr uncaptured returns.</div>
+
+  <div class="lang-tabs" id="langTabs">
+    <button class="ltab active" onclick="switchLang('en',this)">
+      <span class="ltab-main">English</span>
+      <span class="ltab-code">en-IN</span>
+    </button>
+    <button class="ltab" onclick="switchLang('hi',this)">
+      <span class="ltab-main">हिंदी</span>
+      <span class="ltab-code">hi-IN</span>
+    </button>
+    <button class="ltab" onclick="switchLang('ta',this)">
+      <span class="ltab-main">தமிழ்</span>
+      <span class="ltab-code">ta-IN</span>
+    </button>
+    <button class="ltab" onclick="switchLang('mr',this)">
+      <span class="ltab-main">मराठी</span>
+      <span class="ltab-code">mr-IN</span>
+    </button>
+    <button class="ltab" onclick="switchLang('bn',this)">
+      <span class="ltab-main">বাংলা</span>
+      <span class="ltab-code">bn-IN</span>
+    </button>
+  </div>
+
+  <div class="conv-box">
+    <div class="conv-hdr">
+      <div class="conv-avatar">P</div>
+      <div>
+        <div class="conv-info-t">Priya calling Amit Patel</div>
+        <div class="conv-info-s">Portfolio Gap Review · Gemini 3.1 Live · Twilio Outbound</div>
+      </div>
+      <div class="call-pill"><div class="blink"></div>Simulated</div>
+    </div>
+    <div id="convMsgs"></div>
+  </div>
+</div>
+
+<!-- Brief Flow -->
+<div class="section">
+  <div class="section-eye">How Priya is Briefed</div>
+  <div class="section-h">Gap Analysis → Brief → Live Call</div>
+  <div class="section-desc">Priya doesn't improvise. Every word is grounded in that client's specific portfolio data, generated by Gemini before the call goes out.</div>
+
+  <div class="flow-grid">
+    <div class="flow-step">
+      <div class="flow-ico">📈</div>
+      <div class="flow-num">Step 1</div>
+      <div class="flow-t">Gap Analysis Engine</div>
+      <div class="flow-d">Runs nightly. Compares current portfolio vs model — sector drift, fund vs category, upcoming maturities, performance lag. Outputs structured JSON per client.</div>
+    </div>
+    <div class="flow-arr">→</div>
+    <div class="flow-step">
+      <div class="flow-ico">✨</div>
+      <div class="flow-num">Step 2</div>
+      <div class="flow-t">AI Brief Generator</div>
+      <div class="flow-d">Gemini Flash converts the gap JSON into a per-client brief: system instruction for the call, talking points for the advisor dashboard, WhatsApp voice script.</div>
+    </div>
+    <div class="flow-arr">→</div>
+    <div class="flow-step">
+      <div class="flow-ico">✅</div>
+      <div class="flow-num">Step 3</div>
+      <div class="flow-t">Compliance Gate</div>
+      <div class="flow-d">SEBI guideline check, TRAI DND scrub, DPDP consent validation. Brief is published only when all gates pass. Advisor can review and edit before call launches.</div>
+    </div>
+    <div class="flow-arr">→</div>
+    <div class="flow-step">
+      <div class="flow-ico">📞</div>
+      <div class="flow-num">Step 4</div>
+      <div class="flow-t">Priya Live Call</div>
+      <div class="flow-d">Gemini Live receives the brief as its system instruction. Priya speaks to exact portfolio numbers in the client's language. Transcript + outcome logged to GCS.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Guardrails -->
+<div class="section">
+  <div class="section-eye">Safety & Compliance</div>
+  <div class="section-h">What Priya never does</div>
+  <div class="section-desc">Hard boundaries enforced at the system instruction level — not just policy, but architecture.</div>
+
+  <div class="guard-grid">
+    <div class="guard">
+      <div class="guard-ico">🚫</div>
+      <div>
+        <div class="guard-t">Never recommends specific funds</div>
+        <div class="guard-d">Presents scenarios and options, always directing to the advisor. "Rohan will walk you through which suits your goals best."</div>
+      </div>
+    </div>
+    <div class="guard">
+      <div class="guard-ico">🔐</div>
+      <div>
+        <div class="guard-t">Never collects credentials</div>
+        <div class="guard-d">Will never ask for account numbers, OTPs, PINs, PAN, Aadhaar, or any financial identifiers — in any language.</div>
+      </div>
+    </div>
+    <div class="guard">
+      <div class="guard-ico">🤖</div>
+      <div>
+        <div class="guard-t">Never denies being AI</div>
+        <div class="guard-d">If asked: "I am Priya, an AI assistant from Cymbal Wealth Management." Always transparent, in every language.</div>
+      </div>
+    </div>
+    <div class="guard">
+      <div class="guard-ico">📵</div>
+      <div>
+        <div class="guard-t">Never continues over a "no"</div>
+        <div class="guard-d">Any expression of "not now", "busy", or "stop" — Priya ends the call immediately and logs the outcome as do-not-call.</div>
+      </div>
+    </div>
+    <div class="guard">
+      <div class="guard-ico">💰</div>
+      <div>
+        <div class="guard-t">Never guarantees returns</div>
+        <div class="guard-d">Uses "approximately", "historically", "model suggests" — never states specific future returns or fund performance as fact.</div>
+      </div>
+    </div>
+    <div class="guard">
+      <div class="guard-ico">🏦</div>
+      <div>
+        <div class="guard-t">Never executes transactions</div>
+        <div class="guard-d">Cannot process SIP switches, redemptions, or changes. All actions are flagged to the advisor for client confirmation before execution.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Compliance strip -->
+<div class="compliance-strip">
+  <span style="font-size:10px;color:#334155;font-weight:600">Regulatory Compliance</span>
+  <div class="comp-pill">SEBI IA Regulations 2020</div>
+  <div class="comp-pill">TRAI DND Registry</div>
+  <div class="comp-pill">DPDP Act 2023</div>
+  <div class="comp-pill">AMFI Code of Conduct</div>
+  <div class="comp-pill">RBI KYC Guidelines</div>
+</div>
+
+<script>
+  var CONV = {
+    en: [
+      { r:'p', t:'Good afternoon, Mr. Patel. I am Priya — calling from Cymbal Wealth Management on behalf of your advisor Rohan Sharma. This call is being recorded for quality purposes. Do you have a moment to speak?', lg:'en-IN' },
+      { r:'c', t:'Yes, go ahead.' },
+      { r:'p', t:'Thank you. Rohan has run your portfolio against the model for your risk profile. Your portfolio is up 9.2% this year — which sounds solid. But the model portfolio is up 15.8%. That 6.6 percentage point gap works out to roughly ₹2.5 Crore in returns not captured this year.', lg:'en-IN' },
+      { r:'c', t:'That is quite a difference. What is causing it?' },
+      { r:'p', t:'Technology is the main reason. You hold 38% in tech — Infosys, TCS, HCL — but the model says 20%. While tech has been flat this year, financials and healthcare have both rallied over 30%. HDFC Bank is up 34%, SBI up 28%, Cipla and Sun Pharma both up 24% — and you are underweight all of them.', lg:'en-IN' },
+      { r:'c', t:'I see. What does Rohan suggest?' },
+      { r:'p', t:'Rohan recommends rotating ₹8 to 10 Crore out of technology into banking and pharma. Your tech weight comes to 22%, financials move to 26%, and the model gap closes substantially. He will send you the detailed rebalancing proposal within 24 hours. Would you like him to call you personally to walk through it?', lg:'en-IN' }
+    ],
+    hi: [
+      { r:'p', t:'नमस्ते, पटेल जी। मैं प्रिया हूँ — Cymbal Wealth Management से — आपके advisor रोहन शर्मा की तरफ से call कर रही हूँ। यह call quality के लिए record हो रही है। क्या आप कुछ मिनट बात कर सकते हैं?', lg:'hi-IN' },
+      { r:'c', t:'हाँ, बताइए।' },
+      { r:'p', t:'धन्यवाद, पटेल जी। रोहन ने आपके portfolio का model portfolio से comparison किया है। आपका portfolio इस साल 9.2% बढ़ा — यह अच्छा लगता है। लेकिन आपके risk profile का model portfolio 15.8% है। यह 6.6 percentage points का अंतर लगभग ₹2.5 करोड़ बनता है।', lg:'hi-IN' },
+      { r:'c', t:'इतना अंतर क्यों है?' },
+      { r:'p', t:'मुख्य कारण है technology, पटेल जी। आपके portfolio में 38% technology है — Infosys, TCS, HCL — जबकि model कहता है 20%। Tech इस साल flat रहा, लेकिन financials और healthcare दोनों 30% से ज़्यादा चढ़े। HDFC Bank 34% ऊपर है, SBI 28%, Cipla और Sun Pharma दोनों 24% — और आप इन सब में कम invested हैं।', lg:'hi-IN' },
+      { r:'c', t:'समझ आया। रोहन क्या सुझाते हैं?' },
+      { r:'p', t:'रोहन suggest करते हैं कि ₹8 से 10 करोड़ technology से निकालकर banking और pharma में लगाएं। इससे tech का weight 22% हो जाएगा, financials 26% तक आएंगे, और model का gap काफी कम हो जाएगा। वो 24 घंटे में आपको detailed proposal भेजेंगे। क्या आप चाहेंगे कि रोहन personally call करें?', lg:'hi-IN' }
+    ],
+    ta: [
+      { r:'p', t:'வணக்கம், பட்டேல் ஐயா! நான் பிரியா — Cymbal Wealth Management-இல் இருந்து பேசுகிறேன், உங்கள் advisor ரோஹன் சர்மா சார்பாக. இந்த call தரத்திற்காக record செய்யப்படுகிறது. இப்போது கொஞ்சம் பேச முடியுமா?', lg:'ta-IN' },
+      { r:'c', t:'சொல்லுங்க.' },
+      { r:'p', t:'நன்றி, ஐயா. ரோஹன் உங்கள் portfolio-ஐ model portfolio-உடன் ஒப்பிட்டார். இந்த ஆண்டு உங்கள் portfolio 9.2% வளர்ந்துள்ளது — நல்லதுதான். ஆனால் உங்கள் risk profile-க்கான model portfolio 15.8% வளர்ந்துள்ளது. இந்த 6.6 percentage points வித்தியாசம் — சுமார் ₹2.5 கோடி ஐயா.', lg:'ta-IN' },
+      { r:'c', t:'ஏன் இந்த வித்தியாசம்?' },
+      { r:'p', t:'முக்கிய காரணம் technology ஐயா. உங்கள் portfolio-ல் 38% technology உள்ளது — Infosys, TCS, HCL — ஆனால் model சொல்வது 20%. Technology இந்த ஆண்டு flat-ஆக இருந்தது. Financials, healthcare — இரண்டும் 30%-க்கும் அதிகமாக வளர்ந்தன. HDFC Bank 34%, SBI 28%, Cipla மற்றும் Sun Pharma 24% — இவற்றில் நீங்கள் குறைவாக invest செய்துள்ளீர்கள்.', lg:'ta-IN' },
+      { r:'c', t:'புரிகிறது. ரோஹன் என்ன சொல்கிறார்?' },
+      { r:'p', t:'ரோஹன் ₹8 முதல் 10 கோடி வரை technology-இல் இருந்து banking மற்றும் pharma-க்கு மாற்ற பரிந்துரைக்கிறார். Tech weight 22%-ஆக குறையும், financials 26%-க்கு உயரும், model gap கணிசமாக குறையும். 24 மணி நேரத்தில் detailed proposal அனுப்புவார். நேரடியாக பேச விரும்புகிறீர்களா, ஐயா?', lg:'ta-IN' }
+    ],
+    mr: [
+      { r:'p', t:'नमस्कार, पटेल साहेब! मी प्रिया — Cymbal Wealth Management मधून — तुमच्या advisor रोहन शर्मा यांच्यावतीने call करतेय. ही call quality साठी record होत आहे. थोडा वेळ बोलता येईल का?', lg:'mr-IN' },
+      { r:'c', t:'हो, सांगा.' },
+      { r:'p', t:'धन्यवाद साहेब. रोहन यांनी तुमच्या portfolio चे model portfolio शी comparison केले. तुमचा portfolio या वर्षी 9.2% वाढला — हे चांगले वाटते. पण model portfolio 15.8% आहे. हा 6.6 percentage points चा फरक म्हणजे सुमारे ₹2.5 करोड साहेब.', lg:'mr-IN' },
+      { r:'c', t:'एवढा फरक का आहे?' },
+      { r:'p', t:'मुख्य कारण technology आहे साहेब. तुमच्या portfolio मध्ये 38% technology आहे — Infosys, TCS, HCL — पण model 20% सांगतो. Tech या वर्षी flat राहिले, पण financials आणि healthcare दोन्ही 30% पेक्षा जास्त वाढले. HDFC Bank 34%, SBI 28%, Cipla आणि Sun Pharma दोन्ही 24% — या सर्वांमध्ये तुम्ही कमी invested आहात.', lg:'mr-IN' },
+      { r:'c', t:'समजलं. रोहन काय सुचवतात?' },
+      { r:'p', t:'रोहन ₹8 ते 10 करोड technology मधून banking आणि pharma मध्ये transfer करण्याचा सल्ला देतात. Tech weight 22% होईल, financials 26% पर्यंत येतील आणि model gap लक्षणीय कमी होईल. 24 तासांत detailed proposal पाठवतील. ते तुम्हाला personally call करावे का, साहेब?', lg:'mr-IN' }
+    ],
+    bn: [
+      { r:'p', t:'নমস্কার, পটেল বাবু! আমি প্রিয়া — Cymbal Wealth Management থেকে — আপনার advisor রোহন শর্মার পক্ষ থেকে call করছি। এই call মান নিয়ন্ত্রণের জন্য record হচ্ছে। এখন কি একটু কথা বলা যাবে?', lg:'bn-IN' },
+      { r:'c', t:'হ্যাঁ, বলুন।' },
+      { r:'p', t:'ধন্যবাদ। রোহন আপনার portfolio-কে model portfolio-র সাথে তুলনা করেছেন। এই বছর আপনার portfolio 9.2% বেড়েছে — ভালোই শোনাচ্ছে। কিন্তু আপনার risk profile-এর model portfolio 15.8%। এই 6.6 percentage points-এর পার্থক্য মানে প্রায় ₹2.5 কোটি।', lg:'bn-IN' },
+      { r:'c', t:'এত পার্থক্য কেন বাবু?' },
+      { r:'p', t:'মূল কারণ technology, বাবু। আপনার portfolio-তে 38% technology আছে — Infosys, TCS, HCL — কিন্তু model বলছে 20%। Tech এই বছর flat ছিল, কিন্তু financials এবং healthcare দুটোই 30%-এর বেশি বেড়েছে। HDFC Bank 34%, SBI 28%, Cipla ও Sun Pharma 24% — এসবে আপনি কম invested।', lg:'bn-IN' },
+      { r:'c', t:'বুঝলাম। রোহন কী suggest করছেন?' },
+      { r:'p', t:'₹8 থেকে 10 কোটি technology থেকে banking এবং pharma-তে সরানোর পরামর্শ দিচ্ছেন রোহন। Tech weight 22%-এ নামবে, financials 26%-এ উঠবে এবং model gap উল্লেখযোগ্যভাবে কমবে। 24 ঘণ্টার মধ্যে detailed proposal পাঠাবেন। সরাসরি কথা বলতে চান কি, বাবু?', lg:'bn-IN' }
+    ]
+  };
+
+  var LANG_NAMES = { en:'Rohan Sharma', hi:'Rohan Sharma', ta:'Rohan Sharma', mr:'Rohan Sharma', bn:'Rohan Sharma' };
+  var current = 'en';
+  var timers = [];
+
+  function switchLang(lang, btn) {
+    if (lang === current) return;
+    current = lang;
+    document.querySelectorAll('.ltab').forEach(function(t){ t.classList.remove('active'); });
+    btn.classList.add('active');
+    render();
+  }
+
+  function render() {
+    timers.forEach(clearTimeout); timers = [];
+    var box = document.getElementById('convMsgs');
+    box.innerHTML = '';
+    var msgs = CONV[current];
+
+    // show typing indicator first
+    var typing = document.createElement('div');
+    typing.className = 'typing-row';
+    typing.innerHTML = '<div class="bav p" style="flex-shrink:0;margin-top:2px">P</div><div class="typing-bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>';
+    box.appendChild(typing);
+
+    var t = setTimeout(function(){
+      box.removeChild(typing);
+      msgs.forEach(function(msg, i){
+        var delay = i * 320;
+        timers.push(setTimeout(function(){
+          var row = document.createElement('div');
+          var isP = msg.r === 'p';
+          row.className = 'brow' + (isP ? ' right' : '');
+
+          var av = document.createElement('div');
+          av.className = 'bav ' + (isP ? 'p' : 'c');
+          av.textContent = isP ? 'P' : 'AP';
+
+          var wrap = document.createElement('div');
+          wrap.className = 'bwrap';
+
+          var bub = document.createElement('div');
+          bub.className = 'bubble ' + (isP ? 'p-bub' : 'c-bub');
+          bub.textContent = msg.t;
+          wrap.appendChild(bub);
+
+          if (isP && msg.lg) {
+            var meta = document.createElement('div');
+            meta.className = 'bmeta';
+            meta.textContent = 'Priya · ' + msg.lg + ' · Gemini 3.1 Live';
+            wrap.appendChild(meta);
+          }
+
+          if (isP) { row.appendChild(wrap); row.appendChild(av); }
+          else      { row.appendChild(av);   row.appendChild(wrap); }
+
+          box.appendChild(row);
+          requestAnimationFrame(function(){ row.classList.add('vis'); });
+        }, delay));
+      });
+    }, 600);
+    timers.push(t);
+  }
+
+  render();
+</script>
+</body>
+</html>
