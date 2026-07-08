@@ -1594,6 +1594,8 @@ function GeminiHub({
   var [voiceNote, setVoiceNote] = useState(null);
   var [videoPhase, setVideoPhase] = useState('idle');
   var [callHistory, setCallHistory] = useState([]);
+  var [meetState, setMeetState] = useState('idle');
+  var [meetUrl, setMeetUrl] = useState('');
   var timerRef = useRef(null);
   var pollRef = useRef(null);
   useEffect(function () {
@@ -2011,9 +2013,6 @@ function GeminiHub({
     );
 
     // ── 4. VIDEO MEET LINK ───────────────────────────────────────
-    var [meetState, setMeetState] = useState('idle');  // idle | sending | sent | error
-    var [meetUrl, setMeetUrl]     = useState('');
-
     function doSendMeetLink() {
       if (!client || meetState === 'sending') return;
       setMeetState('sending');
