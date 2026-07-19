@@ -207,6 +207,7 @@ async def api_trigger_call(request: Request):
     sip_id       = body.get("sip_id", "")
     arn_code     = body.get("arn_code", "")
     trigger_type = body.get("trigger_type", "sip_renewal")
+    demo_mobile_ui = body.get("demo_mobile", "")
 
     bq = _bq()
     query = f"""
@@ -238,7 +239,7 @@ async def api_trigger_call(request: Request):
     }
 
     demo_mobile = os.getenv("DEMO_MOBILE", "")
-    dial_to     = demo_mobile if demo_mobile else row["mobile"]
+    dial_to     = demo_mobile_ui or demo_mobile or row["mobile"]
     queue_id    = f"MANUAL-{uuid.uuid4().hex[:8].upper()}"
 
     try:
@@ -396,6 +397,7 @@ async def api_whatsapp(request: Request):
     sip_id      = body.get("sip_id", "")
     arn_code    = body.get("arn_code", "")
     trigger     = body.get("trigger_type", "sip_renewal")
+    demo_mobile_ui = body.get("demo_mobile", "")
 
     bq = _bq()
     rows = _run_query(bq, f"""
@@ -438,7 +440,7 @@ async def api_whatsapp(request: Request):
             "note": "Set TWILIO_ACCOUNT_SID to send real WhatsApp messages",
         })
 
-    to_mobile = demo_mobile if demo_mobile else row["mobile"]
+    to_mobile = demo_mobile_ui or demo_mobile or row["mobile"]
     # Ensure whatsapp: prefix
     wa_to   = f"whatsapp:{to_mobile}"   if not to_mobile.startswith("whatsapp:")   else to_mobile
     wa_from = f"whatsapp:{twilio_from}" if not twilio_from.startswith("whatsapp:") else twilio_from
@@ -1069,6 +1071,7 @@ async def wealth_call_initiate(request: Request):
     client_name = body.get("client_name", "")
     mobile     = body.get("mobile", "")
     channel    = body.get("channel", "voice")
+    demo_mobile_ui = body.get("demo_mobile", "")
 
     if channel != "voice":
         return JSONResponse({"error": "Only voice channel supported for real calls"}, status_code=400)
@@ -1078,7 +1081,7 @@ async def wealth_call_initiate(request: Request):
 
     call_id    = f"WM-{uuid.uuid4().hex[:8].upper()}"
     system_instr = _WEALTH_INSTRUCTIONS[client_id]
-    dial_to    = DEMO_MOBILE if DEMO_MOBILE else mobile
+    dial_to    = demo_mobile_ui or DEMO_MOBILE or mobile
     language   = "ta-IN" if client_id == "vikram_nair" else "en-IN"
 
     # Step 1: Prepare broker with client context and system instruction
@@ -1386,7 +1389,7 @@ async def wealth_whatsapp_vn_generate(request: Request):
         log.warning("TTS failed for note %s: %s", note_id, exc)
 
     if audio_bytes:
-        threading.Thread(target=_upload_voice_note_gcs, args=(note_id, audio_bytes), daemon=True).start()
+        _upload_voice_note_gcs(note_id, audio_bytes)
 
     _WM_VOICE_NOTES[note_id] = {
         "note_id":     note_id,
@@ -1415,6 +1418,7 @@ async def wealth_whatsapp_vn_send(request: Request):
     import threading
     body    = await request.json()
     note_id = body.get("note_id", "")
+    demo_mobile_ui = body.get("demo_mobile", "")
 
     note = _WM_VOICE_NOTES.get(note_id)
     if not note:
@@ -1432,7 +1436,7 @@ async def wealth_whatsapp_vn_send(request: Request):
     wa_status = "simulated"
 
     if TWILIO_SID:
-        to_mobile = DEMO_MOBILE or "+919999999999"
+        to_mobile = demo_mobile_ui or DEMO_MOBILE or "+919999999999"
         wa_to  = f"whatsapp:{to_mobile}"  if not to_mobile.startswith("whatsapp:")  else to_mobile
         wa_from = TWILIO_WHATSAPP_FROM if TWILIO_WHATSAPP_FROM.startswith("whatsapp:") else f"whatsapp:{TWILIO_WHATSAPP_FROM}"
         try:
@@ -1484,6 +1488,7 @@ async def wealth_whatsapp_voice_note(request: Request):
     body = await request.json()
     client_key = body.get("client_key", "")
     client_name = body.get("client_name", client_key.replace("_", " ").title())
+    demo_mobile_ui = body.get("demo_mobile", "")
 
     if client_key not in _WM_VOICE_NOTE_SCRIPTS:
         return JSONResponse({"error": f"No voice note script for client: {client_key}"}, status_code=404)
@@ -1538,7 +1543,7 @@ async def wealth_whatsapp_voice_note(request: Request):
     audio_url = f"{base_url}/api/wealth/voice-note/{note_id}/audio"
 
     if TWILIO_SID and audio_bytes:
-        to_mobile = DEMO_MOBILE or "+919999999999"
+        to_mobile = demo_mobile_ui or DEMO_MOBILE or "+919999999999"
         wa_to = f"whatsapp:{to_mobile}" if not to_mobile.startswith("whatsapp:") else to_mobile
         wa_from = TWILIO_WHATSAPP_FROM if TWILIO_WHATSAPP_FROM.startswith("whatsapp:") else f"whatsapp:{TWILIO_WHATSAPP_FROM}"
         try:
@@ -1563,7 +1568,7 @@ async def wealth_whatsapp_voice_note(request: Request):
             wa_status = "error"
     elif TWILIO_SID and not audio_bytes:
         # TTS failed — send script as text WhatsApp message fallback
-        to_mobile = DEMO_MOBILE or "+919999999999"
+        to_mobile = demo_mobile_ui or DEMO_MOBILE or "+919999999999"
         wa_to = f"whatsapp:{to_mobile}" if not to_mobile.startswith("whatsapp:") else to_mobile
         wa_from = TWILIO_WHATSAPP_FROM if TWILIO_WHATSAPP_FROM.startswith("whatsapp:") else f"whatsapp:{TWILIO_WHATSAPP_FROM}"
         try:
@@ -1889,6 +1894,7 @@ async def wealth_video_meet_send(request: Request):
     client_key  = body.get("client_key", "")
     client_name = body.get("client_name", client_key.replace("_", " ").title())
     mobile      = body.get("mobile", "")
+    demo_mobile_ui = body.get("demo_mobile", "")
 
     room_id  = f"CymbalWealth-{_uuid.uuid4().hex[:8].upper()}"
     meet_url = f"https://meet.jit.si/{room_id}"
@@ -1906,7 +1912,7 @@ async def wealth_video_meet_send(request: Request):
     wa_status = "simulated"
 
     if TWILIO_SID:
-        dial_to = DEMO_MOBILE or mobile
+        dial_to = demo_mobile_ui or DEMO_MOBILE or mobile
         wa_to   = f"whatsapp:{dial_to}"   if not dial_to.startswith("whatsapp:")   else dial_to
         wa_from = TWILIO_WHATSAPP_FROM if TWILIO_WHATSAPP_FROM.startswith("whatsapp:") else f"whatsapp:{TWILIO_WHATSAPP_FROM}"
         try:

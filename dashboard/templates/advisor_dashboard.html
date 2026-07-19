@@ -636,7 +636,9 @@ var NAV = [{
 // ─── SIDEBAR ──────────────────────────────────────────────────────────────────
 function Sidebar({
   active,
-  onNav
+  onNav,
+  demoPhone,
+  onDemoPhoneChange
 }) {
   return /*#__PURE__*/React.createElement("aside", {
     style: {
@@ -830,6 +832,59 @@ function Sidebar({
       borderTop: '1px solid rgba(255,255,255,0.04)'
     }
   }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: 6,
+      padding: '8px 10px',
+      borderRadius: 8,
+      background: 'rgba(99,102,241,0.06)',
+      border: '1px solid rgba(99,102,241,0.18)'
+    }
+  },
+    /*#__PURE__*/React.createElement("div", {
+      style: { fontSize: 8, fontWeight: 700, color: '#6366f1', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 5, display: 'flex', alignItems: 'center', gap: 4 }
+    },
+      /*#__PURE__*/React.createElement(Ico, { n: 'phone', size: 9, sw: 2 }),
+      "Demo Phone"
+    ),
+    /*#__PURE__*/React.createElement("div", {
+      style: { display: 'flex', gap: 4, alignItems: 'center' }
+    },
+      /*#__PURE__*/React.createElement("input", {
+        type: "tel",
+        value: demoPhone,
+        onChange: function(e) { onDemoPhoneChange(e.target.value); },
+        placeholder: "+91XXXXXXXXXX",
+        style: {
+          flex: 1,
+          fontSize: 10,
+          padding: '4px 7px',
+          borderRadius: 5,
+          border: '1px solid rgba(99,102,241,0.25)',
+          background: 'rgba(0,0,0,0.3)',
+          color: '#e2e8f0',
+          fontFamily: 'Inter,sans-serif',
+          outline: 'none',
+          minWidth: 0
+        }
+      }),
+      /*#__PURE__*/React.createElement("button", {
+        onClick: function() { localStorage.setItem('demoPhone', demoPhone); },
+        style: {
+          fontSize: 9,
+          fontWeight: 700,
+          padding: '4px 8px',
+          borderRadius: 5,
+          border: '1px solid rgba(99,102,241,0.3)',
+          background: 'rgba(99,102,241,0.15)',
+          color: '#a5b4fc',
+          cursor: 'pointer',
+          fontFamily: 'Inter,sans-serif',
+          whiteSpace: 'nowrap',
+          flexShrink: 0
+        }
+      }, "Set")
+    )
+  ), /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
       alignItems: 'center',
@@ -1578,7 +1633,8 @@ function ChannelDropdown({ client, selectedChannelId, onSelect }) {
 // ─── GEMINI HUB ───────────────────────────────────────────────────────────────
 function GeminiHub({
   client,
-  activeCh
+  activeCh,
+  demoPhone
 }) {
   var [live, setLive] = useState(false);
   var [secs, setSecs] = useState(0);
@@ -1725,6 +1781,7 @@ function GeminiHub({
           client_id: client.clientKey,
           client_name: client.name,
           mobile: '',
+          demo_mobile: demoPhone || '',
           context: client.story || '',
           channel: 'voice'
         })
@@ -1814,7 +1871,7 @@ function GeminiHub({
       setVoiceNote({ note_id: prev.note_id, status: 'sending', script: prev.script, has_audio: prev.has_audio });
       fetch('/api/wealth/whatsapp/voice-note/send', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ note_id: prev.note_id, client_key: client.clientKey })
+        body: JSON.stringify({ note_id: prev.note_id, client_key: client.clientKey, demo_mobile: demoPhone || '' })
       }).then(function(r){ return r.json(); })
         .then(function(d){
           setVoiceNote({ note_id: prev.note_id, status: d.status, script: prev.script, twilio_sid: d.twilio_sid, has_audio: prev.has_audio });
@@ -2022,7 +2079,8 @@ function GeminiHub({
         body: JSON.stringify({
           client_key:  client.clientKey,
           client_name: client.name,
-          mobile:      client.mobile || ''
+          mobile:      client.mobile || '',
+          demo_mobile: demoPhone || ''
         })
       })
         .then(function(r) { return r.json(); })
@@ -2291,7 +2349,7 @@ function GeminiHub({
       setVoiceNote({ note_id: prev.note_id, status: 'sending', script: prev.script, has_audio: prev.has_audio });
       fetch('/api/wealth/whatsapp/voice-note/send', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ note_id: prev.note_id, client_key: client.clientKey }),
+        body: JSON.stringify({ note_id: prev.note_id, client_key: client.clientKey, demo_mobile: demoPhone || '' }),
       })
         .then(function (r) { return r.json(); })
         .then(function (d) { setVoiceNote({ note_id: prev.note_id, status: d.status, script: prev.script, twilio_sid: d.twilio_sid, has_audio: prev.has_audio }); })
@@ -3077,6 +3135,7 @@ function App() {
   var [nav, setNav] = useState('dashboard');
   var [client, setClient] = useState(null);
   var [activeCh, setActiveCh] = useState(null);
+  var [demoPhone, setDemoPhone] = useState(localStorage.getItem('demoPhone') || '');
   function handleClientSelect(c) {
     setClient(c);
     setActiveCh(c ? c.recommendedChannel : null);
@@ -3084,6 +3143,9 @@ function App() {
   function handleChannelSelect(c, channelId) {
     setClient(c);
     setActiveCh(channelId);
+  }
+  function handleDemoPhoneChange(val) {
+    setDemoPhone(val);
   }
   return /*#__PURE__*/React.createElement("div", {
     style: {
@@ -3094,7 +3156,9 @@ function App() {
     }
   }, /*#__PURE__*/React.createElement(Sidebar, {
     active: nav,
-    onNav: setNav
+    onNav: setNav,
+    demoPhone: demoPhone,
+    onDemoPhoneChange: handleDemoPhoneChange
   }), /*#__PURE__*/React.createElement("div", {
     style: {
       flex: 1,
@@ -3129,7 +3193,8 @@ function App() {
     style: { display: 'flex', flexDirection: 'column', height: '100%', overflowY: 'auto', borderLeft: '2px solid rgba(99,102,241,0.28)', boxShadow: '-6px 0 32px rgba(99,102,241,0.06)', gap: 0 }
   }, /*#__PURE__*/React.createElement(EnterpriseHub, null), /*#__PURE__*/React.createElement(GeminiHub, {
     client: client,
-    activeCh: activeCh
+    activeCh: activeCh,
+    demoPhone: demoPhone
   })))));
 }
 ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(ErrorBoundary, null, React.createElement(App, null)));
