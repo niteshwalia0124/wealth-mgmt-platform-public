@@ -739,7 +739,7 @@ async def ws_proxy_endpoint(websocket: WebSocket):
     location = os.getenv("GOOGLE_CLOUD_LOCATION", "us-central1")
     if location == "global":
         location = "us-central1"
-    gcp_project = project or os.getenv("GOOGLE_CLOUD_PROJECT", "butterfly-987")
+    gcp_project = project or os.getenv("GOOGLE_CLOUD_PROJECT", "your-gcp-project-id")
 
     upstream_url = (
         f"wss://{location}-aiplatform.googleapis.com"
@@ -1771,7 +1771,7 @@ async def wealth_client_history(client_key: str):
 
 
 # ─── GEMINI ENTERPRISE HUB (Agentspace) ──────────────────────────────────────
-_AGENTSPACE_PROJECT  = "butterfly-987"
+_AGENTSPACE_PROJECT  = "your-gcp-project-id"
 _AGENTSPACE_LOCATION = "global"
 _AGENTSPACE_ENGINE   = "agentspace_1751710232953"
 _AGENTSPACE_BASE     = (

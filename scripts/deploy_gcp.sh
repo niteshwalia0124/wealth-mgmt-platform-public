@@ -10,7 +10,7 @@ if [ -f .env ]; then
   export $(grep -v '^#' .env | grep -v '^$' | xargs)
 fi
 
-PROJECT=${GCP_PROJECT:-"butterfly-987"}
+PROJECT=${GCP_PROJECT:-"your-gcp-project-id"}
 REGION=${GCP_REGION:-"us-central1"}
 DATASET=${BQ_DATASET:-"sbi_mf_poc"}
 VOICE_BUCKET=${GCS_BUCKET:-"sbi-mf-voice-notes"}

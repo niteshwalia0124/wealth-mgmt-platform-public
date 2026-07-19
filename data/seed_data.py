@@ -12,7 +12,7 @@ load_dotenv()
 from google.cloud import bigquery
 from datetime import date, timedelta
 
-BQ_PROJECT = os.getenv("GCP_PROJECT", "butterfly-987")
+BQ_PROJECT = os.getenv("GCP_PROJECT", "your-gcp-project-id")
 BQ_DATASET = os.getenv("BQ_DATASET", "sbi_mf_poc")
 
 client = bigquery.Client(project=BQ_PROJECT)

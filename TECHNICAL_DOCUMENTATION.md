@@ -12,7 +12,7 @@ An end-to-end outbound voice AI system that calls mutual fund investors on behal
 
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
-│                         Google Cloud (butterfly-987)                 │
+│                         Google Cloud (your-gcp-project-id)                 │
 │                                                                      │
 │  ┌─────────────────┐   ┌──────────────────────┐   ┌──────────────┐  │
 │  │  BigQuery        │   │  Cloud Run           │   │  Cloud Run   │  │
@@ -162,7 +162,7 @@ When Gemini's `server_content.interrupted = True`, the broker sends `{"event": "
 | Variable | Default | Purpose |
 |----------|---------|---------|
 | `GEMINI_LIVE_MODEL` | `gemini-3.1-flash-live-preview-04-2026` | Gemini Live model ID |
-| `GCP_PROJECT` | `butterfly-987` | GCP project |
+| `GCP_PROJECT` | `your-gcp-project-id` | GCP project |
 | `GCP_LOCATION` | `global` | Vertex AI location (mapped to `us-central1` for WebSocket) |
 | `GOOGLE_API_KEY` | — | If set, uses AI Studio key instead of Vertex AI |
 | `TRANSCRIPT_BUCKET` | `sbi-mf-call-transcripts` | GCS bucket for call transcripts |
@@ -440,7 +440,7 @@ Two independent Cloud Run services, each with its own Dockerfile and Cloud Build
 ```bash
 gcloud builds submit --config cloudbuild-broker.yaml .
 gcloud run deploy sbi-mf-broker \
-  --image gcr.io/butterfly-987/sbi-mf-broker \
+  --image gcr.io/your-gcp-project-id/sbi-mf-broker \
   --region us-central1 --min-instances 1
 ```
 
@@ -451,7 +451,7 @@ gcloud run deploy sbi-mf-broker \
 ```bash
 gcloud builds submit --config cloudbuild-dashboard.yaml .
 gcloud run deploy sbi-mf-dashboard \
-  --image gcr.io/butterfly-987/sbi-mf-dashboard \
+  --image gcr.io/your-gcp-project-id/sbi-mf-dashboard \
   --region us-central1
 ```
 

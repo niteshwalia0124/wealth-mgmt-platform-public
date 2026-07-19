@@ -66,7 +66,7 @@ def _validate_twilio(request: Request, form: dict) -> None:
 
 GEMINI_LIVE_MODEL = os.getenv("GEMINI_LIVE_MODEL", "gemini-3.1-flash-live-preview")
 
-GCP_PROJECT = os.getenv("GCP_PROJECT", "butterfly-987")
+GCP_PROJECT = os.getenv("GCP_PROJECT", "your-gcp-project-id")
 GCP_LOCATION = os.getenv("GCP_LOCATION", "global")
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
 
