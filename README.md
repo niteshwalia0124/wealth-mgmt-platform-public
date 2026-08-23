@@ -53,8 +53,8 @@ The platform automates the end-to-end investor advisory and distribution lifecyc
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/niteshwalia0124/wealth-mgmt-platform-public.git
-   cd wealth-mgmt-platform-public
+   git clone https://github.com/niteshwalia0124/autonomous-wealth-platform.git
+   cd autonomous-wealth-platform
    ```
 
 2. **Configure environment variables:**
