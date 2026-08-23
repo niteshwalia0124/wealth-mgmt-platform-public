@@ -17,7 +17,7 @@ COPY voice/__init__.py       ./voice/__init__.py
 COPY assets/                 ./assets/
 
 ENV PORT=8010
-ENV GCP_PROJECT=butterfly-987
+ENV GCP_PROJECT=your-gcp-project-id
 ENV GCP_LOCATION=global
 ENV GEMINI_LIVE_MODEL=gemini-3.1-flash-live-preview-04-2026
 ENV GCS_BUCKET=wealth-mgmt-voice-notes

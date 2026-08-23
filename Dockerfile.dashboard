@@ -24,7 +24,7 @@ COPY voice/            ./voice/
 COPY assets/           ./assets/
 
 ENV PORT=8080
-ENV GCP_PROJECT=butterfly-987
+ENV GCP_PROJECT=your-gcp-project-id
 ENV BQ_DATASET=wealth_mgmt_demo
 
 EXPOSE 8080

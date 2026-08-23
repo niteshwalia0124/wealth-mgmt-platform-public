@@ -826,7 +826,7 @@ async def ws_proxy_endpoint(websocket: WebSocket):
 
 # ── Wealth Management Voice Call ──────────────────────────────────────────────
 
-BROKER_URL       = os.getenv("LIVEAPI_BROKER_URL",  "https://wealth-mgmt-broker-1058427839055.us-central1.run.app")  # shared broker, unchanged
+BROKER_URL       = os.getenv("LIVEAPI_BROKER_URL",  "http://localhost:8010")  # broker endpoint
 TWILIO_SID       = os.getenv("TWILIO_ACCOUNT_SID",  "")
 TWILIO_TOKEN     = os.getenv("TWILIO_AUTH_TOKEN",    "")
 TWILIO_FROM      = os.getenv("TWILIO_FROM_NUMBER",   "")
@@ -1012,7 +1012,7 @@ _WM_VOICE_NOTE_SCRIPTS: dict[str, str] = {
     ),
 }
 
-DASHBOARD_URL = os.getenv("DASHBOARD_URL", "https://wealth-mgmt-demo2-dashboard-1058427839055.us-central1.run.app")
+DASHBOARD_URL = os.getenv("DASHBOARD_URL", "http://localhost:8080")
 TWILIO_WHATSAPP_FROM = os.getenv("TWILIO_WHATSAPP_FROM", "whatsapp:+14155238886")
 
 

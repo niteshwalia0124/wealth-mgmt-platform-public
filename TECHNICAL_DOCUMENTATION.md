@@ -175,7 +175,7 @@ When Gemini's `server_content.interrupted = True`, the broker sends `{"event": "
 
 **Deployed on:** Cloud Run `sbi-mf-dashboard`  
 **Port:** 8080  
-**URL:** `https://sbi-mf-dashboard-1058427839055.us-central1.run.app`
+**URL:** `https://sbi-mf-dashboard-your-project-id.us-central1.run.app`
 
 The distributor-facing web portal. Distributors select their ARN, view investor portfolios, launch individual AI calls, and monitor call activity in real time.
 
