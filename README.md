@@ -21,7 +21,9 @@ The platform automates the end-to-end investor advisory and distribution lifecyc
 
 ---
 
-## 🏛️ System Architecture
+## 🏛️ High-Level System Architecture
+
+![High-Level System Architecture](assets/system_architecture.png)
 
 ```mermaid
 flowchart TD
