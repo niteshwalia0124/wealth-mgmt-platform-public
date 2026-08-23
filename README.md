@@ -23,45 +23,7 @@ The platform automates the end-to-end investor advisory and distribution lifecyc
 
 ## 🏛️ High-Level System Architecture
 
-![Outbound Wealth Management & Mutual Fund AI Platform Architecture](assets/system_architecture.png)
-
-```mermaid
-graph TD
-    subgraph Tier1["Tier 1: Advisor & Distributor Portal"]
-        P1["Portfolio Overview"]
-        P2["1-Click AI Call Dispatch"]
-        P3["Real-Time Status Monitor"]
-    end
-
-    subgraph Tier2["Tier 2: Campaign & Context Orchestrator"]
-        C1["SIP Failure & Maturity Events"]
-        C2["Dynamic Investor Prompt Assembly"]
-        C3["Multilingual Profile & Accent Rules"]
-    end
-
-    subgraph Tier3["Tier 3: Real-Time Live Voice Bridge"]
-        V1["Twilio PSTN Telephony Gateway"]
-        V2["Bidirectional Audio Resampler (8kHz ↔ 16kHz/24kHz)"]
-        V3["Gemini 3.1 Flash Live Speech-to-Speech Engine"]
-    end
-
-    subgraph Tier4["Tier 4: Post-Call Intelligence & Data"]
-        D1["Cloud Storage Transcripts"]
-        D2["Gemini Flash Outcome Processor"]
-        D3["BigQuery Analytics & Audit Trails"]
-        D4["Twilio WhatsApp VIP Follow-Up"]
-    end
-
-    Tier1 -->|Campaign / Call Trigger| Tier2
-    Tier2 -->|Dynamic Session Context| Tier3
-    Tier3 -->|Call Transcripts & Audio| Tier4
-    Tier4 -->|Structured Outcomes & Metrics| Tier1
-
-    style Tier1 fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#fff
-    style Tier2 fill:#0c4a6e,stroke:#0ea5e9,stroke-width:2px,color:#fff
-    style Tier3 fill:#3b0764,stroke:#c084fc,stroke-width:2px,color:#fff
-    style Tier4 fill:#022c22,stroke:#10b981,stroke-width:2px,color:#fff
-```
+![Autonomous Wealth Management Outbound Voice AI Platform Architecture](assets/system_architecture.png)
 
 ---
 
