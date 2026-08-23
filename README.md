@@ -23,45 +23,44 @@ The platform automates the end-to-end investor advisory and distribution lifecyc
 
 ## 🏛️ High-Level System Architecture
 
-![High-Level System Architecture](assets/system_architecture.png)
+![Outbound Wealth Management & Mutual Fund AI Platform Architecture](assets/system_architecture.png)
 
 ```mermaid
-flowchart TD
-    subgraph Data_Layer["1. Data & Event Sources"]
-        BQ[(BigQuery: Portfolios & Transactions)]
-        GCS[(Google Cloud Storage: Voice Notes & Transcripts)]
+graph TD
+    subgraph Tier1["Tier 1: Advisor & Distributor Portal"]
+        P1["Portfolio Overview"]
+        P2["1-Click AI Call Dispatch"]
+        P3["Real-Time Status Monitor"]
     end
 
-    subgraph Agentic_Core["2. Agentic Pipeline & Governance"]
-        TE[Trigger Engine: Portfolio Event Detection]
-        CG[Compliance Gate: SEBI Rules & Risk Suitability]
-        OP[Outcome Processor: Post-Call Analytics & CRM Sync]
+    subgraph Tier2["Tier 2: Campaign & Context Orchestrator"]
+        C1["SIP Failure & Maturity Events"]
+        C2["Dynamic Investor Prompt Assembly"]
+        C3["Multilingual Profile & Accent Rules"]
     end
 
-    subgraph Live_Streaming["3. Real-Time Multimodal Communication"]
-        Broker[LiveAPI Broker: FastAPI + WebSockets]
-        Gemini[Gemini 3.1 Flash Live on Vertex AI]
-        Twilio[Twilio Voice & WhatsApp Business API]
-        Avatar[Video Avatar & Speech Engine]
+    subgraph Tier3["Tier 3: Real-Time Live Voice Bridge"]
+        V1["Twilio PSTN Telephony Gateway"]
+        V2["Bidirectional Audio Resampler (8kHz ↔ 16kHz/24kHz)"]
+        V3["Gemini 3.1 Flash Live Speech-to-Speech Engine"]
     end
 
-    subgraph Presentation_Layer["4. User & Advisor Interfaces"]
-        Investor([Investor Phone / Video Call])
-        Dashboard[Advisor Command Dashboard: Web Portal]
+    subgraph Tier4["Tier 4: Post-Call Intelligence & Data"]
+        D1["Cloud Storage Transcripts"]
+        D2["Gemini Flash Outcome Processor"]
+        D3["BigQuery Analytics & Audit Trails"]
+        D4["Twilio WhatsApp VIP Follow-Up"]
     end
 
-    BQ --> TE
-    TE --> CG
-    CG -->|Approved Leads| Broker
-    Broker <-->|Bidirectional Audio/fMP4| Gemini
-    Broker <-->|Inbound/Outbound PSTN| Twilio
-    Twilio <--> Investor
-    Broker <--> Avatar
-    Broker -->|Call Artifacts| GCS
-    GCS --> OP
-    OP -->|Structured Insights| BQ
-    BQ --> Dashboard
-    Dashboard -->|Manual Trigger| Broker
+    Tier1 -->|Campaign / Call Trigger| Tier2
+    Tier2 -->|Dynamic Session Context| Tier3
+    Tier3 -->|Call Transcripts & Audio| Tier4
+    Tier4 -->|Structured Outcomes & Metrics| Tier1
+
+    style Tier1 fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#fff
+    style Tier2 fill:#0c4a6e,stroke:#0ea5e9,stroke-width:2px,color:#fff
+    style Tier3 fill:#3b0764,stroke:#c084fc,stroke-width:2px,color:#fff
+    style Tier4 fill:#022c22,stroke:#10b981,stroke-width:2px,color:#fff
 ```
 
 ---
